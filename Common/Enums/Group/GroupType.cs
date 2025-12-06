@@ -1,4 +1,4 @@
-﻿namespace Common.Enums
+﻿namespace Common.Enums.Group
 {
     public enum GroupType
     {
