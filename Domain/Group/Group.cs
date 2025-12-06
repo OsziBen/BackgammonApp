@@ -1,4 +1,4 @@
-﻿using Common.Enums;
+﻿using Common.Enums.Group;
 using Common.Models;
 
 namespace Domain.Group
@@ -18,5 +18,6 @@ namespace Domain.Group
         public User.User Creator { get; set; } = null!;
         public ICollection<GroupMembership.GroupMembership> GroupMemberships { get; set; } = [];
         public ICollection<GroupRole.GroupRole> GroupRoles { get; set; } = [];
+        public ICollection<Post.Post> Posts { get; set; } = [];
     }
 }
