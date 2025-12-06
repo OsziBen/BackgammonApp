@@ -1,9 +1,12 @@
 ﻿using Common.Models;
 using Domain.AppRole;
+using Domain.Comment;
 using Domain.Group;
 using Domain.GroupMembership;
 using Domain.GroupMembershipRole;
 using Domain.GroupRole;
+using Domain.Post;
+using Domain.Reaction;
 using Domain.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +25,9 @@ namespace Infrastructure.Data
         public DbSet<GroupRole> GroupRoles { get; set; } = null!;
         public DbSet<GroupMembership> GroupMemberships { get; set; } = null!;
         public DbSet<GroupMembershipRole> GroupMembershipRoles { get; set; } = null!;
+        public DbSet<Post> Posts { get; set; } = null!;
+        public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Reaction> Reactions { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,14 +35,14 @@ namespace Infrastructure.Data
             {
                 user.HasKey(u => u.Id);
 
+                user.HasIndex(u => u.EmailAddress)
+                    .IsUnique();
+
                 user.HasOne(u => u.AppRole)
                     .WithMany(ar => ar.Users)
                     .HasForeignKey(u => u.AppRoleId)
                     .IsRequired()
                     .OnDelete(DeleteBehavior.Restrict);
-
-                user.HasIndex(u => u.EmailAddress)
-                    .IsUnique();
 
                 user.Property(u => u.FirstName)
                     .HasMaxLength(50)
@@ -207,14 +213,14 @@ namespace Infrastructure.Data
             {
                 groupRole.HasKey(gr => gr.Id);
 
+                groupRole.HasIndex(gr => new { gr.GroupId, gr.Name })
+                         .IsUnique();
+
                 groupRole.HasOne(gr => gr.Group)
                          .WithMany(g => g.GroupRoles)
                          .HasForeignKey(gr => gr.GroupId)
                          .IsRequired(false)
                          .OnDelete(DeleteBehavior.Cascade);
-
-                groupRole.HasIndex(gr => new { gr.GroupId, gr.Name })
-                         .IsUnique();
 
                 groupRole.Property(gr => gr.Name)
                          .HasMaxLength(20)
@@ -261,6 +267,9 @@ namespace Infrastructure.Data
             {
                 groupMembership.HasKey(gm => gm.Id);
 
+                groupMembership.HasIndex(gm => new { gm.UserId, gm.GroupId })
+                               .IsUnique();
+
                 groupMembership.HasOne(gm => gm.User)
                                .WithMany(u => u.GroupMemberships)
                                .HasForeignKey(gm => gm.UserId)
@@ -272,9 +281,6 @@ namespace Infrastructure.Data
                                .HasForeignKey(gm => gm.GroupId)
                                .IsRequired()
                                .OnDelete(DeleteBehavior.Cascade);
-
-                groupMembership.HasIndex(gm => new { gm.UserId, gm.GroupId })
-                               .IsUnique();
             });
 
             modelBuilder.Entity<GroupMembershipRole>(groupMembershipRole =>
@@ -298,6 +304,101 @@ namespace Infrastructure.Data
 
                 groupMembershipRole.Property(gmr => gmr.IsActive)
                                    .HasDefaultValue(true);
+            });
+
+            modelBuilder.Entity<Post>(post =>
+            {
+                post.HasKey(p => p.Id);
+
+                post.HasOne(p => p.Author)
+                    .WithMany(u => u.Posts)
+                    .HasForeignKey(p => p.AuthorId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                post.HasOne(p => p.Group)
+                    .WithMany(g => g.Posts)
+                    .HasForeignKey(p => p.GroupId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                post.Property(p => p.Title)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                post.Property(p => p.Content)
+                    .HasMaxLength(1000)
+                    .IsRequired();
+
+                post.Property(p => p.Type)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                post.Property(p => p.VisibilityType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                post.Property(p => p.IsPinned)
+                    .HasDefaultValue(false);
+
+                post.Property(p => p.IsDeleted)
+                    .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<Comment>(comment =>
+            {
+                comment.HasKey(c => c.Id);
+
+                comment.HasOne(c => c.Author)
+                       .WithMany(u => u.Comments)
+                       .HasForeignKey(c => c.AuthorId)
+                       .IsRequired()
+                       .OnDelete(DeleteBehavior.Restrict);
+
+                comment.HasOne(c => c.Post)
+                       .WithMany(p => p.Comments)
+                       .HasForeignKey(c => c.PostId)
+                       .IsRequired()
+                       .OnDelete(DeleteBehavior.Restrict);
+
+                comment.HasOne(c => c.ParentComment)
+                       .WithMany(c => c.Replies)
+                       .HasForeignKey(c => c.ParentCommentId)
+                       .IsRequired(false)
+                       .OnDelete(DeleteBehavior.SetNull);
+
+                comment.Property(c => c.Content)
+                       .HasMaxLength(500)
+                       .IsRequired();
+
+                comment.Property(c => c.IsDeleted)
+                       .HasDefaultValue(false);
+
+            });
+
+            modelBuilder.Entity<Reaction>(reaction =>
+            {
+                reaction.HasKey(r => r.Id);
+
+                reaction.HasIndex(r => new { r.AuthorId, r.TargetId, r.TargetType })
+                        .IsUnique();
+
+                reaction.HasOne(r => r.Author)
+                        .WithMany(u => u.Reactions)
+                        .HasForeignKey(r => r.AuthorId)
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                reaction.Property(r => r.Type)
+                        .HasConversion<int>()
+                        .IsRequired();
+
+                reaction.Property(r => r.TargetType)
+                        .HasConversion<int>()
+                        .IsRequired();
+
+                reaction.Property(r => r.IsDeleted)
+                        .HasDefaultValue(false);
             });
         }
     }
