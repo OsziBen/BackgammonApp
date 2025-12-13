@@ -1,12 +1,20 @@
 ﻿using Common.Models;
 using Domain.AppRole;
+using Domain.BoardState;
+using Domain.CheckerMove;
 using Domain.Comment;
+using Domain.CubeAction;
+using Domain.DiceRoll;
+using Domain.Game;
 using Domain.Group;
 using Domain.GroupMembership;
 using Domain.GroupMembershipRole;
 using Domain.GroupRole;
+using Domain.Match;
+using Domain.PlayerTurn;
 using Domain.Post;
 using Domain.Reaction;
+using Domain.RulesTemplate;
 using Domain.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -399,6 +407,244 @@ namespace Infrastructure.Data
 
                 reaction.Property(r => r.IsDeleted)
                         .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<RulesTemplate>(rulesTemplate =>
+            {
+                rulesTemplate.HasKey(r => r.Id);
+
+                rulesTemplate.HasOne(rt => rt.Author)
+                             .WithMany(u => u.RulesTemplates)
+                             .HasForeignKey(rt => rt.AuthorId)
+                             .IsRequired(false)
+                             .OnDelete(DeleteBehavior.Restrict);
+
+                rulesTemplate.Property(rt => rt.Name)
+                             .HasMaxLength(50)
+                             .IsRequired();
+
+                rulesTemplate.Property(rt => rt.Description)
+                             .HasMaxLength(300)
+                             .IsRequired(false);
+
+                rulesTemplate.Property(rt => rt.IsPublic)
+                             .HasDefaultValue(false);
+
+                rulesTemplate.Property(rt => rt.UseClock)
+                             .HasDefaultValue(false);
+
+                rulesTemplate.Property(rt => rt.CrawfordRuleEnabled)
+                             .HasDefaultValue(true);
+
+                rulesTemplate.Property(rt => rt.IsDeleted)
+                             .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<Match>(match =>
+            {
+                match.HasKey(m => m.Id);
+
+                match.HasIndex(g => new { g.Id, g.CurrentGameNumber }).IsUnique();
+
+                match.HasOne(m => m.CreatedByUser)
+                     .WithMany(u => u.CreatedMatches)
+                     .HasForeignKey(m => m.CreatedByUserId)
+                     .IsRequired()
+                     .OnDelete(DeleteBehavior.Restrict);
+
+                match.HasOne(m => m.WhitePlayer)
+                     .WithMany(u => u.MatchesAsWhite)
+                     .HasForeignKey(m => m.WhitePlayerId)
+                     .IsRequired()
+                     .OnDelete(DeleteBehavior.Restrict);
+
+                match.HasOne(m => m.BlackPlayer)
+                     .WithMany(u => u.MatchesAsBlack)
+                     .HasForeignKey(m => m.BlackPlayerId)
+                     .IsRequired()
+                     .OnDelete(DeleteBehavior.Restrict);
+
+                match.HasOne(m => m.Winner)
+                     .WithMany()
+                     .HasForeignKey(m => m.WinnerId)
+                     .IsRequired(false)
+                     .OnDelete(DeleteBehavior.Restrict);
+
+                match.HasOne(m => m.RulesTemplate)
+                     .WithMany(rt => rt.Matches)
+                     .HasForeignKey(m => m.RulesTemplateId)
+                     .IsRequired(false)
+                     .OnDelete(DeleteBehavior.Restrict);
+
+                match.Property(rt => rt.Type)
+                     .HasConversion<int>()
+                     .IsRequired();
+
+                match.Property(rt => rt.StatusType)
+                     .HasConversion<int>()
+                     .IsRequired();
+
+                match.Property(m => m.MatchCode)
+                     .HasMaxLength(20)
+                     .IsRequired(false);
+
+                match.Property(m => m.Notes)
+                     .HasMaxLength(200)
+                     .IsRequired(false);
+
+                match.Property(m => m.IsResigned)
+                     .HasDefaultValue(false);
+
+                match.Property(m => m.IsDeleted)
+                     .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<Game>(game =>
+            {
+                game.HasKey(g => g.Id);
+
+                game.HasOne(g => g.Match)
+                    .WithMany(m => m.Games)
+                    .HasForeignKey(g => g.MatchId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                game.HasOne(g => g.Winner)
+                    .WithMany()
+                    .HasForeignKey(g => g.WinnerId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                game.HasOne(g => g.StartingPlayer)
+                    .WithMany()
+                    .HasForeignKey(g => g.StartingPlayerId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                game.HasOne(g => g.DoublingCubeOwner)
+                    .WithMany()
+                    .HasForeignKey(g => g.DoublingCubeOwnerId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                game.Property(g => g.WhitePlayerScore)
+                    .HasConversion<int>()
+                    .IsRequired(false);
+
+                game.Property(g => g.BlackPlayerScore)
+                    .HasConversion<int>()
+                    .IsRequired(false);
+
+                game.Property(g => g.DoublingCubeValue)
+                    .HasDefaultValue(1);
+
+                game.Property(g => g.IsCrawfordActive)
+                    .HasDefaultValue(false);
+
+                game.Property(g => g.IsFinished)
+                    .HasDefaultValue(false);
+
+                game.Property(g => g.IsTimeOutLoss)
+                    .HasDefaultValue(false);
+
+                game.Property(g => g.IsDeleted)
+                    .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<PlayerTurn>(playerMove =>
+            {
+                playerMove.HasKey(pm => pm.Id);
+
+                playerMove.HasOne(pm => pm.Game)
+                          .WithMany(g => g.PlayerMoves)
+                          .HasForeignKey(pm => pm.GameId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                playerMove.HasOne(pm => pm.Player)
+                          .WithMany()
+                          .HasForeignKey(pm => pm.PlayerId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                playerMove.Property(pm => pm.ResultType)
+                          .HasConversion<int>()
+                          .IsRequired();
+            });
+
+            modelBuilder.Entity<CheckerMove>(checkerMove =>
+            {
+                checkerMove.HasKey(cm => cm.Id);
+
+                checkerMove.HasIndex(cm => new { cm.PlayerTurnId, cm.OrderWithinTurn })
+                           .IsUnique();
+
+                checkerMove.HasOne(cm => cm.PlayerTurn)
+                           .WithMany(pm => pm.CheckerMoves)
+                           .HasForeignKey(cm => cm.PlayerTurnId)
+                           .IsRequired()
+                           .OnDelete(DeleteBehavior.Restrict);
+
+                checkerMove.Property(cm => cm.IsHit)
+                           .HasDefaultValue(false);
+
+                checkerMove.Property(cm => cm.IsBearOff)
+                           .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<DiceRoll>(diceRoll =>
+            {
+                diceRoll.HasKey(dr => dr.Id);
+
+                diceRoll.HasOne(dr => dr.PlayerTurn)
+                        .WithOne(pm => pm.DiceRoll)
+                        .HasForeignKey<DiceRoll>(dr => dr.PlayerTurnId)
+                        .IsRequired(false)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                diceRoll.Property(dr => dr.IsDouble)
+                        .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<CubeAction>(cubeAction =>
+            {
+                cubeAction.HasKey(ca => ca.Id);
+
+                cubeAction.HasIndex(ca => new { ca.PlayerTurnId, ca.OrderWithinTurn })
+                          .IsUnique();
+
+                cubeAction.HasOne(ca => ca.PlayerTurn)
+                          .WithMany(pt => pt.CubeActions)
+                          .HasForeignKey(ca => ca.PlayerTurnId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                cubeAction.HasOne(ca => ca.PreviousOwner)
+                          .WithMany()
+                          .HasForeignKey(ca => ca.PreviousOwnerId)
+                          .IsRequired(false)
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                cubeAction.HasOne(ca => ca.NewOwner)
+                          .WithMany()
+                          .HasForeignKey(ca => ca.NewOwnerId)
+                          .IsRequired(false)
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                cubeAction.Property(ca => ca.ActionType)
+                          .HasConversion<int>()
+                          .IsRequired();
+            });
+
+            modelBuilder.Entity<BoardState>(boardState =>
+            {
+                boardState.HasKey(bs => bs.Id);
+
+                boardState.HasIndex(bs => new { bs.GameId, bs.Order });
+
+                boardState.Property(bs => bs.CurrentPlayer)
+                          .HasConversion<int>()
+                          .IsRequired();
             });
         }
     }
