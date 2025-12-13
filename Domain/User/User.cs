@@ -28,5 +28,9 @@ namespace Domain.User
         public ICollection<Post.Post> Posts { get; set; } = [];
         public ICollection<Comment.Comment> Comments { get; set; } = [];
         public ICollection<Reaction.Reaction> Reactions { get; set; } = [];
+        public ICollection<RulesTemplate.RulesTemplate> RulesTemplates { get; set; } = [];
+        public ICollection<Match.Match> CreatedMatches { get; set; } = [];
+        public ICollection<Match.Match> MatchesAsWhite { get; set; } = [];
+        public ICollection<Match.Match> MatchesAsBlack { get; set; } = [];
     }
 }
