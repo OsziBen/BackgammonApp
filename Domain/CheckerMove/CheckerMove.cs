@@ -6,9 +6,9 @@ namespace Domain.CheckerMove
     {
         public Guid PlayerTurnId { get; set; }
         public int OrderWithinTurn { get; set; }  // hányadik lépés adott körben
-        
+
         public int FromPoint { get; set; }
-        public int ToPoint { get; set; }        
+        public int ToPoint { get; set; }
         public int PipsUsed { get; set; }    // érték, nem a kocka száma!
 
         public bool IsHit { get; set; }

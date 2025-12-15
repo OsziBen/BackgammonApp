@@ -30,7 +30,7 @@ namespace Domain.Game
         public DateTimeOffset? FinishedAt { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
-        public DateTimeOffset? DeletedAt { get; set;}
+        public DateTimeOffset? DeletedAt { get; set; }
 
         public Match.Match Match { get; set; } = null!;
         public User.User? Winner { get; set; }

@@ -25,7 +25,7 @@ namespace Domain.Match
         public bool IsDeleted { get; set; }
         public string? MatchCode { get; set; }
         public string? Notes { get; set; }
-        
+
         public Guid? TournamentMatchId { get; set; }
 
         public DateTimeOffset ScheduledAt { get; set; }
