@@ -9,9 +9,7 @@ namespace Domain.TournamentPairing
         public Guid WhiteParticipantId { get; set; }
         public Guid BlackParticipantId { get; set; }
 
-        public TournamentPairingResult? Result { get; set; }   // WhiteWin / BlackWin / Draw / Bye
-
-        public Guid? MatchId { get; set; }
+        public TournamentPairingResult? Result { get; set; }
         public string? RecordingUrl { get; set; }
 
         public bool IsDeleted { get; set; }
