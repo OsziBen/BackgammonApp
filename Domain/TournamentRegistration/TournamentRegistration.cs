@@ -10,7 +10,7 @@ namespace Domain.TournamentRegistration
 
         public TournamentRegistrationStatus Status { get; set; }
 
-        public int? Seed { get; set; }                     // Swiss / SE első kör
+        public int? Seed { get; set; }      // Swiss / SE első kör
 
         public DateTimeOffset? ConfirmedAt { get; set; }
         public DateTimeOffset? CancelledAt { get; set; }
