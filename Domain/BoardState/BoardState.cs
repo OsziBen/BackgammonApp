@@ -1,6 +1,5 @@
 ﻿using Common.Enums.BoardState;
 using Common.Models;
-using Domain.PlayerTurn;
 
 namespace Domain.BoardState
 {

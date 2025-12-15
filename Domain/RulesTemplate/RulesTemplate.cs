@@ -1,5 +1,4 @@
 ﻿using Common.Models;
-using Domain.User;
 
 namespace Domain.RulesTemplate
 {
