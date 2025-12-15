@@ -32,5 +32,7 @@ namespace Domain.User
         public ICollection<Match.Match> CreatedMatches { get; set; } = [];
         public ICollection<Match.Match> MatchesAsWhite { get; set; } = [];
         public ICollection<Match.Match> MatchesAsBlack { get; set; } = [];
+        public ICollection<Tournament.Tournament> OrganizedTournaments { get; set; } = [];
+        public ICollection<TournamentParticipant.TournamentParticipant> TournamentParticipations { get; set; } = [];
     }
 }
