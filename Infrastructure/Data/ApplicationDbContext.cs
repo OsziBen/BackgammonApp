@@ -15,6 +15,12 @@ using Domain.PlayerTurn;
 using Domain.Post;
 using Domain.Reaction;
 using Domain.RulesTemplate;
+using Domain.Tournament;
+using Domain.TournamentPairing;
+using Domain.TournamentParticipant;
+using Domain.TournamentRegistration;
+using Domain.TournamentRound;
+using Domain.TournamentStanding;
 using Domain.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +42,20 @@ namespace Infrastructure.Data
         public DbSet<Post> Posts { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Reaction> Reactions { get; set; } = null!;
+        public DbSet<BoardState> BoardStates { get; set; } = null!;
+        public DbSet<CheckerMove> CheckerMoves { get; set; } = null!;
+        public DbSet<CubeAction> CubeActions { get; set; } = null!;
+        public DbSet<DiceRoll> DiceRolls { get; set; } = null!;
+        public DbSet<Game> Games { get; set; } = null!;
+        public DbSet<Match> Matches { get; set; } = null!;
+        public DbSet<PlayerTurn> PlayerTurns { get; set; } = null!;
+        public DbSet<RulesTemplate> RulesTemplates { get; set; } = null!;
+        public DbSet<Tournament> Tournaments { get; set; } = null!;
+        public DbSet<TournamentPairing> TournamentPairings { get; set; } = null!;
+        public DbSet<TournamentParticipant> TournamentParticipants { get; set; } = null!;
+        public DbSet<TournamentRegistration> TournamentRegistrations { get; set; } = null!;
+        public DbSet<TournamentRound> TournamentRounds { get; set; } = null!;
+        public DbSet<TournamentStanding> TournamentStandings { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -645,6 +665,173 @@ namespace Infrastructure.Data
                 boardState.Property(bs => bs.CurrentPlayer)
                           .HasConversion<int>()
                           .IsRequired();
+            });
+
+            modelBuilder.Entity<Tournament>(tournament =>
+            {
+                tournament.HasKey(t => t.Id);
+
+                tournament.HasOne(t => t.OrganizerUser)
+                          .WithMany(u => u.OrganizedTournaments)
+                          .HasForeignKey(t => t.OrganizerUserId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                tournament.HasOne(t => t.RulesTemplate)
+                          .WithMany()
+                          .HasForeignKey(t => t.RulesTemplateId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
+
+                tournament.Property(t => t.Name)
+                          .HasMaxLength(100)
+                          .IsRequired();
+
+                tournament.Property(t => t.Description)
+                          .HasMaxLength(500)
+                          .IsRequired(false);
+
+                tournament.Property(t => t.Type)
+                          .HasConversion<int>()
+                          .IsRequired();
+
+                tournament.Property(t => t.Status)
+                          .HasConversion<int>()
+                          .IsRequired();
+
+                tournament.Property(t => t.IsDeleted)
+                          .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<TournamentPairing>(tournamentPairing =>
+            {
+                tournamentPairing.HasKey(tp => tp.Id);
+
+                tournamentPairing.HasOne(tp => tp.TournamentRound)
+                                 .WithMany(tr => tr.Pairings)
+                                 .HasForeignKey(tp => tp.TournamentRoundId)
+                                 .IsRequired()
+                                 .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentPairing.HasOne(tp => tp.WhiteParticipant)
+                                 .WithMany()
+                                 .HasForeignKey(tp => tp.WhiteParticipantId)
+                                 .IsRequired()
+                                 .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentPairing.HasOne(tp => tp.BlackParticipant)
+                                 .WithMany()
+                                 .HasForeignKey(tp => tp.BlackParticipantId)
+                                 .IsRequired()
+                                 .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentPairing.Property(tp => tp.Result)
+                                 .HasConversion<int>()
+                                 .IsRequired(false);
+
+                tournamentPairing.Property(tp => tp.RecordingUrl)
+                                 .HasMaxLength(200)
+                                 .IsRequired(false);
+
+                tournamentPairing.Property(tp => tp.IsDeleted)
+                                 .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<TournamentParticipant>(tournamentParticipant =>
+            {
+                tournamentParticipant.HasKey(tp => tp.Id);
+
+                tournamentParticipant.HasOne(tp => tp.Tournament)
+                                     .WithMany(t => t.Participants)
+                                     .HasForeignKey(tp => tp.TournamentId)
+                                     .IsRequired()
+                                     .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentParticipant.HasOne(tp => tp.User)
+                                     .WithMany(u => u.TournamentParticipations)
+                                     .HasForeignKey(tp => tp.UserId)
+                                     .IsRequired(false)
+                                     .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentParticipant.Property(tp => tp.Status)
+                                     .HasConversion<int>()
+                                     .IsRequired();
+
+                tournamentParticipant.Property(tp => tp.DisplayName)
+                                     .HasMaxLength(50)
+                                     .IsRequired();
+
+                tournamentParticipant.Property(tp => tp.Email)
+                                     .HasMaxLength(50)
+                                     .IsRequired(false);
+
+                tournamentParticipant.Property(tp => tp.Notes)
+                                     .HasMaxLength(200)
+                                     .IsRequired(false);
+
+                tournamentParticipant.Property(tp => tp.IsDeleted)
+                                     .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<TournamentRegistration>(tournamentRegistration =>
+            {
+                tournamentRegistration.HasKey(tr => tr.Id);
+
+                tournamentRegistration.HasOne(tr => tr.Tournament)
+                                      .WithMany()
+                                      .HasForeignKey(tr => tr.TournamentId)
+                                      .IsRequired()
+                                      .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentRegistration.HasOne(tr => tr.Participant)
+                                      .WithMany(tp => tp.Registrations)
+                                      .HasForeignKey(tr => tr.ParticipantId)
+                                      .IsRequired()
+                                      .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentRegistration.Property(tr => tr.Status)
+                                      .HasConversion<int>()
+                                      .IsRequired();
+
+                tournamentRegistration.Property(tr => tr.IsDeleted)
+                                      .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<TournamentRound>(tournamentRound =>
+            {
+                tournamentRound.HasKey(tr => tr.Id);
+
+                tournamentRound.HasOne(tr => tr.Tournament)
+                               .WithMany(t => t.Rounds)
+                               .HasForeignKey(tr => tr.TournamentId)
+                               .IsRequired()
+                               .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentRound.Property(tr => tr.IsFinished)
+                               .HasDefaultValue(false);
+
+                tournamentRound.Property(tr => tr.IsDeleted)
+                               .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<TournamentStanding>(tournamentStanding =>
+            {
+                tournamentStanding.HasKey(ts => ts.Id);
+
+                tournamentStanding.HasIndex(ts => new { ts.TournamentId, ts.ParticipantId })
+                                  .IsUnique();
+
+                tournamentStanding.HasOne(ts => ts.Tournament)
+                                  .WithMany(t => t.Standings)
+                                  .HasForeignKey(ts => ts.TournamentId)
+                                  .IsRequired()
+                                  .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentStanding.HasOne(ts => ts.Participant)
+                                  .WithMany()
+                                  .HasForeignKey(ts => ts.ParticipantId)
+                                  .IsRequired()
+                                  .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
