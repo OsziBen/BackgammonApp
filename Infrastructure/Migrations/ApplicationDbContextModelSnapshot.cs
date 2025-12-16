@@ -49,7 +49,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("AppRoles");
+                    b.ToTable("AppRoles", (string)null);
 
                     b.HasData(
                         new
@@ -120,7 +120,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GameId", "Order");
 
-                    b.ToTable("BoardStates");
+                    b.ToTable("BoardStates", (string)null);
                 });
 
             modelBuilder.Entity("Domain.CheckerMove.CheckerMove", b =>
@@ -165,7 +165,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PlayerTurnId", "OrderWithinTurn")
                         .IsUnique();
 
-                    b.ToTable("CheckerMoves");
+                    b.ToTable("CheckerMoves", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Comment.Comment", b =>
@@ -210,7 +210,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.CubeAction.CubeAction", b =>
@@ -252,7 +252,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PlayerTurnId", "OrderWithinTurn")
                         .IsUnique();
 
-                    b.ToTable("CubeActions");
+                    b.ToTable("CubeActions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.DiceRoll.DiceRoll", b =>
@@ -283,7 +283,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PlayerTurnId")
                         .IsUnique();
 
-                    b.ToTable("DiceRolls");
+                    b.ToTable("DiceRolls", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Game.Game", b =>
@@ -372,7 +372,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Group.Group", b =>
@@ -420,7 +420,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Groups");
+                    b.ToTable("Groups", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GroupMembership.GroupMembership", b =>
@@ -445,7 +445,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "GroupId")
                         .IsUnique();
 
-                    b.ToTable("GroupMemberships");
+                    b.ToTable("GroupMemberships", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GroupMembershipRole.GroupMembershipRole", b =>
@@ -476,7 +476,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GroupRoleId");
 
-                    b.ToTable("GroupMembershipRoles");
+                    b.ToTable("GroupMembershipRoles", (string)null);
                 });
 
             modelBuilder.Entity("Domain.GroupRole.GroupRole", b =>
@@ -517,7 +517,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("GroupId", "Name")
                         .IsUnique();
 
-                    b.ToTable("GroupRoles");
+                    b.ToTable("GroupRoles", (string)null);
 
                     b.HasData(
                         new
@@ -648,7 +648,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Id", "CurrentGameNumber")
                         .IsUnique();
 
-                    b.ToTable("Matches");
+                    b.ToTable("Matches", (string)null);
                 });
 
             modelBuilder.Entity("Domain.PlayerTurn.PlayerTurn", b =>
@@ -696,7 +696,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("PlayerTurns");
+                    b.ToTable("PlayerTurns", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Post.Post", b =>
@@ -755,7 +755,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Reaction.Reaction", b =>
@@ -795,7 +795,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AuthorId", "TargetId", "TargetType")
                         .IsUnique();
 
-                    b.ToTable("Reactions");
+                    b.ToTable("Reactions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.RulesTemplate.RulesTemplate", b =>
@@ -858,7 +858,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("RulesTemplates");
+                    b.ToTable("RulesTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Tournament.Tournament", b =>
@@ -914,7 +914,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("RulesTemplateId");
 
-                    b.ToTable("Tournaments");
+                    b.ToTable("Tournaments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.TournamentPairing.TournamentPairing", b =>
@@ -964,7 +964,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("WhiteParticipantId");
 
-                    b.ToTable("TournamentPairings");
+                    b.ToTable("TournamentPairings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.TournamentParticipant.TournamentParticipant", b =>
@@ -1015,7 +1015,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TournamentParticipants");
+                    b.ToTable("TournamentParticipants", (string)null);
                 });
 
             modelBuilder.Entity("Domain.TournamentRegistration.TournamentRegistration", b =>
@@ -1062,7 +1062,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.ToTable("TournamentRegistrations");
+                    b.ToTable("TournamentRegistrations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.TournamentRound.TournamentRound", b =>
@@ -1106,7 +1106,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.ToTable("TournamentRounds");
+                    b.ToTable("TournamentRounds", (string)null);
                 });
 
             modelBuilder.Entity("Domain.TournamentStanding.TournamentStanding", b =>
@@ -1152,7 +1152,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("TournamentId", "ParticipantId")
                         .IsUnique();
 
-                    b.ToTable("TournamentStandings");
+                    b.ToTable("TournamentStandings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.User.User", b =>
@@ -1238,7 +1238,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("EmailAddress")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
