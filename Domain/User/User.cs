@@ -1,8 +1,9 @@
-﻿using Common.Models;
+﻿using Common.Interfaces;
+using Common.Models;
 
 namespace Domain.User
 {
-    public class User : BaseEntity
+    public class User : BaseEntity, ISoftDeletable
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
