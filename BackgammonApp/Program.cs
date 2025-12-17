@@ -2,12 +2,20 @@ using Application.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Extensions;
+using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.ConfigureSerilog();
+
 builder.Services.AddControllers();
+
+builder.Services.ConfigureApiVersioning(builder.Configuration);
+builder.Services.ConfigureMediatRServices();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,6 +36,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+app.UseConfiguredSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
