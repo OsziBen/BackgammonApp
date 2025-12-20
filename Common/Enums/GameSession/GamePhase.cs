@@ -12,6 +12,7 @@
         CubeAccepted = 21,
         CubeDeclined = 22,
 
+        GameAbandoned = 98,
         GameFinished = 99
     }
 
