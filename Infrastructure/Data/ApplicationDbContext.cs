@@ -847,6 +847,12 @@ namespace Infrastructure.Data
                   .IsRequired()
                   .OnDelete(DeleteBehavior.Restrict);
 
+                gameSession.HasOne(gs => gs.WinnerPlayer)
+                           .WithMany()
+                           .HasForeignKey(gs => gs.WinnerPlayerId)
+                           .IsRequired(false)
+                           .OnDelete(DeleteBehavior.Restrict);
+
                 gameSession.HasOne(gs => gs.CurrentGame)
                   .WithOne()
                   .HasForeignKey<GameSession>(gs => gs.CurrentGameId)
