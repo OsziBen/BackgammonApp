@@ -16,6 +16,7 @@
         // Üzleti szabály hibák (409 Conflict / 422 Unprocessable Entity)
         BusinessRuleViolation = 4000,
         ArchivedItemModification = 4001,
+        SessionFull = 4002,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
