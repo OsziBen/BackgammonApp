@@ -15,6 +15,9 @@ namespace Infrastructure.Repositories
         public IUserRepository Users { get; }
         public IBaseRepository<AppRole> AppRoles { get; }
         public IGroupMembershipRoleRepository GroupMembershipRoles { get; }
+        
+        public IGameSessionRepository GameSessions { get; }
+        public IGamePlayerRepository GamePlayers { get; }
         // többi repo
 
         public UnitOfWork(ApplicationDbContext context)
@@ -24,6 +27,9 @@ namespace Infrastructure.Repositories
             Users = new UserRepository(_context);
             AppRoles = new BaseRepository<AppRole>(_context);
             GroupMembershipRoles = new GroupMembershipRoleRepository(_context);
+            
+            GameSessions = new GameSessionRepository(_context);
+            GamePlayers = new GamePlayerRepository(_context);
             // többi repo
         }
 
@@ -45,12 +51,7 @@ namespace Infrastructure.Repositories
             }
             catch
             {
-                if (_currentTransaction != null)
-                {
-                    await _currentTransaction.RollbackAsync();
-                    _currentTransaction.Dispose();
-                    _currentTransaction = null;
-                }
+                await RollbackAsync();
 
                 throw;
             }
