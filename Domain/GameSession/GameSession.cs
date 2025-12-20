@@ -1,0 +1,26 @@
+﻿using Common.Enums.GameSession;
+using Common.Models;
+
+namespace Domain.GameSession
+{
+    public class GameSession : BaseEntity
+    {
+        public Guid MatchId { get; set; }
+        public Guid CurrentGameId { get; set; }
+        public string SessionCode { get; set; } = null!;
+
+        public GamePhase CurrentPhase { get; set; }
+        public Guid? CurrentPlayerId { get; set; }
+        public string? CurrentBoardStateJson { get; set; }
+
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? StartedAt { get; set; }
+        public DateTimeOffset? FinishedAt { get; set; }
+        public DateTimeOffset LastUpdatedAt { get; set; }
+        public bool IsFinished { get; set; }
+
+        public Match.Match Match { get; set; } = null!;
+        public Game.Game CurrentGame { get; set; } = null!;
+        public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
+    }
+}
