@@ -41,5 +41,6 @@ namespace Domain.Match
         public User.User? Winner { get; set; }
         public RulesTemplate.RulesTemplate? RulesTemplate { get; set; }
         public ICollection<Game.Game> Games { get; set; } = [];
+        public ICollection<GameSession.GameSession> GameSessions { get; set; } = [];
     }
 }
