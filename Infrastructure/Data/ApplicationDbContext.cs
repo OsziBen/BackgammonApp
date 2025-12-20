@@ -6,6 +6,8 @@ using Domain.Comment;
 using Domain.CubeAction;
 using Domain.DiceRoll;
 using Domain.Game;
+using Domain.GamePlayer;
+using Domain.GameSession;
 using Domain.Group;
 using Domain.GroupMembership;
 using Domain.GroupMembershipRole;
@@ -56,7 +58,8 @@ namespace Infrastructure.Data
         public DbSet<TournamentRegistration> TournamentRegistrations { get; set; } = null!;
         public DbSet<TournamentRound> TournamentRounds { get; set; } = null!;
         public DbSet<TournamentStanding> TournamentStandings { get; set; } = null!;
-
+        public DbSet<GameSession> GameSessions { get; set; } = null!;
+        public DbSet<GamePlayer> GamePlayers { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(user =>
@@ -832,6 +835,64 @@ namespace Infrastructure.Data
                                   .HasForeignKey(ts => ts.ParticipantId)
                                   .IsRequired()
                                   .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<GameSession>(gameSession =>
+            {
+                gameSession.HasKey(gs => gs.Id);
+
+                gameSession.HasOne(gs => gs.Match)
+                  .WithMany(m => m.GameSessions)
+                  .HasForeignKey(gs => gs.MatchId)
+                  .IsRequired()
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                gameSession.HasOne(gs => gs.CurrentGame)
+                  .WithOne()
+                  .HasForeignKey<GameSession>(gs => gs.CurrentGameId)
+                  .IsRequired()
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                gameSession.Property(gs => gs.SessionCode)
+                           .HasMaxLength(20)
+                           .IsRequired();
+
+                gameSession.Property(gs => gs.CurrentPhase)
+                  .HasConversion<int>()
+                  .IsRequired();
+
+                gameSession.Property(gs => gs.IsFinished)
+                           .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<GamePlayer>(gamePlayer =>
+            {
+                gamePlayer.HasKey(gp => gp.Id);
+
+                gamePlayer.HasIndex(gp => new { gp.GameSessionId, gp.UserId })
+                          .IsUnique();
+
+                gamePlayer.HasOne(gp => gp.GameSession)
+                  .WithMany(gs => gs.Players)
+                  .HasForeignKey(gp => gp.GameSessionId)
+                  .IsRequired()
+                  .OnDelete(DeleteBehavior.Cascade);
+
+                gamePlayer.HasOne(gp => gp.User)
+                  .WithMany(u => u.GamePlayers)
+                  .HasForeignKey(gp => gp.UserId)
+                  .IsRequired()
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                gamePlayer.Property(gp => gp.Color)
+                          .HasConversion<int>()
+                          .IsRequired();
+
+                gamePlayer.Property(gp => gp.IsHost)
+                          .HasDefaultValue(false);
+
+                gamePlayer.Property(gp => gp.IsConnected)
+                          .HasDefaultValue(false);
             });
         }
     }
