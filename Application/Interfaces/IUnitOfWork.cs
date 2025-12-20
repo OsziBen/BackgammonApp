@@ -9,6 +9,9 @@ namespace Application.Interfaces
         IGroupMembershipRoleRepository GroupMembershipRoles { get; }
         // repositories
 
+        IGameSessionRepository GameSessions { get; }
+        IGamePlayerRepository GamePlayers { get; }
+
         Task<int> CommitAsync();
         Task RollbackAsync();
     }
