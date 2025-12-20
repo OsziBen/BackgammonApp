@@ -19,8 +19,11 @@ namespace Domain.GameSession
         public DateTimeOffset LastUpdatedAt { get; set; }
         public bool IsFinished { get; set; }
 
+        public Guid? WinnerPlayerId { get; set; }
+
         public Match.Match Match { get; set; } = null!;
         public Game.Game CurrentGame { get; set; } = null!;
+        public GamePlayer.GamePlayer? WinnerPlayer { get; set; }
         public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
     }
 }
