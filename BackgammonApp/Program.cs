@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Extensions;
+using WebAPI.Hubs;
 using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,9 +24,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
+builder.Services.AddRealtimeServices();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupMembershipRoleRepository, GroupMembershipRoleRepository>();
+
 // TODO: extension method(s)
 
 var app = builder.Build();
@@ -46,5 +50,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GameSessionHub>("/hubs/game-session");
 
 app.Run();
