@@ -1,9 +1,12 @@
-﻿using Application.GameSessions.Responses;
+﻿using Application.GameSessions.Commands.StartGameSession;
+using Application.GameSessions.Guards;
+using Application.GameSessions.Responses;
 using Application.Interfaces;
-using Common.Enums;
+using Application.Shared;
 using Common.Enums.BoardState;
 using Common.Exceptions;
 using Domain.GamePlayer;
+using Domain.GameSession;
 using MediatR;
 
 namespace Application.GameSessions.Commands.JoinGameSession
@@ -11,10 +14,14 @@ namespace Application.GameSessions.Commands.JoinGameSession
     public class JoinGameSessionCommandHandler : IRequestHandler<JoinGameSessionCommand, GameSessionSnapshotResponse>
     {
         private readonly IUnitOfWork _uow;
+        private readonly IMediator _mediator;
 
-        public JoinGameSessionCommandHandler(IUnitOfWork uow)
+        public JoinGameSessionCommandHandler(
+            IUnitOfWork uow,
+            IMediator mediator)
         {
             _uow = uow;
+            _mediator = mediator;
         }
 
         public async Task<GameSessionSnapshotResponse> Handle(
@@ -25,14 +32,8 @@ namespace Application.GameSessions.Commands.JoinGameSession
                 .GetBySessionCodeAsync(
                 request.SessionCode,
                 includePlayers: true,
-                asNoTracking: false);
-
-            if (session == null)
-            {
-                throw new NotFoundException(
-                    FunctionCode.ResourceNotFound,
-                    $"Game session with code '{request.SessionCode}' was not found.");
-            }
+                asNoTracking: false)
+                .GetOrThrowAsync(nameof(GameSession), request.SessionCode);
 
             var player = session.Players
                 .FirstOrDefault(p => p.UserId == request.UserId);
@@ -42,23 +43,12 @@ namespace Application.GameSessions.Commands.JoinGameSession
             if (player == null)
             {
                 // JOIN
-                if (session.Players.Count >= 2)
-                {
-                    throw new BusinessRuleException(FunctionCode.SessionFull, "Session is full");
-                }
+                JoinGameSessionGuards.EnsureSessionNotFull(session);
 
-                player = new GamePlayer
-                {
-                    Id = Guid.NewGuid(),
-                    GameSessionId = session.Id,
-                    UserId = request.UserId,
-                    IsHost = session.Players.Count == 0,
-                    Color = session.Players.Count == 0
-                        ? PlayerColor.White
-                        : PlayerColor.Black,
-                    IsConnected = true,
-                    LastConnectedAt = DateTimeOffset.UtcNow
-                };
+                player = GamePlayerFactory.Create(
+                    session.Id,
+                    request.UserId,
+                    session.Players.Count == 0);
 
                 await _uow.GamePlayers.AddAsync(player);
                 isRejoin = false;
@@ -73,9 +63,15 @@ namespace Application.GameSessions.Commands.JoinGameSession
             }
 
             session.LastUpdatedAt = DateTimeOffset.UtcNow;
-            _uow.GameSessions.Update(session);
 
             await _uow.CommitAsync();
+
+            if (!isRejoin && session.Players.Count + 1 == 2)
+            {
+                await _mediator.Send(
+                    new StartGameSessionCommand(session.Id),
+                    cancellationToken);
+            }
 
             return new GameSessionSnapshotResponse
             {
