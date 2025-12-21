@@ -16,5 +16,20 @@
                 Guid sessionId,
                 Guid timedOutPlayerId,
                 Guid? winnerPlayerId);
+
+        Task StartingPlayerDetermined(
+            Guid sessionId,
+            IEnumerable<(Guid PlayerId, int Roll)> rolls,
+            Guid startingPlayerId);
+
+        Task GameStarted(
+            Guid sessionId,
+            Guid startingPlayerId);
+
+        Task DiceRolled(
+            Guid sessionId,
+            Guid playerId,
+            int die1,
+            int die2);
     }
 }
