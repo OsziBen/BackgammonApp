@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Domain.GamePlayer;
-using Domain.User;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,5 +29,12 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(gp =>
                     gp.GameSessionId == sessionId &&
                     gp.UserId != excludePlayerId);
+
+        public Task<List<GamePlayer>> GetPlayersBySessionAsync(
+            Guid sessionId,
+            bool asNoTracking = false)
+            => Query(asNoTracking: asNoTracking)
+                .Where(gp => gp.GameSessionId == sessionId)
+                .ToListAsync();
     }
 }
