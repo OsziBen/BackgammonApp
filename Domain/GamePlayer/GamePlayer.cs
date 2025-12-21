@@ -14,6 +14,8 @@ namespace Domain.GamePlayer
         public bool IsConnected { get; set; }
         public DateTimeOffset? LastConnectedAt { get; set; }
 
+        public int? StartingRoll { get; set; }
+
         public GameSession.GameSession GameSession { get; set; } = null!;
         public User.User User { get; set; } = null!;
     }
