@@ -17,6 +17,10 @@
         BusinessRuleViolation = 4000,
         ArchivedItemModification = 4001,
         SessionFull = 4002,
+        InvalidGamePhase = 4003,
+        InvalidGameState = 4004,
+        GameAlreadyFinished = 4005,
+        NotYourTurn = 4006,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
