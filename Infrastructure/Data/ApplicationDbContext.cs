@@ -842,10 +842,10 @@ namespace Infrastructure.Data
                 gameSession.HasKey(gs => gs.Id);
 
                 gameSession.HasOne(gs => gs.Match)
-                  .WithMany(m => m.GameSessions)
-                  .HasForeignKey(gs => gs.MatchId)
-                  .IsRequired()
-                  .OnDelete(DeleteBehavior.Restrict);
+                           .WithMany(m => m.GameSessions)
+                           .HasForeignKey(gs => gs.MatchId)
+                           .IsRequired()
+                           .OnDelete(DeleteBehavior.Restrict);
 
                 gameSession.HasOne(gs => gs.WinnerPlayer)
                            .WithMany()
@@ -854,18 +854,18 @@ namespace Infrastructure.Data
                            .OnDelete(DeleteBehavior.Restrict);
 
                 gameSession.HasOne(gs => gs.CurrentGame)
-                  .WithOne()
-                  .HasForeignKey<GameSession>(gs => gs.CurrentGameId)
-                  .IsRequired()
-                  .OnDelete(DeleteBehavior.Restrict);
+                           .WithOne()
+                           .HasForeignKey<GameSession>(gs => gs.CurrentGameId)
+                           .IsRequired()
+                           .OnDelete(DeleteBehavior.Restrict);
 
                 gameSession.Property(gs => gs.SessionCode)
                            .HasMaxLength(20)
                            .IsRequired();
 
                 gameSession.Property(gs => gs.CurrentPhase)
-                  .HasConversion<int>()
-                  .IsRequired();
+                           .HasConversion<int>()
+                           .IsRequired();
 
                 gameSession.Property(gs => gs.IsFinished)
                            .HasDefaultValue(false);
@@ -879,16 +879,16 @@ namespace Infrastructure.Data
                           .IsUnique();
 
                 gamePlayer.HasOne(gp => gp.GameSession)
-                  .WithMany(gs => gs.Players)
-                  .HasForeignKey(gp => gp.GameSessionId)
-                  .IsRequired()
-                  .OnDelete(DeleteBehavior.Cascade);
+                          .WithMany(gs => gs.Players)
+                          .HasForeignKey(gp => gp.GameSessionId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Cascade);
 
                 gamePlayer.HasOne(gp => gp.User)
-                  .WithMany(u => u.GamePlayers)
-                  .HasForeignKey(gp => gp.UserId)
-                  .IsRequired()
-                  .OnDelete(DeleteBehavior.Restrict);
+                          .WithMany(u => u.GamePlayers)
+                          .HasForeignKey(gp => gp.UserId)
+                          .IsRequired()
+                          .OnDelete(DeleteBehavior.Restrict);
 
                 gamePlayer.Property(gp => gp.Color)
                           .HasConversion<int>()

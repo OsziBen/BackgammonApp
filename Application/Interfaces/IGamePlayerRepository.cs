@@ -13,5 +13,9 @@ namespace Application.Interfaces
             Guid sessionId,
             Guid excludePlayerId,
             bool asNoTracking = false);
+
+        Task<List<GamePlayer>> GetPlayersBySessionAsync(
+            Guid sessionId,
+            bool asNoTracking = false);
     }
 }

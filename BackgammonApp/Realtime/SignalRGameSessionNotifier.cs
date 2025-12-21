@@ -13,6 +13,33 @@ namespace WebAPI.Realtime
             _hub = hub;
         }
 
+        public Task DiceRolled(
+            Guid sessionId,
+            Guid playerId,
+            int die1,
+            int die2)
+            => _hub.Clients
+                .Group(sessionId.ToString())
+                .SendAsync(
+                    "DiceRolled",
+                    new
+                    {
+                        SessionId = sessionId,
+                        PlayerId = playerId,
+                        Die1 = die1,
+                        Die2 = die2
+                    });
+
+        public Task GameStarted(
+            Guid sessionId,
+            Guid startingPlayerId)
+            => _hub.Clients
+                .Group(sessionId.ToString())
+                .SendAsync("GameStarted", new
+                {
+                    startingPlayerId = startingPlayerId
+                });
+
         public async Task PlayerDisconnected(
             Guid sessionId,
             Guid playerId,
@@ -54,5 +81,20 @@ namespace WebAPI.Realtime
                     WinnerPlayerId = winnerPlayerId
                 });
         }
+
+        public Task StartingPlayerDetermined(
+            Guid sessionId,
+            IEnumerable<(Guid PlayerId, int Roll)> rolls,
+            Guid startingPlayerId)
+            => _hub.Clients.Group(sessionId.ToString())
+                .SendAsync("StartingPlayerDetermined", new
+                {
+                    Rolls = rolls.Select(r => new
+                    {
+                        r.PlayerId,
+                        r.Roll
+                    }),
+                    startingPlayerId = startingPlayerId
+                });
     }
 }

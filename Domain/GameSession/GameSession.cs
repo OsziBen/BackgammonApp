@@ -11,6 +11,8 @@ namespace Domain.GameSession
 
         public GamePhase CurrentPhase { get; set; }
         public Guid? CurrentPlayerId { get; set; }
+        public int[]? LastDiceRoll { get; set; }
+        public int? RemainingMoves { get; set; }
         public string? CurrentBoardStateJson { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
