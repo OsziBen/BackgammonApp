@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Extensions;
 using WebAPI.Hubs;
@@ -29,6 +30,7 @@ builder.Services.AddRealtimeServices();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupMembershipRoleRepository, GroupMembershipRoleRepository>();
+builder.Services.AddScoped<IDiceService, DiceService>();
 
 // TODO: extension method(s)
 
