@@ -24,7 +24,7 @@ namespace Domain.PlayerTurn
         public Game.Game Game { get; set; } = null!;
         public User.User Player { get; set; } = null!;
         public ICollection<CubeAction.CubeAction> CubeActions { get; set; } = [];
-        public DiceRoll.DiceRoll? DiceRoll { get; set; }    // nincs dobás, ha nem fogadja el a duplázást
+        public DiceRollSnapshot.DiceRollSnapshot? DiceRollSnapshot { get; set; }    // nincs dobás, ha nem fogadja el a duplázást
         public ICollection<CheckerMove.CheckerMove> CheckerMoves { get; set; } = [];
     }
 }

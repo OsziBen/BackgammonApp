@@ -1,4 +1,5 @@
 ﻿using Application.GameSessions.Realtime;
+using Application.GameSessions.Requests;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Hubs;
 
@@ -12,6 +13,20 @@ namespace WebAPI.Realtime
         {
             _hub = hub;
         }
+
+        public Task CheckersMoved(
+            Guid sessionId,
+            Guid playerId,
+            IReadOnlyList<MoveDto> moves)
+            => _hub.Clients.Group(sessionId.ToString())
+                .SendAsync(
+                    "CheckerMoved",
+                    new
+                    {
+                        SessionId = sessionId,
+                        PlayerId = playerId,
+                        Moves = moves
+                    });
 
         public Task DiceRolled(
             Guid sessionId,

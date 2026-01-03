@@ -1,8 +1,8 @@
 ﻿using Common.Models;
 
-namespace Domain.DiceRoll
+namespace Domain.DiceRollSnapshot
 {
-    public class DiceRoll : BaseEntity
+    public class DiceRollSnapshot : BaseEntity
     {
         public Guid PlayerTurnId { get; set; }
 

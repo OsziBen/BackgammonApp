@@ -3,7 +3,7 @@ using Common.Models;
 
 namespace Domain.GameSession
 {
-    public class GameSession : BaseEntity
+    public partial class GameSession : BaseEntity
     {
         public Guid MatchId { get; set; }
         public Guid CurrentGameId { get; set; }

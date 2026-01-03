@@ -1,10 +1,10 @@
 ﻿using Common.Models;
 using Domain.AppRole;
-using Domain.BoardState;
+using Domain.BoardStateSnapshot;
 using Domain.CheckerMove;
 using Domain.Comment;
 using Domain.CubeAction;
-using Domain.DiceRoll;
+using Domain.DiceRollSnapshot;
 using Domain.Game;
 using Domain.GamePlayer;
 using Domain.GameSession;
@@ -44,10 +44,10 @@ namespace Infrastructure.Data
         public DbSet<Post> Posts { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Reaction> Reactions { get; set; } = null!;
-        public DbSet<BoardState> BoardStates { get; set; } = null!;
+        public DbSet<BoardStateSnapshot> BoardStateSnapshots { get; set; } = null!;
         public DbSet<CheckerMove> CheckerMoves { get; set; } = null!;
         public DbSet<CubeAction> CubeActions { get; set; } = null!;
-        public DbSet<DiceRoll> DiceRolls { get; set; } = null!;
+        public DbSet<DiceRollSnapshot> DiceRollSnapshots { get; set; } = null!;
         public DbSet<Game> Games { get; set; } = null!;
         public DbSet<Match> Matches { get; set; } = null!;
         public DbSet<PlayerTurn> PlayerTurns { get; set; } = null!;
@@ -615,13 +615,13 @@ namespace Infrastructure.Data
                            .HasDefaultValue(false);
             });
 
-            modelBuilder.Entity<DiceRoll>(diceRoll =>
+            modelBuilder.Entity<DiceRollSnapshot>(diceRoll =>
             {
                 diceRoll.HasKey(dr => dr.Id);
 
                 diceRoll.HasOne(dr => dr.PlayerTurn)
-                        .WithOne(pm => pm.DiceRoll)
-                        .HasForeignKey<DiceRoll>(dr => dr.PlayerTurnId)
+                        .WithOne(pm => pm.DiceRollSnapshot)
+                        .HasForeignKey<DiceRollSnapshot>(dr => dr.PlayerTurnId)
                         .IsRequired(false)
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -659,7 +659,7 @@ namespace Infrastructure.Data
                           .IsRequired();
             });
 
-            modelBuilder.Entity<BoardState>(boardState =>
+            modelBuilder.Entity<BoardStateSnapshot>(boardState =>
             {
                 boardState.HasKey(bs => bs.Id);
 
