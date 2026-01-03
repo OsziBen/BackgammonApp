@@ -1,7 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Application.GameSessions.Commands.PlayerDisconnected
 {
