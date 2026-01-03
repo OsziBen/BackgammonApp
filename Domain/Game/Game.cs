@@ -37,6 +37,6 @@ namespace Domain.Game
         public User.User? StartingPlayer { get; set; }
         public User.User? DoublingCubeOwner { get; set; }
         public ICollection<PlayerTurn.PlayerTurn> PlayerMoves { get; set; } = [];
-        public ICollection<BoardState.BoardState> BoardStates { get; set; } = [];
+        public ICollection<BoardStateSnapshot.BoardStateSnapshot> BoardStateSnapshots { get; set; } = [];
     }
 }
