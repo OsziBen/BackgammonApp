@@ -1,9 +1,9 @@
 ﻿using Common.Enums.BoardState;
 using Common.Models;
 
-namespace Domain.BoardState
+namespace Domain.BoardStateSnapshot
 {
-    public class BoardState : BaseEntity
+    public class BoardStateSnapshot : BaseEntity
     {
         public Guid GameId { get; set; }
         public Guid? PlayerTurnId { get; set; }
