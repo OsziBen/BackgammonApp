@@ -1,4 +1,6 @@
-﻿namespace Application.GameSessions.Realtime
+﻿using Application.GameSessions.Requests;
+
+namespace Application.GameSessions.Realtime
 {
     public interface IGameSessionNotifier
     {
@@ -31,5 +33,10 @@
             Guid playerId,
             int die1,
             int die2);
+
+        Task CheckersMoved(
+            Guid sessionId,
+            Guid playerId,
+            IReadOnlyList<MoveDto> moves);
     }
 }
