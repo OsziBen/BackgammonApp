@@ -21,6 +21,9 @@
         InvalidGameState = 4004,
         GameAlreadyFinished = 4005,
         NotYourTurn = 4006,
+        InvalidMove = 4007,
+        InvalidDiceRoll = 4007,
+        InvalidDiceRollValues = 4008,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
