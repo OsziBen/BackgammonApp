@@ -65,7 +65,22 @@ namespace Domain.GameLogic.Generators
 
             foreach (var from in GetMovablePoints(state))
             {
-                var to = CalculateTarget(from, die, state);
+                int to = from == BoardConstants.BarPosition
+                    ? CalculateBarEntryTarget(state.CurrentPlayer, die)
+                    : CalculateTarget(state, from, die);
+
+                if (state.CurrentPlayer == PlayerColor.White &&
+                    to > 24 &&
+                    BearOffRules.CanBearOff(state, from, die))
+                {
+                    to = BoardConstants.OffBoardPosition;
+                }
+                else if (state.CurrentPlayer == PlayerColor.Black &&
+                    to < 1 &&
+                    BearOffRules.CanBearOff(state, from, die))
+                {
+                    to = BoardConstants.OffBoardPosition;
+                }
 
                 if (!IsLegalMove(state, from, to, die))
                 {
@@ -116,13 +131,22 @@ namespace Domain.GameLogic.Generators
         }
 
         private static int CalculateTarget(
+            BoardState state,
             int from,
-            int die,
-            BoardState state)
+            int die)
         {
             return state.CurrentPlayer == PlayerColor.White
                 ? from + die
                 : from - die;
+        }
+
+        private static int CalculateBarEntryTarget(
+            PlayerColor player,
+            int die)
+        {
+            return player == PlayerColor.White
+                ? die
+                : 25 - die;
         }
 
         private static bool IsLegalMove(
@@ -192,8 +216,9 @@ namespace Domain.GameLogic.Generators
                 return false;
             }
 
-            return BoardConstants.IsHomeBoard(
-                targetPoint, state.CurrentPlayer);
+            return BoardConstants.IsEntryPoint(
+                targetPoint,
+                state.CurrentPlayer);
         }
     }
 }
