@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="../Application/Application.csproj" />
+  <Project Path="../BackgammonTest/BackgammonTest.csproj" Id="9525271f-7539-4f9d-b443-6023d329dad7" />
   <Project Path="../Common/Common.csproj" />
   <Project Path="../Domain/Domain.csproj" />
   <Project Path="../Infrastructure/Infrastructure.csproj" />
