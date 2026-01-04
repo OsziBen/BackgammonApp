@@ -14,14 +14,17 @@ namespace Domain.GameLogic
                 BoardConstants.IsHomeBoard(p.Key, player));
 
 
-        public bool HasCheckerOnHigherPoint(
+        public bool HasCheckerFurtherFromBearOff(
             PlayerColor player,
             int fromPoint)
             => Points.Any(p =>
                 p.Value.Owner == player &&
                 p.Value.Count > 0 &&
-                ((player == PlayerColor.White && p.Key > fromPoint) ||
-                 (player == PlayerColor.Black && p.Key < fromPoint)));
+                BoardConstants.IsHomeBoard(p.Key, player) &&
+                (
+                    (player == PlayerColor.White && p.Key > fromPoint) ||
+                    (player == PlayerColor.Black && p.Key < fromPoint)
+                ));
 
         public BoardState Clone()
             => new BoardState(
