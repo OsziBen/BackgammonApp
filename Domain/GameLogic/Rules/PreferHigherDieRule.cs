@@ -9,7 +9,8 @@ namespace Domain.GameLogic.Rules
         {
             var list = sequences.ToList();
 
-            if (list.Count == 0)
+            if (list.Count == 0 ||
+                list.All(sequence => sequence.Moves.Count == 0))
             {
                 return list;
             }

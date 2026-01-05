@@ -27,7 +27,7 @@ namespace Domain.GameLogic
                 return true;
             }
 
-            return !HasCheckerOnHigherPoint(player, fromPoint);
+            return !HasCheckerFurtherFromBearOff(player, fromPoint);
         }
     }
 }

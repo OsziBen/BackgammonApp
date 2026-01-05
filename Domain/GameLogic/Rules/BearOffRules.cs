@@ -24,9 +24,22 @@ namespace Domain.GameLogic.Rules
                 return true;
             }
 
-            return !state.HasCheckerOnHigherPoint(
-                state.CurrentPlayer,
-                fromPoint);
+            if (state.CurrentPlayer == PlayerColor.White)
+            {
+                if (exactTarget > 24 && !state.HasCheckerFurtherFromBearOff(PlayerColor.White, fromPoint))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (exactTarget < 1 && !state.HasCheckerFurtherFromBearOff(PlayerColor.Black, fromPoint))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

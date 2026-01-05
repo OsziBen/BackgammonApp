@@ -15,5 +15,14 @@ namespace Domain.GameLogic.Constants
                 ? point >= 19 && point <= 24
                 : point >= 1 && point <= 6;
         }
+
+        public static bool IsEntryPoint(
+            int point,
+            PlayerColor player)
+        {
+            return player == PlayerColor.White
+                ? point >= 1 && point <= 6
+                : point >= 19 && point <= 24;
+        }
     }
 }

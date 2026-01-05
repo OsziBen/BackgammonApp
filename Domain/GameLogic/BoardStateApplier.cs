@@ -17,10 +17,24 @@ namespace Domain.GameLogic
             var offBlack = state.OffBlack;
 
             // FROM
-            var from = points[move.From];
-            points[move.From] = from.Count == 1
-                ? new CheckerPosition(null, 0)
-                : new CheckerPosition(from.Owner, from.Count - 1);
+            if (move.From == BoardConstants.BarPosition)
+            {
+                if (state.CurrentPlayer == PlayerColor.White)
+                {
+                    barWhite--;
+                }
+                else
+                {
+                    barBlack--;
+                }
+            }
+            else
+            {
+                var from = points[move.From];
+                points[move.From] = from.Count == 1
+                    ? new CheckerPosition(null, 0)
+                    : new CheckerPosition(from.Owner, from.Count - 1);
+            }
 
             // BEAR OFF
             if (move.To == BoardConstants.OffBoardPosition)
