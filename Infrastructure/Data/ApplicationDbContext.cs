@@ -844,7 +844,7 @@ namespace Infrastructure.Data
                 gameSession.HasOne(gs => gs.Match)
                            .WithMany(m => m.GameSessions)
                            .HasForeignKey(gs => gs.MatchId)
-                           .IsRequired()
+                           .IsRequired(false)
                            .OnDelete(DeleteBehavior.Restrict);
 
                 gameSession.HasOne(gs => gs.WinnerPlayer)
@@ -856,7 +856,7 @@ namespace Infrastructure.Data
                 gameSession.HasOne(gs => gs.CurrentGame)
                            .WithOne()
                            .HasForeignKey<GameSession>(gs => gs.CurrentGameId)
-                           .IsRequired()
+                           .IsRequired(false)
                            .OnDelete(DeleteBehavior.Restrict);
 
                 gameSession.Property(gs => gs.SessionCode)
@@ -869,6 +869,28 @@ namespace Infrastructure.Data
 
                 gameSession.Property(gs => gs.IsFinished)
                            .HasDefaultValue(false);
+
+                gameSession.OwnsOne(gs => gs.Settings, settings =>
+                {
+                    settings.Property(s => s.TargerPoints)
+                            .HasDefaultValue(1)
+                            .IsRequired();
+
+                    settings.Property(s => s.DoublingCubeEnabled)
+                            .IsRequired();
+
+                    settings.Property(s => s.ClockEnabled)
+                            .IsRequired();
+
+                    settings.Property(s => s.MatchTimePerPlayerInSeconds)
+                            .IsRequired(false);
+
+                    settings.Property(s => s.StartOfTurnDelayPerPlayerInSeconds)
+                            .IsRequired(false);
+
+                    settings.Property(s => s.CrawfordRuleEnabled)
+                            .IsRequired();
+                });
             });
 
             modelBuilder.Entity<GamePlayer>(gamePlayer =>
