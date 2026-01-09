@@ -8,5 +8,7 @@ namespace Application.Interfaces
             string sessionCode,
             bool includePlayers = true,
             bool asNoTracking = false);
+
+        Task<bool> HasActiveSession(Guid playerId);
     }
 }
