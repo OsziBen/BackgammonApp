@@ -1,4 +1,5 @@
 ﻿using Application.GameSessions.Requests;
+using Common.Enums.GameSession;
 
 namespace Application.GameSessions.Realtime
 {
@@ -38,5 +39,10 @@ namespace Application.GameSessions.Realtime
             Guid sessionId,
             Guid playerId,
             IReadOnlyList<MoveDto> moves);
+
+        Task GameFinished(
+            Guid sessionId,
+            Guid winnerPlayerId,
+            GameFinishReason reason);
     }
 }
