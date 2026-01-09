@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Application.GameSessions.Commands.DetermineStartingPlayer
 {
-    public class DetermineStartingPlayerCommandHandler : IRequestHandler<DetermineStartingPlayerCommand>
+    public class DetermineStartingPlayerCommandHandler : IRequestHandler<DetermineStartingPlayerCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
@@ -25,7 +25,7 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
             _diceService = diceService;
         }
 
-        public async Task Handle(
+        public async Task<Unit> Handle(
             DetermineStartingPlayerCommand request,
             CancellationToken cancellationToken)
         {
@@ -47,7 +47,7 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
 
             if (players.Count < GameSessionConstants.MaxPlayers)
             {
-                return;
+                return Unit.Value;
             }
 
             var (roll1, roll2) = _diceService.RollDistinctPair();

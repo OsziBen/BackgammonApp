@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.GameSessions.Commands.PlayerReconnected
 {
-    public class PlayerReconnectedCommandHandler : IRequestHandler<PlayerReconnectedCommand>
+    public class PlayerReconnectedCommandHandler : IRequestHandler<PlayerReconnectedCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
@@ -17,7 +17,7 @@ namespace Application.GameSessions.Commands.PlayerReconnected
             _gameSessionNotifier = gameSessionNotifier;
         }
 
-        public async Task Handle(
+        public async Task<Unit> Handle(
             PlayerReconnectedCommand request,
             CancellationToken cancellationToken)
         {
@@ -26,7 +26,7 @@ namespace Application.GameSessions.Commands.PlayerReconnected
 
             if (player == null || player.IsConnected)
             {
-                return;
+                return Unit.Value;
             }
 
             player.IsConnected = true;
@@ -38,6 +38,8 @@ namespace Application.GameSessions.Commands.PlayerReconnected
                 player.GameSessionId,
                 player.Id,
                 player.LastConnectedAt.Value);
+
+            return Unit.Value;
         }
     }
 }
