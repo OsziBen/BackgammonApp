@@ -1,7 +1,7 @@
 ﻿using Application.GameSessions.Requests;
 using MediatR;
 
-namespace Application.GameSessions.MoveCheckers
+namespace Application.GameSessions.Commands.MoveCheckers
 {
     public record MoveCheckersCommand(
         Guid SessionId,

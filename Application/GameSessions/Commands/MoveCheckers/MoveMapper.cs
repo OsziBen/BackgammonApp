@@ -1,7 +1,7 @@
 ﻿using Application.GameSessions.Requests;
 using Domain.GameLogic;
 
-namespace Application.GameSessions.MoveCheckers
+namespace Application.GameSessions.Commands.MoveCheckers
 {
     public static class MoveMapper
     {

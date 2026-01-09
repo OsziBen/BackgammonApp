@@ -3,8 +3,6 @@ using Application.GameSessions.Guards;
 using Application.GameSessions.Responses;
 using Application.Interfaces;
 using Application.Shared;
-using Common.Enums.BoardState;
-using Common.Exceptions;
 using Domain.GamePlayer;
 using Domain.GameSession;
 using MediatR;

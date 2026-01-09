@@ -428,7 +428,7 @@ namespace Infrastructure.Migrations
                     b.Property<string>("CurrentBoardStateJson")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("CurrentGameId")
+                    b.Property<Guid?>("CurrentGameId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("CurrentPhase")
@@ -436,6 +436,12 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid?>("CurrentPlayerId")
                         .HasColumnType("uuid");
+
+                    b.Property<Guid?>("DoublingCubeOwnerPlayerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DoublingCubeValue")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("FinishedAt")
                         .HasColumnType("timestamp with time zone");
@@ -451,11 +457,8 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("MatchId")
+                    b.Property<Guid?>("MatchId")
                         .HasColumnType("uuid");
-
-                    b.Property<int?>("RemainingMoves")
-                        .HasColumnType("integer");
 
                     b.Property<string>("SessionCode")
                         .IsRequired()
@@ -1539,23 +1542,57 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Game.Game", "CurrentGame")
                         .WithOne()
                         .HasForeignKey("Domain.GameSession.GameSession", "CurrentGameId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Match.Match", "Match")
                         .WithMany("GameSessions")
                         .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.GamePlayer.GamePlayer", "WinnerPlayer")
                         .WithMany()
                         .HasForeignKey("WinnerPlayerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.OwnsOne("Domain.GameSession.GameSessionSettings", "Settings", b1 =>
+                        {
+                            b1.Property<Guid>("GameSessionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<bool>("ClockEnabled")
+                                .HasColumnType("boolean");
+
+                            b1.Property<bool>("CrawfordRuleEnabled")
+                                .HasColumnType("boolean");
+
+                            b1.Property<bool>("DoublingCubeEnabled")
+                                .HasColumnType("boolean");
+
+                            b1.Property<int?>("MatchTimePerPlayerInSeconds")
+                                .HasColumnType("integer");
+
+                            b1.Property<int?>("StartOfTurnDelayPerPlayerInSeconds")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("TargerPoints")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
+                                .HasDefaultValue(1);
+
+                            b1.HasKey("GameSessionId");
+
+                            b1.ToTable("GameSessions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameSessionId");
+                        });
+
                     b.Navigation("CurrentGame");
 
                     b.Navigation("Match");
+
+                    b.Navigation("Settings")
+                        .IsRequired();
 
                     b.Navigation("WinnerPlayer");
                 });

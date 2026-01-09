@@ -1,9 +1,14 @@
 ﻿using Application.GameSessions.Commands.JoinGameSession;
+using Application.GameSessions.Commands.MoveCheckers;
 using Application.GameSessions.Commands.PlayerDisconnected;
+using Application.GameSessions.Commands.PlayerForfeit;
 using Application.GameSessions.Commands.PlayerReconnected;
+using Application.GameSessions.Commands.RollDice;
+using Application.GameSessions.Requests;
 using Application.Realtime.Connections;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using WebAPI.Extensions;
 
 namespace WebAPI.Hubs
 {
@@ -20,12 +25,14 @@ namespace WebAPI.Hubs
             _connections = connections;
         }
 
-        public async Task JoinSession(string sessionCode, Guid userId)
+        public async Task JoinSession(string sessionCode)
         {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
             var result = await _mediator.Send(
                 new JoinGameSessionCommand(
                     sessionCode,
-                    userId,
+                    playerId,
                     Context.ConnectionId
                 ));
 
@@ -56,15 +63,41 @@ namespace WebAPI.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            if (_connections.TryGet(Context.ConnectionId, out var gamePlayerId))
+            if (_connections.TryGet(Context.ConnectionId, out var playerId))
             {
                 await _mediator.Send(
-                    new PlayerDisconnectedCommand(gamePlayerId));
+                    new PlayerDisconnectedCommand(playerId));
 
                 _connections.Remove(Context.ConnectionId);
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task RollDice(Guid sessionId)      // lesz majd duplázó akció is, azok a kör elején választhatók (ha nem, akkor automatikusan dobás)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new RollDiceCommand(sessionId, playerId));
+        }
+
+        public async Task MoveCheckers(
+            Guid sessionId,
+            IReadOnlyList<MoveDto> moves)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new MoveCheckersCommand(sessionId, playerId, moves));
+        }
+
+        public async Task Forfeit(Guid sessionId)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new PlayerForfeitCommand(sessionId, playerId));
         }
     }
 }

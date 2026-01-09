@@ -25,5 +25,13 @@ namespace Infrastructure.Repositories
 
             return await query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode);
         }
+
+        public async Task<bool> HasActiveSession(Guid playerId)
+        {
+            return await Query(asNoTracking: true)
+                .AnyAsync(gs =>
+                !gs.IsFinished &&
+                gs.Players.Any(p => p.Id == playerId));
+        }
     }
 }
