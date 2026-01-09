@@ -5,27 +5,33 @@ namespace Domain.GameSession
     public static class GameSessionFactory
     {
         public static GameSession Create(
-            Guid matchId,
-            string sessionCode)
+            Guid hostPlayerId,
+            string sessionCode,
+            GameSessionSettings  settings)
         {
             var now = DateTimeOffset.UtcNow;
 
             return new GameSession
             {
                 Id = Guid.NewGuid(),
-                MatchId = matchId,
+                MatchId = null,
+                CurrentGameId = null,
+
                 SessionCode = sessionCode,
+                Settings = settings,
 
                 CurrentPhase = GamePhase.WaitingForPlayers,
                 CurrentPlayerId = null,
                 LastDiceRoll = null,
-                RemainingMoves = null,
                 CurrentBoardStateJson = null,
 
+                DoublingCubeValue = settings.DoublingCubeEnabled ? 1 : null,
+                DoublingCubeOwnerPlayerId = null,
+
                 CreatedAt = now,
+                LastUpdatedAt = now,
                 StartedAt = null,
                 FinishedAt = null,
-                LastUpdatedAt = now,
 
                 IsFinished = false,
                 WinnerPlayerId = null
