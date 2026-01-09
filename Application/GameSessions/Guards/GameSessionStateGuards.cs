@@ -10,7 +10,7 @@ namespace Application.GameSessions.Guards
         public static void EnsureDiceStateValid(GameSession session)
         {
             if (session.CurrentPhase == GamePhase.MoveCheckers &&
-                (session.LastDiceRoll == null || session.RemainingMoves == null))
+                (session.LastDiceRoll == null))
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidGameState,
@@ -20,7 +20,7 @@ namespace Application.GameSessions.Guards
 
         public static void EnsureNoActiveDice(GameSession session)
         {
-            if (session.LastDiceRoll != null || session.RemainingMoves != null)
+            if (session.LastDiceRoll != null)
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidGameState,
