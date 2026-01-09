@@ -1,4 +1,5 @@
 ﻿using Common.Enums.BoardState;
+using Common.Enums.GameSession;
 using Domain.GameLogic;
 
 namespace Application.Realtime
@@ -11,6 +12,8 @@ namespace Application.Realtime
         public int OffWhite { get; set; }
         public int OffBlack { get; set; }
         public PlayerColor CurrentPlayer { get; set; }
+        public GamePhase CurrentGamePhase { get; set; }
+        public DiceRoll? DiceRoll { get; set; }
 
         public static RuntimeBoardStateSnapshot FromDomain(BoardState state)
             => new()
@@ -24,14 +27,5 @@ namespace Application.Realtime
                 OffBlack = state.OffBlack,
                 CurrentPlayer = state.CurrentPlayer
             };
-
-        public BoardState ToDomain()
-            => new(
-                Points,
-                BarWhite,
-                BarBlack,
-                OffWhite,
-                OffBlack,
-                CurrentPlayer);
     }
 }
