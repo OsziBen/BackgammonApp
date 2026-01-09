@@ -12,7 +12,7 @@ using Domain.GameLogic.Generators;
 using Domain.GameSession;
 using MediatR;
 
-namespace Application.GameSessions.MoveCheckers
+namespace Application.GameSessions.Commands.MoveCheckers
 {
     public class MoveCheckersCommandHandler : IRequestHandler<MoveCheckersCommand, Unit>
     {
