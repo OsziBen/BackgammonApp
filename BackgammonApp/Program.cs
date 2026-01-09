@@ -1,5 +1,8 @@
+using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces;
+using Domain.GameLogic.Generators;
 using Infrastructure.Data;
+using Infrastructure.Realtime.Factories;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +34,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupMembershipRoleRepository, GroupMembershipRoleRepository>();
 builder.Services.AddScoped<IDiceService, DiceService>();
+builder.Services.AddScoped<IBoardStateFactory, BoardStateFactory>();
+builder.Services.AddScoped<IMoveSequenceGenerator, MoveSequenceGenerator>();
+builder.Services.AddScoped<ISessionCodeGenerator, SessionCodeGenerator>();
 
 // TODO: extension method(s)
 
