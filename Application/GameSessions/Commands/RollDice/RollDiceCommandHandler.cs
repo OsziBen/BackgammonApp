@@ -49,7 +49,6 @@ namespace Application.GameSessions.Commands.RollDice
             var movesCount = die1 == die2 ? 4 : 2;
 
             session.LastDiceRoll = new[] { die1, die2 };
-            session.RemainingMoves = movesCount;
             session.CurrentPhase = GamePhase.MoveCheckers;
             session.LastUpdatedAt = DateTimeOffset.UtcNow;
 
