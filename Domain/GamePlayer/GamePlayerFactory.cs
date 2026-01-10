@@ -4,23 +4,32 @@ namespace Domain.GamePlayer
 {
     public static class GamePlayerFactory
     {
-        public static GamePlayer Create(
+        public static GamePlayer CreateHost(
             Guid sessionId,
-            Guid userId,
-            bool isHost)
+            Guid userId)
         {
             return new GamePlayer
             {
-                Id = Guid.NewGuid(),
                 GameSessionId = sessionId,
                 UserId = userId,
-                IsHost = isHost,
-                Color = isHost
-                    ? PlayerColor.White
-                    : PlayerColor.Black,
+                IsHost = true,
+                Color = PlayerColor.White,
                 IsConnected = true,
-                LastConnectedAt = DateTimeOffset.UtcNow,
-                StartingRoll = null
+                LastConnectedAt = DateTimeOffset.UtcNow
+            };
+        }
+        public static GamePlayer CreateGuest(
+            Guid sessionId,
+            Guid userId)
+        {
+            return new GamePlayer
+            {
+                GameSessionId = sessionId,
+                UserId = userId,
+                IsHost = false,
+                Color = PlayerColor.Black,
+                IsConnected = true,
+                LastConnectedAt = DateTimeOffset.UtcNow
             };
         }
     }
