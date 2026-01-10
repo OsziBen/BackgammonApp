@@ -6,7 +6,9 @@ namespace Application.GameSessions.Commands.StartGameSession.Validator
     {
         public StartGameSessionCommandValidator()
         {
-
+            RuleFor(x => x.SessionId)
+                .NotEmpty()
+                .WithMessage("Session ID is required.");
         }
     }
 }
