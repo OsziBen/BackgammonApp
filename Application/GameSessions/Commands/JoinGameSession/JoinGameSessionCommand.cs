@@ -6,6 +6,6 @@ namespace Application.GameSessions.Commands.JoinGameSession
     public record JoinGameSessionCommand(
         string SessionCode,
         Guid UserId,
-        string ConnectionId
+        string ConnectionId         //ConnectionId is an application-level identifier used later for real-time (SignalR) communication.
         ) : IRequest<GameSessionSnapshotResponse>;
 }
