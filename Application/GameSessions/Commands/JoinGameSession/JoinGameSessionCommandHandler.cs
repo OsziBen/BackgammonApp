@@ -3,6 +3,7 @@ using Application.GameSessions.Guards;
 using Application.GameSessions.Responses;
 using Application.Interfaces;
 using Application.Shared;
+using Common.Enums.GameSession;
 using Domain.GamePlayer;
 using Domain.GameSession;
 using MediatR;
@@ -28,43 +29,27 @@ namespace Application.GameSessions.Commands.JoinGameSession
         {
             var session = await _uow.GameSessions
                 .GetBySessionCodeAsync(
-                request.SessionCode,
-                includePlayers: true,
-                asNoTracking: false)
+                    request.SessionCode,
+                    includePlayers: true,
+                    asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionCode);
 
-            var player = session.Players
-                .FirstOrDefault(p => p.UserId == request.UserId);
+            var joinResult = session.JoinPlayer(request.UserId);
 
-            bool isRejoin;
-
-            if (player == null)
+            if (!joinResult.IsRejoin)
             {
-                // JOIN
-                JoinGameSessionGuards.EnsureSessionNotFull(session);
-
-                player = GamePlayerFactory.Create(
-                    session.Id,
-                    request.UserId,
-                    session.Players.Count == 0);
-
-                await _uow.GamePlayers.AddAsync(player);
-                isRejoin = false;
+                await _uow.GamePlayers.AddAsync(joinResult.Player);
             }
             else
             {
-                // REJOIN
-                player.IsConnected = true;
-                player.LastConnectedAt = DateTimeOffset.UtcNow;
-                _uow.GamePlayers.Update(player);
-                isRejoin = true;
+                _uow.GamePlayers.Update(joinResult.Player);
             }
 
             session.LastUpdatedAt = DateTimeOffset.UtcNow;
 
             await _uow.CommitAsync();
 
-            if (!isRejoin && session.Players.Count + 1 == 2)
+            if (!joinResult.IsRejoin && session.CanStartGame())
             {
                 await _mediator.Send(
                     new StartGameSessionCommand(session.Id),
@@ -74,12 +59,12 @@ namespace Application.GameSessions.Commands.JoinGameSession
             return new GameSessionSnapshotResponse
             {
                 SessionId = session.Id,
-                PlayerId = player.Id,
-                PlayerColor = player.Color,
+                PlayerId = joinResult.Player.Id,
+                PlayerColor = joinResult.Player.Color,
                 CurrentPhase = session.CurrentPhase,
                 CurrentPlayerId = session.CurrentPlayerId,
                 BoardStateJson = session.CurrentBoardStateJson,
-                IsRejoin = isRejoin
+                IsRejoin = joinResult.IsRejoin,
             };
         }
     }
