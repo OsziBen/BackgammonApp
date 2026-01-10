@@ -6,7 +6,8 @@ namespace Domain.GamePlayer
     {
         public static GamePlayer CreateHost(
             Guid sessionId,
-            Guid userId)
+            Guid userId,
+            DateTimeOffset now)
         {
             return new GamePlayer
             {
@@ -15,12 +16,13 @@ namespace Domain.GamePlayer
                 IsHost = true,
                 Color = PlayerColor.White,
                 IsConnected = true,
-                LastConnectedAt = DateTimeOffset.UtcNow
+                LastConnectedAt = now
             };
         }
         public static GamePlayer CreateGuest(
             Guid sessionId,
-            Guid userId)
+            Guid userId,
+            DateTimeOffset now)
         {
             return new GamePlayer
             {
@@ -29,7 +31,7 @@ namespace Domain.GamePlayer
                 IsHost = false,
                 Color = PlayerColor.Black,
                 IsConnected = true,
-                LastConnectedAt = DateTimeOffset.UtcNow
+                LastConnectedAt = now
             };
         }
     }

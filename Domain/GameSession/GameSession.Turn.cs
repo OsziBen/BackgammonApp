@@ -4,7 +4,7 @@ namespace Domain.GameSession
 {
     public partial class GameSession
     {
-        public void EndTurn()
+        public void EndTurn(DateTimeOffset now)
         {
             if (Players.Count != 2)
             {
@@ -21,7 +21,7 @@ namespace Domain.GameSession
 
             CurrentPhase = GamePhase.RollDice;
 
-            LastUpdatedAt = DateTimeOffset.UtcNow;
+            LastUpdatedAt = now;
         }
     }
 }

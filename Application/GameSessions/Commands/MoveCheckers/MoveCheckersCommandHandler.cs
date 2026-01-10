@@ -3,6 +3,7 @@ using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using Application.Realtime;
 using Application.Shared;
+using Application.Shared.Time;
 using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
@@ -20,17 +21,20 @@ namespace Application.GameSessions.Commands.MoveCheckers
         private readonly IBoardStateFactory _boardStateFactory;
         private readonly IMoveSequenceGenerator _moveSequenceGenerator;
         private readonly IGameSessionNotifier _gameSessionNotifier;
+        private readonly IDateTimeProvider _timeProvider;
 
         public MoveCheckersCommandHandler(
             IUnitOfWork uow,
             IBoardStateFactory boardStateFactory,
             IMoveSequenceGenerator moveSequenceGenerator,
-            IGameSessionNotifier gameSessionNotifier)
+            IGameSessionNotifier gameSessionNotifier,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _boardStateFactory = boardStateFactory;
             _moveSequenceGenerator = moveSequenceGenerator;
             _gameSessionNotifier = gameSessionNotifier;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Unit> Handle(
@@ -40,6 +44,8 @@ namespace Application.GameSessions.Commands.MoveCheckers
             var session = await _uow.GameSessions
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
+
+            var now = _timeProvider.UtcNow;
 
             GameSessionGuards.EnsureNotFinished(session);
             GamePhaseGuards.EnsurePhase(session, GamePhase.MoveCheckers);
@@ -76,7 +82,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
             if (nextState.IsGameOver(out var winner, out var resultType))
             {
                 session.IsFinished = true;
-                session.FinishedAt = DateTimeOffset.UtcNow;
+                session.FinishedAt = now;
                 session.CurrentPhase = GamePhase.GameFinished;
 
                 session.WinnerPlayerId = session.Players
@@ -85,12 +91,12 @@ namespace Application.GameSessions.Commands.MoveCheckers
             }
             else
             {
-                session.EndTurn();
+                session.EndTurn(now);
             }
 
             var json = BoardStateMapper.ToJson(nextState);
             session.UpdateBoardStateJson(json);
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.LastUpdatedAt = now;
 
             await _uow.CommitAsync();
 

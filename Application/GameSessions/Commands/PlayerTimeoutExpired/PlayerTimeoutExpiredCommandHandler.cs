@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
+using Application.Shared.Time;
 using MediatR;
 
 
@@ -9,13 +10,16 @@ namespace Application.GameSessions.Commands.PlayerTimeoutExpired
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
+        private readonly IDateTimeProvider _timeProvider;
 
         public PlayerTimeoutExpiredCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier)
+            IGameSessionNotifier gameSessionNotifier,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
+            _timeProvider = timeProvider;
         }
 
         public async Task Handle(
@@ -38,9 +42,11 @@ namespace Application.GameSessions.Commands.PlayerTimeoutExpired
             {
                 return;
             }
+            
+            var now = _timeProvider.UtcNow;
 
             session.IsFinished = true;
-            session.FinishedAt = DateTimeOffset.UtcNow;
+            session.FinishedAt = now;
 
             var opponent = await _uow.GamePlayers.GetOpponentAsync(session.Id, player.Id, asNoTracking: false);
 
@@ -49,7 +55,7 @@ namespace Application.GameSessions.Commands.PlayerTimeoutExpired
                 session.WinnerPlayerId = opponent.Id;
             }
 
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.LastUpdatedAt = now;
 
             // TODO:
             // player.Forfeit();

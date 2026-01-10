@@ -1,10 +1,12 @@
 using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces;
+using Application.Shared.Time;
 using Domain.GameLogic.Generators;
 using Infrastructure.Data;
 using Infrastructure.Realtime.Factories;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Infrastructure.Shared.Time;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Extensions;
 using WebAPI.Hubs;
@@ -37,6 +39,8 @@ builder.Services.AddScoped<IDiceService, DiceService>();
 builder.Services.AddScoped<IBoardStateFactory, BoardStateFactory>();
 builder.Services.AddScoped<IMoveSequenceGenerator, MoveSequenceGenerator>();
 builder.Services.AddScoped<ISessionCodeGenerator, SessionCodeGenerator>();
+
+builder.Services.AddSingleton<IDateTimeProvider, SystemdateTimeProvider>();
 
 // TODO: extension method(s)
 

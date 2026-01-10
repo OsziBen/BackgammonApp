@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Commands.PlayerTimeoutExpired;
 using Application.Interfaces;
+using Application.Shared.Time;
 using Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,14 @@ namespace Infrastructure.BackgroundServices
     public class DisconnectedPlayerMonitor : BackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IDateTimeProvider _timeProvider;
 
-        public DisconnectedPlayerMonitor(IServiceScopeFactory serviceScopeFactory)
+        public DisconnectedPlayerMonitor(
+            IServiceScopeFactory serviceScopeFactory,
+            IDateTimeProvider timeProvider)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _timeProvider = timeProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,7 +34,7 @@ namespace Infrastructure.BackgroundServices
                 var mediator = scope.ServiceProvider
                     .GetRequiredService<IMediator>();
 
-                var now = DateTimeOffset.UtcNow;
+                var now = _timeProvider.UtcNow;
 
                 var expiredPlayers = await uow.GamePlayers
                     .Query(asNoTracking: false)

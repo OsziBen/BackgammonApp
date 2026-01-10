@@ -3,6 +3,7 @@ using Application.GameSessions.Realtime;
 using Application.GameSessions.Responses;
 using Application.Interfaces;
 using Application.Shared;
+using Application.Shared.Time;
 using Common.Enums.GameSession;
 using Domain.GameSession;
 using MediatR;
@@ -14,15 +15,18 @@ namespace Application.GameSessions.Commands.RollDice
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDiceService _diceService;
+        private readonly IDateTimeProvider _timeProvider;
 
         public RollDiceCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
-            IDiceService diceService)
+            IDiceService diceService,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
             _diceService = diceService;
+            _timeProvider = timeProvider;
         }
 
         public async Task<RollDiceResult> Handle(
@@ -32,6 +36,8 @@ namespace Application.GameSessions.Commands.RollDice
             var session = await _uow.GameSessions
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
+
+            var now = _timeProvider.UtcNow;
 
             GameSessionGuards.EnsureNotFinished(session);
             GamePhaseGuards.EnsurePhase(
@@ -50,7 +56,7 @@ namespace Application.GameSessions.Commands.RollDice
 
             session.LastDiceRoll = new[] { die1, die2 };
             session.CurrentPhase = GamePhase.MoveCheckers;
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.LastUpdatedAt = now;
 
             //_uow.GameSessions.Update(session);
             await _uow.CommitAsync();
