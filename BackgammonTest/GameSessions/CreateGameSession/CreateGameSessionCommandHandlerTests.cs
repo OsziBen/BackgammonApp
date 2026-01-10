@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Commands.CreateGameSession;
 using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces;
+using BackgammonTest.GameSessions.Shared;
 using Domain.GameSession;
 using FluentAssertions;
 using Moq;
@@ -13,6 +14,8 @@ namespace BackgammonTest.GameSessions.CreateGameSession
         public async Task Handle_Should_Create_Session_And_Return_Session_Id()
         {
             // Arrange
+            var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
+
             var uowMock = new Mock<IUnitOfWork>();
             var repoMock = new Mock<IGameSessionRepository>();
 
@@ -24,7 +27,8 @@ namespace BackgammonTest.GameSessions.CreateGameSession
 
             var handler = new CreateGameSessionCommandHandler(
                 uowMock.Object,
-                new FakeSessionCodeGenerator()
+                new FakeSessionCodeGenerator(),
+                dateTimeProvider
             );
 
             var command = new CreateGameSessionCommand
@@ -57,6 +61,8 @@ namespace BackgammonTest.GameSessions.CreateGameSession
         public async Task Handle_Should_Throw_When_Player_Has_Active_Session()
         {
             // Arrange
+            var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
+
             var uowMock = new Mock<IUnitOfWork>();
             var repoMock = new Mock<IGameSessionRepository>();
 
@@ -68,7 +74,8 @@ namespace BackgammonTest.GameSessions.CreateGameSession
 
             var handler = new CreateGameSessionCommandHandler(
                 uowMock.Object,
-                new FakeSessionCodeGenerator());
+                new FakeSessionCodeGenerator(),
+                dateTimeProvider);
 
             var command = new CreateGameSessionCommand(
                 Guid.NewGuid(),

@@ -1,4 +1,5 @@
-﻿using Common.Enums.GameSession;
+﻿using BackgammonTest.GameSessions.Shared;
+using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
 using Domain.GameSession;
@@ -8,7 +9,7 @@ namespace BackgammonTest.GameSessions.StartGameSession
 {
     public class GameSessionStartDomainLogicTests
     {
-        private static GameSession CreateValidSession()
+        private static GameSession CreateValidSession(DateTimeOffset now)
         {
             var session = new GameSession
             {
@@ -17,9 +18,9 @@ namespace BackgammonTest.GameSessions.StartGameSession
             };
 
             session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid()));
+                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), now));
             session.Players.Add(
-                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid()));
+                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), now));
 
             return session;
         }
@@ -28,29 +29,35 @@ namespace BackgammonTest.GameSessions.StartGameSession
         public void Start_Should_Set_Phase_And_Timestamps()
         {
             // Arrange
-            var session = CreateValidSession();
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
+            var session = CreateValidSession(dateTimeProvider.UtcNow);
 
             // Act
-            session.Start();
+            session.Start(dateTimeProvider.UtcNow);
 
             // Assert
             session.CurrentPhase.Should()
                 .Be(GamePhase.DeterminingStartingPlayer);
 
             session.StartedAt.Should().NotBeNull();
-            session.StartedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(1));
-            session.LastUpdatedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(1));
+            session.StartedAt.Should().Be(fixedNow);
+            session.LastUpdatedAt.Should().Be(fixedNow);
         }
 
         [Fact]
         public void Start_Should_Throw_When_Session_Is_Finished()
         {
             // Arrange
-            var session = CreateValidSession();
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
+            var session = CreateValidSession(dateTimeProvider.UtcNow);
             session.IsFinished = true;
 
             // Act
-            Action act = () => session.Start();
+            Action act = () => session.Start(dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -61,11 +68,14 @@ namespace BackgammonTest.GameSessions.StartGameSession
         public void Start_Should_Throw_When_Phase_Is_Not_WaitingForPlayers()
         {
             // Arrange
-            var session = CreateValidSession();
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
+            var session = CreateValidSession(dateTimeProvider.UtcNow);
             session.CurrentPhase = GamePhase.RollDice;
 
             // Act
-            Action act = () => session.Start();
+            Action act = () => session.Start(dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -76,16 +86,19 @@ namespace BackgammonTest.GameSessions.StartGameSession
         public void Start_Should_Throw_When_Player_Count_Is_Not_Two()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = new GameSession
             {
                 CurrentPhase = GamePhase.WaitingForPlayers
             };
 
             session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid()));
+                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
 
             // Act
-            Action act = () => session.Start();
+            Action act = () => session.Start(dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()

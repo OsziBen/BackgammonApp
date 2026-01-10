@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Commands.DetermineStartingPlayer;
 using Application.GameSessions.Commands.StartGameSession;
 using Application.Interfaces;
+using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
 using Domain.GamePlayer;
 using Domain.GameSession;
@@ -16,15 +17,18 @@ namespace BackgammonTest.GameSessions.StartGameSession
         public async Task Handle_Should_Start_Session_And_Send_DetermineStartingPlayer_Command()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = new GameSession
             {
                 CurrentPhase = GamePhase.WaitingForPlayers
             };
 
             session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid()));
+                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
             session.Players.Add(
-                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid()));
+                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
 
             var uowMock = new Mock<IUnitOfWork>();
             var mediatorMock = new Mock<IMediator>();
@@ -47,7 +51,8 @@ namespace BackgammonTest.GameSessions.StartGameSession
 
             var handler = new StartGameSessionCommandHandler(
                 uowMock.Object,
-                mediatorMock.Object);
+                mediatorMock.Object,
+                dateTimeProvider);
 
             var command = new StartGameSessionCommand(session.Id);
 

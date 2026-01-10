@@ -1,4 +1,5 @@
-﻿using Common.Enums.GameSession;
+﻿using BackgammonTest.GameSessions.Shared;
+using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
 using Domain.GameSession;
@@ -26,11 +27,14 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Add_First_Player_As_Host()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession();
             var userId = Guid.NewGuid();
 
             // Act
-            var result = session.JoinPlayer(userId);
+            var result = session.JoinPlayer(userId, dateTimeProvider.UtcNow);
 
             // Assert
             result.IsRejoin.Should().BeFalse();
@@ -44,13 +48,16 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Add_Second_Player_As_NonHost()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession();
-            session.JoinPlayer(Guid.NewGuid());
+            session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
 
             var secondUserId = Guid.NewGuid();
 
             // Act
-            var result = session.JoinPlayer(secondUserId);
+            var result = session.JoinPlayer(secondUserId, dateTimeProvider.UtcNow);
 
             // Assert
             result.IsRejoin.Should().BeFalse();
@@ -63,14 +70,17 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Rejoin_Existing_Player()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession();
             var userId = Guid.NewGuid();
 
-            var firstJoin = session.JoinPlayer(userId);
+            var firstJoin = session.JoinPlayer(userId, dateTimeProvider.UtcNow);
             firstJoin.Player.IsConnected = false;
 
             // Act
-            var rejoin = session.JoinPlayer(userId);
+            var rejoin = session.JoinPlayer(userId, dateTimeProvider.UtcNow);
 
             // Assert
             rejoin.IsRejoin.Should().BeTrue();
@@ -84,12 +94,15 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Throw_When_Session_Is_Full()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession();
-            session.JoinPlayer(Guid.NewGuid());
-            session.JoinPlayer(Guid.NewGuid());
+            session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
+            session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
 
             // Act
-            Action act = () => session.JoinPlayer(Guid.NewGuid());
+            Action act = () => session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -101,10 +114,13 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Throw_When_Session_Is_Finished()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession(isFinished: true);
 
             // Act
-            Action act = () => session.JoinPlayer(Guid.NewGuid());
+            Action act = () => session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -116,10 +132,13 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public void Join_Player_Should_Throw_When_Not_Waiting_For_Players()
         {
             // Arrange
+            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
+            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+
             var session = CreateSession(phase: GamePhase.RollDice);
 
             // Act
-            Action act = () => session.JoinPlayer(Guid.NewGuid());
+            Action act = () => session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
