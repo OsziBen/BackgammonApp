@@ -75,6 +75,8 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
                     (players[1].Id, roll2)
                 },
                 startingPlayer.Id);
+
+            return Unit.Value;
         }
     }
 }
