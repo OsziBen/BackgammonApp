@@ -27,13 +27,13 @@ namespace Application.GameSessions.Commands.StartGameSession
             CancellationToken cancellationToken)
         {
             var session = await _uow.GameSessions
-                .GetByIdAsync(request.GameSessionId, asNoTracking: false)
-                .GetOrThrowAsync(nameof(GameSession), request.GameSessionId);
+                .GetByIdAsync(request.SessionId, asNoTracking: false)
+                .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             if (session == null)
             {
                 throw NotFoundException.CreateForResource(
-                    nameof(GameSessions), request.GameSessionId);
+                    nameof(GameSessions), request.SessionId);
             }
 
             GameSessionGuards.EnsureNotFinished(session);

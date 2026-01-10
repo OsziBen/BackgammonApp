@@ -2,5 +2,5 @@
 
 namespace Application.GameSessions.Commands.StartGameSession
 {
-    public record StartGameSessionCommand(Guid GameSessionId) : IRequest<Unit>;
+    public record StartGameSessionCommand(Guid SessionId) : IRequest<Unit>;
 }
