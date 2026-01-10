@@ -6,6 +6,31 @@ namespace Domain.GameSession
 {
     public partial class GameSession
     {
+        public void Start()
+        {
+            if (IsFinished)
+            {
+                throw new BusinessRuleException(
+                    "Cannot start a finished game session.");
+            }
+
+            if (CurrentPhase != GamePhase.WaitingForPlayers)
+            {
+                throw new BusinessRuleException(
+                    $"Cannot start session in phase {CurrentPhase}.");
+            }
+
+            if (Players.Count != 2)
+            {
+                throw new BusinessRuleException(
+                    "Game session must have exactly 2 players to start.");
+            }
+
+            CurrentPhase = GamePhase.DeterminingStartingPlayer;
+            StartedAt ??= DateTimeOffset.UtcNow;
+            LastUpdatedAt = DateTimeOffset.UtcNow;
+        }
+
         public void Finish(Guid winnerPlayerId)
         {
             IsFinished = true;
