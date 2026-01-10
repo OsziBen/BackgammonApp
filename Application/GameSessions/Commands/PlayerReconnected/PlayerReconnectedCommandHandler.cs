@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
+using Application.Shared.Time;
 using MediatR;
 
 namespace Application.GameSessions.Commands.PlayerReconnected
@@ -8,13 +9,16 @@ namespace Application.GameSessions.Commands.PlayerReconnected
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
+        private readonly IDateTimeProvider _timeProvider;
 
         public PlayerReconnectedCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier)
+            IGameSessionNotifier gameSessionNotifier,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Unit> Handle(
@@ -29,15 +33,17 @@ namespace Application.GameSessions.Commands.PlayerReconnected
                 return Unit.Value;
             }
 
+            var now = _timeProvider.UtcNow;
+
             player.IsConnected = true;
-            player.LastConnectedAt = DateTime.UtcNow;
+            player.LastConnectedAt = now;
 
             await _uow.CommitAsync();
 
             await _gameSessionNotifier.PlayerReconnected(
                 player.GameSessionId,
                 player.Id,
-                player.LastConnectedAt.Value);
+                now);
 
             return Unit.Value;
         }

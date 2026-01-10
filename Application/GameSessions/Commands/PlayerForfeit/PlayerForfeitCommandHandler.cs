@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using Application.Shared;
+using Application.Shared.Time;
 using Common.Enums.GameSession;
 using Domain.GameSession;
 using MediatR;
@@ -11,13 +12,16 @@ namespace Application.GameSessions.Commands.PlayerForfeit
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
+        private readonly IDateTimeProvider _timeProvider;
 
         public PlayerForfeitCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier)
+            IGameSessionNotifier gameSessionNotifier,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Unit> Handle( // TODO: guard-ok hozzáadása
@@ -26,8 +30,8 @@ namespace Application.GameSessions.Commands.PlayerForfeit
         {
             var session = await _uow.GameSessions
                 .GetByIdAsync(
-                request.SessionId,
-                asNoTracking: false)
+                    request.SessionId,
+                    asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             if (session.IsFinished)
@@ -40,7 +44,9 @@ namespace Application.GameSessions.Commands.PlayerForfeit
                 throw new InvalidOperationException("Player not part of this session");
             }
 
-            session.Forfeit(request.PlayerId);
+            var now = _timeProvider.UtcNow;
+
+            session.Forfeit(request.PlayerId, now);
 
             await _uow.CommitAsync();
 

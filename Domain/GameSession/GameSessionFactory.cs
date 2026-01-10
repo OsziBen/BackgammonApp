@@ -5,12 +5,10 @@ namespace Domain.GameSession
     public static class GameSessionFactory
     {
         public static GameSession Create(
-            Guid hostPlayerId,
             string sessionCode,
-            GameSessionSettings  settings)
+            GameSessionSettings settings,
+            DateTimeOffset now)
         {
-            var now = DateTimeOffset.UtcNow;
-
             return new GameSession
             {
                 Id = Guid.NewGuid(),

@@ -6,7 +6,7 @@ namespace Domain.GameSession
 {
     public partial class GameSession
     {
-        public void Start()
+        public void Start(DateTimeOffset now)
         {
             if (IsFinished)
             {
@@ -27,18 +27,18 @@ namespace Domain.GameSession
             }
 
             CurrentPhase = GamePhase.DeterminingStartingPlayer;
-            StartedAt ??= DateTimeOffset.UtcNow;
-            LastUpdatedAt = DateTimeOffset.UtcNow;
+            StartedAt ??= now;
+            LastUpdatedAt = now;
         }
 
-        public void Finish(Guid winnerPlayerId)
+        public void Finish(Guid winnerPlayerId, DateTimeOffset now)
         {
             IsFinished = true;
-            FinishedAt = DateTimeOffset.UtcNow;
+            FinishedAt = now;
             WinnerPlayerId = winnerPlayerId;
         }
 
-        public void Forfeit(Guid playerId)
+        public void Forfeit(Guid playerId, DateTimeOffset now)
         {
             if (IsFinished)
             {
@@ -46,10 +46,10 @@ namespace Domain.GameSession
             }
 
             var winner = Players.Single(p => p.Id != playerId);
-            Finish(winner.Id);
+            Finish(winner.Id, now);
         }
 
-        public JoinResult JoinPlayer(Guid userId)
+        public JoinResult JoinPlayer(Guid userId, DateTimeOffset now)
         {
             if (IsFinished)
             {
@@ -69,7 +69,7 @@ namespace Domain.GameSession
             if (existingPlayer != null)
             {
                 existingPlayer.IsConnected = true;
-                existingPlayer.LastConnectedAt = DateTimeOffset.UtcNow;
+                existingPlayer.LastConnectedAt = now;
 
                 return JoinResult.Rejoined(existingPlayer);
             }
@@ -80,14 +80,13 @@ namespace Domain.GameSession
             }
 
             var newPlayer = Players.Count == 0
-                ? GamePlayerFactory.CreateHost(Id, userId)
-                : GamePlayerFactory.CreateGuest(Id, userId);
+                ? GamePlayerFactory.CreateHost(Id, userId, now)
+                : GamePlayerFactory.CreateGuest(Id, userId, now);
 
             Players.Add(newPlayer);
 
             return JoinResult.Joined(newPlayer);
         }
-
 
         public bool CanStartGame()
             => Players.Count == 2 &&

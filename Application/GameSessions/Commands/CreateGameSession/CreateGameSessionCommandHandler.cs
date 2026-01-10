@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces;
+using Application.Shared.Time;
 using Domain.GameSession;
 using MediatR;
 
@@ -9,13 +10,16 @@ namespace Application.GameSessions.Commands.CreateGameSession
     {
         private readonly IUnitOfWork _uow;
         private readonly ISessionCodeGenerator _sessionCodeGenerator;
+        private readonly IDateTimeProvider _timeProvider;
 
         public CreateGameSessionCommandHandler(
             IUnitOfWork uow,
-            ISessionCodeGenerator sessionCodeGenerator)
+            ISessionCodeGenerator sessionCodeGenerator,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _sessionCodeGenerator = sessionCodeGenerator;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Guid> Handle(
@@ -30,11 +34,12 @@ namespace Application.GameSessions.Commands.CreateGameSession
             }
 
             var sessionCode = _sessionCodeGenerator.Generate();
+            var now = _timeProvider.UtcNow;
 
             var session = GameSessionFactory.Create(
-                request.HostPlayerId,
                 sessionCode,
-                request.Settings);
+                request.Settings,
+                now);
 
             await _uow.GameSessions.AddAsync(session);
             await _uow.CommitAsync();

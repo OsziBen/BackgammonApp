@@ -2,6 +2,7 @@
 using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using Application.Shared;
+using Application.Shared.Time;
 using Common.Constants;
 using Common.Enums.GameSession;
 using Domain.GameSession;
@@ -14,15 +15,18 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDiceService _diceService;
+        private readonly IDateTimeProvider _timeProvider;
 
         public DetermineStartingPlayerCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
-            IDiceService diceService)
+            IDiceService diceService,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
             _diceService = diceService;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Unit> Handle(
@@ -32,6 +36,8 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
             var session = await _uow.GameSessions
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
+
+            var now = _timeProvider.UtcNow;
 
             GameSessionGuards.EnsureNotFinished(session);
             GamePhaseGuards.EnsurePhase(
@@ -61,7 +67,7 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
 
             session.CurrentPlayerId = startingPlayer.Id;
             session.CurrentPhase = GamePhase.RollDice;
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.LastUpdatedAt = now;
 
             //_uow.GameSessions.Update(session);
 

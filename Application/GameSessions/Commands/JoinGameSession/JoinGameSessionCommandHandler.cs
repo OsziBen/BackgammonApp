@@ -1,10 +1,8 @@
 ﻿using Application.GameSessions.Commands.StartGameSession;
-using Application.GameSessions.Guards;
 using Application.GameSessions.Responses;
 using Application.Interfaces;
 using Application.Shared;
-using Common.Enums.GameSession;
-using Domain.GamePlayer;
+using Application.Shared.Time;
 using Domain.GameSession;
 using MediatR;
 
@@ -14,13 +12,16 @@ namespace Application.GameSessions.Commands.JoinGameSession
     {
         private readonly IUnitOfWork _uow;
         private readonly IMediator _mediator;
+        private readonly IDateTimeProvider _timeProvider;
 
         public JoinGameSessionCommandHandler(
             IUnitOfWork uow,
-            IMediator mediator)
+            IMediator mediator,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _mediator = mediator;
+            _timeProvider = timeProvider;
         }
 
         public async Task<GameSessionSnapshotResponse> Handle(
@@ -34,7 +35,9 @@ namespace Application.GameSessions.Commands.JoinGameSession
                     asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionCode);
 
-            var joinResult = session.JoinPlayer(request.UserId);
+            var now = _timeProvider.UtcNow;
+
+            var joinResult = session.JoinPlayer(request.UserId, now);
 
             if (!joinResult.IsRejoin)
             {
@@ -45,7 +48,7 @@ namespace Application.GameSessions.Commands.JoinGameSession
                 _uow.GamePlayers.Update(joinResult.Player);
             }
 
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.LastUpdatedAt = now;
 
             await _uow.CommitAsync();
 

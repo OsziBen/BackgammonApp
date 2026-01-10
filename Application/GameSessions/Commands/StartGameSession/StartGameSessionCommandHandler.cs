@@ -2,6 +2,7 @@
 using Application.GameSessions.Guards;
 using Application.Interfaces;
 using Application.Shared;
+using Application.Shared.Time;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameSession;
@@ -13,13 +14,16 @@ namespace Application.GameSessions.Commands.StartGameSession
     {
         private readonly IUnitOfWork _uow;
         private readonly IMediator _mediator;
+        private readonly IDateTimeProvider _timeProvider;
 
         public StartGameSessionCommandHandler(
             IUnitOfWork uow,
-            IMediator mediator)
+            IMediator mediator,
+            IDateTimeProvider timeProvider)
         {
             _uow = uow;
             _mediator = mediator;
+            _timeProvider = timeProvider;
         }
 
         public async Task<Unit> Handle(
@@ -30,7 +34,9 @@ namespace Application.GameSessions.Commands.StartGameSession
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
-            session.Start();
+            var now = _timeProvider.UtcNow;
+
+            session.Start(now);
 
             await _uow.CommitAsync();
 
