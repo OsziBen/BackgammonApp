@@ -30,20 +30,7 @@ namespace Application.GameSessions.Commands.StartGameSession
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
-            if (session == null)
-            {
-                throw NotFoundException.CreateForResource(
-                    nameof(GameSessions), request.SessionId);
-            }
-
-            GameSessionGuards.EnsureNotFinished(session);
-            GamePhaseGuards.EnsurePhase(
-                session,
-                GamePhase.WaitingForPlayers);
-
-            session.CurrentPhase = GamePhase.DeterminingStartingPlayer;
-            session.StartedAt ??= DateTimeOffset.UtcNow;
-            session.LastUpdatedAt = DateTimeOffset.UtcNow;
+            session.Start();
 
             await _uow.CommitAsync();
 
