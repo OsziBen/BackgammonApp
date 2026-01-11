@@ -3,8 +3,6 @@ using Application.GameSessions.Commands.StartGameSession;
 using Application.Interfaces;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
-using Domain.GamePlayer;
-using Domain.GameSession;
 using FluentAssertions;
 using MediatR;
 using Moq;
@@ -20,15 +18,9 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = new GameSession
-            {
-                CurrentPhase = GamePhase.WaitingForPlayers
-            };
-
-            session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
-            session.Players.Add(
-                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
+            var session = TestGameSessionFactory.CreateValidSession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
 
             var uowMock = new Mock<IUnitOfWork>();
             var mediatorMock = new Mock<IMediator>();
