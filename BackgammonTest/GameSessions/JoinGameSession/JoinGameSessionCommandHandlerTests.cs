@@ -2,9 +2,9 @@
 using Application.GameSessions.Commands.StartGameSession;
 using Application.Interfaces;
 using BackgammonTest.GameSessions.Shared;
+using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
-using Domain.GameSession;
 using FluentAssertions;
 using MediatR;
 using Moq;
@@ -13,19 +13,6 @@ namespace BackgammonTest.GameSessions.JoinGameSession
 {
     public class JoinGameSessionCommandHandlerTests
     {
-        private static GameSession CreateEmptySession(DateTimeOffset now)
-        {
-            return new GameSession
-            {
-                Id = Guid.NewGuid(),
-                SessionCode = "ABC123",
-                CurrentPhase = Common.Enums.GameSession.GamePhase.WaitingForPlayers,
-                Players = new List<GamePlayer>(),
-                CreatedAt = now,
-                LastUpdatedAt = now
-            };
-        }
-
         private static JoinGameSessionCommandHandler CreateHandler(
             Mock<IUnitOfWork> uowMock,
             Mock<IMediator> mediatorMock,
@@ -60,7 +47,10 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateEmptySession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateEmptySession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
+
             var userId = Guid.NewGuid();
 
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
@@ -107,7 +97,10 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateEmptySession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateEmptySession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
+
             session.Players.Add(new GamePlayer
             {
                 Id = Guid.NewGuid(),
@@ -166,7 +159,10 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateEmptySession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateEmptySession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
+
             session.Players.Add(existingPlayer);
 
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
@@ -210,7 +206,9 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateEmptySession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateEmptySession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
 
             session.Players.Add(new GamePlayer { UserId = Guid.NewGuid() });
             session.Players.Add(new GamePlayer { UserId = Guid.NewGuid() });

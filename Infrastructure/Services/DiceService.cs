@@ -4,7 +4,12 @@ namespace Infrastructure.Services
 {
     public class DiceService : IDiceService
     {
-        private static readonly Random _random = new();
+        private readonly Random _random;
+
+        public DiceService()
+        {
+         _random = new Random();   
+        }
 
         public int Roll() => _random.Next(1, 7);
 

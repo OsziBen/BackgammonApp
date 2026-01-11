@@ -2,29 +2,12 @@
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
-using Domain.GameSession;
 using FluentAssertions;
 
 namespace BackgammonTest.GameSessions.StartGameSession
 {
     public class GameSessionStartDomainLogicTests
     {
-        private static GameSession CreateValidSession(DateTimeOffset now)
-        {
-            var session = new GameSession
-            {
-                CurrentPhase = GamePhase.WaitingForPlayers,
-                IsFinished = false
-            };
-
-            session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), now));
-            session.Players.Add(
-                GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), now));
-
-            return session;
-        }
-
         [Fact]
         public void Start_Should_Set_Phase_And_Timestamps()
         {
@@ -32,7 +15,9 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateValidSession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateValidSession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
 
             // Act
             session.Start(dateTimeProvider.UtcNow);
@@ -53,7 +38,10 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateValidSession(dateTimeProvider.UtcNow);
+            var session = TestGameSessionFactory.CreateValidSession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
+
             session.IsFinished = true;
 
             // Act
@@ -71,8 +59,9 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = CreateValidSession(dateTimeProvider.UtcNow);
-            session.CurrentPhase = GamePhase.RollDice;
+            var session = TestGameSessionFactory.CreateValidSession(
+                GamePhase.RollDice,
+                dateTimeProvider.UtcNow);
 
             // Act
             Action act = () => session.Start(dateTimeProvider.UtcNow);
@@ -89,13 +78,16 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
-            var session = new GameSession
-            {
-                CurrentPhase = GamePhase.WaitingForPlayers
-            };
+            var session = TestGameSessionFactory.CreateEmptySession(
+                GamePhase.WaitingForPlayers,
+                dateTimeProvider.UtcNow);
 
             session.Players.Add(
-                GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow));
+                GamePlayerFactory.CreateHost(
+                    session.Id,
+                    Guid.NewGuid(),
+                    dateTimeProvider.UtcNow)
+                );
 
             // Act
             Action act = () => session.Start(dateTimeProvider.UtcNow);
