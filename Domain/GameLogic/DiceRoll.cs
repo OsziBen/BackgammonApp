@@ -11,6 +11,13 @@ namespace Domain.GameLogic
 
         public DiceRoll(IEnumerable<int> values)
         {
+            if (values == null)
+            {
+                throw new ArgumentException(
+                    "Dice roll values cannot be null.",
+                    nameof(values));
+            }
+
             var dice = values.ToList();
 
             if (dice.Count != 2)
