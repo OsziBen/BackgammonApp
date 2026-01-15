@@ -1,5 +1,4 @@
-﻿using Application.GameSessions.Guards;
-using Application.GameSessions.Realtime;
+﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using Application.Realtime;
 using Application.Shared;
@@ -8,7 +7,6 @@ using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameLogic;
-using Domain.GameLogic.Extensions;
 using Domain.GameLogic.Generators;
 using Domain.GameSession;
 using MediatR;
@@ -45,25 +43,17 @@ namespace Application.GameSessions.Commands.MoveCheckers
                 .GetByIdAsync(request.SessionId, asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
-            var now = _timeProvider.UtcNow;
-
-            GameSessionGuards.EnsureNotFinished(session);
-            GamePhaseGuards.EnsurePhase(session, GamePhase.MoveCheckers);
-            RollDiceGuards.EnsureCurrentPlayer(session, request.PlayerId);
-            GameSessionStateGuards.EnsureDiceStateValid(session);
-            MoveCheckersGuards.EnsureDiceRolled(session);
-            MoveCheckersGuards.EnsureMovesProvided(request.Moves);
-
             var boardState = _boardStateFactory.Create(session);
-            var diceRoll = new DiceRoll(session.LastDiceRoll!);
+            var diceRoll = session.GetCurrentDiceRoll(); ;
 
             var possibleSequences =
                 _moveSequenceGenerator.Generate(boardState, diceRoll);
 
             var clientSequence = new MoveSequence(
                 request.Moves
-                    .Select(m => m.ToDomain())
-                    .ToList());
+                    .Select(m => new Move(m.From, m.To, m.Die))
+                    .ToList()
+            );
 
             if (!possibleSequences.Contains(clientSequence))
             {
@@ -72,38 +62,37 @@ namespace Application.GameSessions.Commands.MoveCheckers
                     "Invalid move sequence");
             }
 
-            var nextState = boardState;
+            var now = _timeProvider.UtcNow;
 
-            foreach (var move in clientSequence.Moves)
-            {
-                nextState = nextState.Apply(move);
-            }
+            var nextState = session.ApplyMoveSequence(
+                boardState,
+                clientSequence,
+                request.PlayerId,
+                now,
+                out var resultType);
 
-            if (nextState.IsGameOver(out var winner, out var resultType))
-            {
-                session.IsFinished = true;
-                session.FinishedAt = now;
-                session.CurrentPhase = GamePhase.GameFinished;
+            session.UpdateBoardState(
+                BoardStateMapper.ToJson(session, nextState));
 
-                session.WinnerPlayerId = session.Players
-                    .Single(p => p.Color == winner)
-                    .Id;
-            }
-            else
-            {
-                session.EndTurn(now);
-            }
-
-            var json = BoardStateMapper.ToJson(nextState);
-            session.UpdateBoardStateJson(json);
             session.LastUpdatedAt = now;
 
             await _uow.CommitAsync();
 
-            await _gameSessionNotifier.CheckersMoved(
-                session.Id,
-                request.PlayerId,
-                request.Moves);
+            if (session.IsFinished)
+            {
+                await _gameSessionNotifier.GameFinished(
+                    session.Id,
+                    session.WinnerPlayerId!.Value,
+                    GameFinishReason.Victory,
+                    resultType!.Value);
+            }
+            else
+            {
+                await _gameSessionNotifier.CheckersMoved(
+                    session.Id,
+                    request.PlayerId,
+                    request.Moves);
+            }
 
             return Unit.Value;
         }
