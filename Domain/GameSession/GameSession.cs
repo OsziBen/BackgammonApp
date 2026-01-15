@@ -1,5 +1,8 @@
-﻿using Common.Enums.GameSession;
+﻿using Common.Enums;
+using Common.Enums.GameSession;
+using Common.Exceptions;
 using Common.Models;
+using Domain.GameLogic;
 
 namespace Domain.GameSession
 {
@@ -31,5 +34,45 @@ namespace Domain.GameSession
         public Game.Game? CurrentGame { get; set; }
         public GamePlayer.GamePlayer? WinnerPlayer { get; set; }
         public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
+
+
+        public void UpdateBoardState(string boardStateSnapshot)
+        {
+            CurrentBoardStateJson = boardStateSnapshot;
+        }
+
+        private GamePlayer.GamePlayer GetCurrentPlayer()
+        {
+            if (CurrentPlayerId == null)
+            {
+                throw new InvalidOperationException(
+                    "CurrentPlayerId is not set");
+            }
+
+            var player = Players.SingleOrDefault(
+                p => p.Id == CurrentPlayerId.Value);
+
+            if (player == null)
+            {
+                throw new InvalidOperationException(
+                    $"Current player {CurrentPlayerId} not found in session");
+            }
+
+            return player;
+        }
+
+        public DiceRoll GetCurrentDiceRoll()
+        {
+            EnsurePhase(GamePhase.MoveCheckers);
+
+            if (LastDiceRoll == null)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidGameState,
+                    "Dice has not been rolled.");
+            }
+
+            return new DiceRoll(LastDiceRoll);
+        }
     }
 }
