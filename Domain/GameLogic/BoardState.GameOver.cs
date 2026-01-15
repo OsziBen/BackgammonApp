@@ -27,7 +27,7 @@ namespace Domain.GameLogic
 
         private GameResultType EvaluateResult(PlayerColor loser)
         {
-            if ((loser == PlayerColor.White ? OffWhite : OffBlack) > 0)
+            if (HasAnyCheckersOff(loser))
             {
                 return GameResultType.SimpleVictory;
             }
@@ -40,14 +40,22 @@ namespace Domain.GameLogic
             return GameResultType.GammonVictory;
         }
 
+        private static bool IsInHomeBoard(PlayerColor player, int point)
+            => player == PlayerColor.White ? point >= 19 : point <= 6;
+
         private bool HasCheckerInHomeBoard(PlayerColor player)
             => Points.Any(p =>
                 p.Value.Owner == player &&
                 IsInHomeBoard(player, p.Key));
 
-        private static bool IsInHomeBoard(
-            PlayerColor player,
-            int point)
-            => player == PlayerColor.White ? point >= 19 : point <= 6;
+        private bool HasAnyCheckersOff(PlayerColor player)
+             => player == PlayerColor.White
+                 ? OffWhite > 0
+                 : OffBlack > 0;
+
+        private bool HasWinnerCheckersOff(PlayerColor winner)
+            => winner == PlayerColor.White
+                ? OffWhite == 15
+                : OffBlack == 15;
     }
 }
