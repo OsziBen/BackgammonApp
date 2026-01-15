@@ -2,9 +2,8 @@
 {
     public enum GameResultType
     {
-        Defeat = 0,
-        SimpleVictory = 1,
-        GammonVictory = 2,
-        BackgammonVictory = 3
+        SimpleVictory = 0,
+        GammonVictory = 1,
+        BackgammonVictory = 2
     }
 }
