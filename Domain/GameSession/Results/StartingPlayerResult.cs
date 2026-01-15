@@ -1,4 +1,4 @@
-﻿namespace Domain.GameSession
+﻿namespace Domain.GameSession.Results
 {
     public record StartingPlayerResult(
         Guid StarttingPlayerId,
