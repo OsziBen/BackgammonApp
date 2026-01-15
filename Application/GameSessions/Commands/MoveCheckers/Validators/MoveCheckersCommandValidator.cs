@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Common.Enums;
+using FluentValidation;
 
 namespace Application.GameSessions.Commands.MoveCheckers.Validators
 {
@@ -15,7 +16,9 @@ namespace Application.GameSessions.Commands.MoveCheckers.Validators
                 .WithMessage("PlayerId must not be empty.");
 
             RuleFor(x => x.Moves)
+                .NotNull()
                 .NotEmpty()
+                .WithErrorCode(FunctionCode.InvalidMove.ToString())
                 .WithMessage("Moves list must not be empty.");
 
             RuleForEach(x => x.Moves)
