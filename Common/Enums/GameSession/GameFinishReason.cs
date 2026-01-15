@@ -4,6 +4,7 @@
     {
         Victory,
         Forfeit,
+        CubeRejected,
         Timeout
     }
 }
