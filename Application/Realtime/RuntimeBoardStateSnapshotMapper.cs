@@ -3,13 +3,14 @@ using Domain.GameSession;
 
 namespace Application.Realtime
 {
-    public static class RuntimeBoardStateSnapshotFactory
+    public sealed class RuntimeBoardStateSnapshotMapper
     {
-        public static RuntimeBoardStateSnapshot Create(
+        public static RuntimeBoardStateSnapshot Map(
             GameSession session,
             BoardState boardState)
         {
-            return new RuntimeBoardStateSnapshot{
+            return new RuntimeBoardStateSnapshot
+            {
                 Points = boardState.Points.ToDictionary(
                     p => p.Key,
                     p => p.Value.Clone()),
@@ -19,9 +20,7 @@ namespace Application.Realtime
                 OffBlack = boardState.OffBlack,
                 CurrentPlayer = boardState.CurrentPlayer,
                 CurrentGamePhase = session.CurrentPhase,
-                DiceRoll = session.LastDiceRoll == null
-                ? null
-                : new DiceRoll(session.LastDiceRoll)
+                DiceRoll = session.LastDiceRoll?.ToArray()
             };
         }
     }
