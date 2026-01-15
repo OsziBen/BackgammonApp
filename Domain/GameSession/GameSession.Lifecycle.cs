@@ -1,6 +1,9 @@
-﻿using Common.Enums.GameSession;
+﻿using Common.Enums.Game;
+using Common.Enums.GameSession;
 using Common.Exceptions;
+using Domain.GameLogic;
 using Domain.GamePlayer;
+using Domain.GameSession.Results;
 
 namespace Domain.GameSession
 {
@@ -8,23 +11,7 @@ namespace Domain.GameSession
     {
         public void Start(DateTimeOffset now)
         {
-            if (IsFinished)
-            {
-                throw new BusinessRuleException(
-                    "Cannot start a finished game session.");
-            }
-
-            if (CurrentPhase != GamePhase.WaitingForPlayers)
-            {
-                throw new BusinessRuleException(
-                    $"Cannot start session in phase {CurrentPhase}.");
-            }
-
-            if (Players.Count != 2)
-            {
-                throw new BusinessRuleException(
-                    "Game session must have exactly 2 players to start.");
-            }
+            EnsureCanStartGame();
 
             CurrentPhase = GamePhase.DeterminingStartingPlayer;
             StartedAt ??= now;
@@ -36,30 +23,38 @@ namespace Domain.GameSession
             IsFinished = true;
             FinishedAt = now;
             WinnerPlayerId = winnerPlayerId;
+            CurrentPhase = GamePhase.GameFinished;
         }
 
-        public void Forfeit(Guid playerId, DateTimeOffset now)
+        public GameResultType Forfeit(
+            Guid forfeitingPlayerId,
+            BoardState boardState,
+            DateTimeOffset now)
         {
-            if (IsFinished)
-            {
-                throw new InvalidOperationException("Game already finished");
-            }
+            EnsureNotFinished();
+            EnsureExactlyTwoPlayers();
+            EnsurePlayerIsInSession(forfeitingPlayerId);
 
-            var winner = Players.Single(p => p.Id != playerId);
+            var winner = Players.Single(p => p.Id != forfeitingPlayerId);
+
+            var resultType = GameResultEvaluator.Evaluate(
+                boardState,
+                winner.Color,
+                DoublingCubeValue);
+
             Finish(winner.Id, now);
+
+            return resultType;
         }
 
         public JoinResult JoinPlayer(Guid userId, DateTimeOffset now)
         {
-            if (IsFinished)
-            {
-                throw new BusinessRuleException("Cannot join a finished session."); // TODO: custom exception
-            }
+            EnsureNotFinished();
 
             var existingPlayer = Players
                 .FirstOrDefault(p => p.UserId == userId);
 
-            if (existingPlayer == null &&
+            if (existingPlayer == null &&   // TODO: refactor
                 CurrentPhase != GamePhase.WaitingForPlayers)
             {
                 throw new BusinessRuleException(
@@ -76,7 +71,7 @@ namespace Domain.GameSession
 
             if (Players.Count >= 2)
             {
-                throw new BusinessRuleException("Session is full");
+                throw new BusinessRuleException("Session is full.");
             }
 
             var newPlayer = Players.Count == 0
