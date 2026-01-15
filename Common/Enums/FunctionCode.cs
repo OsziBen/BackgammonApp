@@ -24,6 +24,7 @@
         InvalidMove = 4007,
         InvalidDiceRoll = 4007,
         InvalidDiceRollValues = 4008,
+        PlayerNotInSession = 4009,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
