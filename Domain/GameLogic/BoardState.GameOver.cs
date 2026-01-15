@@ -5,29 +5,24 @@ namespace Domain.GameLogic
 {
     public partial class BoardState
     {
-        public bool IsGameOver(
-            out PlayerColor winner,
+        public bool TryEvaluateVictory(
+            PlayerColor winner,
             out GameResultType resultType)
         {
-            if (OffWhite == 15)
-            {
-                winner = PlayerColor.White;
-                resultType = EvaluateResult(PlayerColor.Black);
+            var loser = winner == PlayerColor.White
+                ? PlayerColor.Black
+                : PlayerColor.White;
 
-                return true;
+            if (!HasWinnerCheckersOff(winner))
+            {
+                resultType = default;
+
+                return false;
             }
 
-            if (OffBlack == 15)
-            {
-                winner = PlayerColor.Black;
-                resultType = EvaluateResult(PlayerColor.White);
-                return true;
-            }
+            resultType = EvaluateResult(loser);
 
-            winner = default;
-            resultType = default;
-
-            return false;
+            return true;
         }
 
         private GameResultType EvaluateResult(PlayerColor loser)
