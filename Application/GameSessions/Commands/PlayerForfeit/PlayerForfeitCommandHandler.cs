@@ -13,18 +13,21 @@ namespace Application.GameSessions.Commands.PlayerForfeit
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IBoardStateFactory _boardStateFactory;
 
         public PlayerForfeitCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IBoardStateFactory boardStateFactory)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
+            _boardStateFactory = boardStateFactory;
         }
 
-        public async Task<Unit> Handle( // TODO: guard-ok hozzáadása
+        public async Task<Unit> Handle(
             PlayerForfeitCommand request,
             CancellationToken cancellationToken)
         {
@@ -34,26 +37,21 @@ namespace Application.GameSessions.Commands.PlayerForfeit
                     asNoTracking: false)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
-            if (session.IsFinished)
-            {
-                throw new InvalidOperationException("Game already finished");
-            }
-
-            if (session.Players.All(p => p.Id != request.PlayerId))
-            {
-                throw new InvalidOperationException("Player not part of this session");
-            }
-
             var now = _timeProvider.UtcNow;
+            var boardState = _boardStateFactory.Create(session);
 
-            session.Forfeit(request.PlayerId, now);
+            var resultType = session.Forfeit(
+                request.PlayerId,
+                boardState,
+                now);
 
             await _uow.CommitAsync();
 
             await _gameSessionNotifier.GameFinished(
                 session.Id,
                 session.WinnerPlayerId!.Value,
-                GameFinishReason.Forfeit);
+                GameFinishReason.Forfeit,
+                resultType);
 
             return Unit.Value;
         }
