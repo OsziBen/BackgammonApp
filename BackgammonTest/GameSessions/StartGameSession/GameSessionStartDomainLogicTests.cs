@@ -1,4 +1,5 @@
 ﻿using BackgammonTest.GameSessions.Shared;
+using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
@@ -39,17 +40,16 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
-                GamePhase.WaitingForPlayers,
+                GamePhase.GameFinished,
                 dateTimeProvider.UtcNow);
-
-            session.IsFinished = true;
 
             // Act
             Action act = () => session.Start(dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
-                .Throw<BusinessRuleException>();
+                .Throw<BusinessRuleException>()
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
         }
 
         [Fact]
