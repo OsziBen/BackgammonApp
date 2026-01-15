@@ -1,4 +1,5 @@
 ﻿using BackgammonTest.GameSessions.Shared;
+using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using FluentAssertions;
@@ -105,7 +106,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("Session is full");
+                .WithMessage("Session is full.");
         }
 
         [Fact]
@@ -116,10 +117,8 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
-                GamePhase.WaitingForPlayers,
+                GamePhase.GameFinished,
                 dateTimeProvider.UtcNow);
-
-            session.IsFinished = true;
 
             // Act
             Action act = () => session.JoinPlayer(Guid.NewGuid(), dateTimeProvider.UtcNow);
@@ -127,7 +126,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("Cannot join a finished session.");
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
         }
 
         [Fact]

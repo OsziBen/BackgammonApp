@@ -1,7 +1,6 @@
 ﻿namespace Domain.GameLogic
 {
-    public record MoveSequence(
-        IReadOnlyList<Move> Moves)
+    public record MoveSequence(IReadOnlyList<Move> Moves)
     {
         public virtual bool Equals(MoveSequence? other)
         {

@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.GameSessions.Requests;
+using Common.Enums.Game;
 using Common.Enums.GameSession;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Hubs;
@@ -49,14 +50,16 @@ namespace WebAPI.Realtime
         public Task GameFinished(
             Guid sessionId,
             Guid winnerPlayerId,
-            GameFinishReason reason)
+            GameFinishReason reason,
+            GameResultType resultType)
             => _hub.Clients
             .Group(sessionId.ToString())
             .SendAsync("GameFinished", new
             {
                 SessionId = sessionId,
                 WinnerPlayerId = winnerPlayerId,
-                Reason = reason.ToString()
+                Reason = reason.ToString(),
+                ResultType = resultType
             });
 
         public Task GameStarted(
@@ -66,7 +69,7 @@ namespace WebAPI.Realtime
                 .Group(sessionId.ToString())
                 .SendAsync("GameStarted", new
                 {
-                    startingPlayerId = startingPlayerId
+                    StartingPlayerId = startingPlayerId
                 });
 
         public async Task PlayerDisconnected(
@@ -123,7 +126,7 @@ namespace WebAPI.Realtime
                         r.PlayerId,
                         r.Roll
                     }),
-                    startingPlayerId = startingPlayerId
+                    StartingPlayerId = startingPlayerId
                 });
     }
 }

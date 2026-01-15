@@ -1,4 +1,5 @@
 ﻿using Application.GameSessions.Requests;
+using Common.Enums.Game;
 using Common.Enums.GameSession;
 
 namespace Application.GameSessions.Realtime
@@ -43,6 +44,7 @@ namespace Application.GameSessions.Realtime
         Task GameFinished(
             Guid sessionId,
             Guid winnerPlayerId,
-            GameFinishReason reason);
+            GameFinishReason reason,
+            GameResultType gameResult);
     }
 }

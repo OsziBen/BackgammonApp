@@ -235,7 +235,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             await act.Should()
                 .ThrowAsync<BusinessRuleException>()
-                .WithMessage("Session is full");
+                .WithMessage("Session is full.");
         }
     }
 }
