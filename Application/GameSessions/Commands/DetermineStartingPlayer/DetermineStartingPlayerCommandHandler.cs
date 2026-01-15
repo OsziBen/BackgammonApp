@@ -48,7 +48,6 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
             var (roll1, roll2) = _diceService.RollDistinctPair();
 
             var result = session.DetermineStartingPlayer(
-                players,
                 roll1,
                 roll2,
                 now);
