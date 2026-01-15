@@ -1,4 +1,5 @@
 ﻿using BackgammonTest.GameSessions.Shared;
+using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
@@ -24,7 +25,6 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 
             // Act
             var result = session.DetermineStartingPlayer(
-                session.Players.ToList(),
                 roll1: 6,
                 roll2: 2,
                 dateTimeProvider.UtcNow);
@@ -58,7 +58,6 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 
             // Act
             var act = () => session.DetermineStartingPlayer(
-                session.Players.ToList(),
                 5,
                 5,
                 dateTimeProvider.UtcNow);
@@ -82,7 +81,6 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 
             // Act
             var act = () => session.DetermineStartingPlayer(
-                session.Players.ToList(),
                 3,
                 5,
                 dateTimeProvider.UtcNow);
@@ -101,14 +99,11 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             var dateTimeProvider = new FakedateTimeProvider(fixedNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
-                GamePhase.DeterminingStartingPlayer,
+                GamePhase.GameFinished,
                 dateTimeProvider.UtcNow);
-
-            session.IsFinished = true;
 
             // Act
             var act = () => session.DetermineStartingPlayer(
-                session.Players.ToList(),
                 4,
                 1,
                 dateTimeProvider.UtcNow);
@@ -116,7 +111,7 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("*already finished*");
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
         }
 
         [Theory]
@@ -144,7 +139,6 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 
             // Act
             var act = () => session.DetermineStartingPlayer(
-                session.Players.ToList(),
                 2,
                 5,
                 dateTimeProvider.UtcNow);
