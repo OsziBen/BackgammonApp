@@ -50,6 +50,8 @@ namespace BackgammonTest.GameSessions.Shared
                     time)
                 );
 
+            ApplyPhaseInvariants(session, phase, time);
+
             return session;
         }
 
@@ -80,10 +82,13 @@ namespace BackgammonTest.GameSessions.Shared
                     break;
 
                 case GamePhase.GameFinished:
+                    session.IsFinished = true;
+                    session.FinishedAt ??= now;
                     break;
 
                 case GamePhase.GameAbandoned:
                     session.IsFinished = true;
+                    session.FinishedAt ??= now;
                     break;
 
                 default:
