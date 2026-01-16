@@ -1,7 +1,9 @@
 using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces;
 using Application.Shared.Time;
+using Domain.GameLogic;
 using Domain.GameLogic.Generators;
+using Domain.GameSession;
 using Infrastructure.Data;
 using Infrastructure.Realtime.Factories;
 using Infrastructure.Repositories;
@@ -35,11 +37,13 @@ builder.Services.AddRealtimeServices();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupMembershipRoleRepository, GroupMembershipRoleRepository>();
-builder.Services.AddScoped<IDiceService, DiceService>();
 builder.Services.AddScoped<IBoardStateFactory, BoardStateFactory>();
 builder.Services.AddScoped<IMoveSequenceGenerator, MoveSequenceGenerator>();
 builder.Services.AddScoped<ISessionCodeGenerator, SessionCodeGenerator>();
+builder.Services.AddScoped<IDiceRoller,DiceRollerAdapter>();
+builder.Services.AddScoped<IStartingPlayerRoller, StartingPlayerRoller>();
 
+builder.Services.AddSingleton<IDiceService, DiceService>();
 builder.Services.AddSingleton<IDateTimeProvider, SystemdateTimeProvider>();
 
 // TODO: extension method(s)
