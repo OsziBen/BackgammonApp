@@ -23,8 +23,6 @@ namespace BackgammonTest.GameSessions.StartGameSession
                 dateTimeProvider.UtcNow);
 
             var uowMock = new Mock<IUnitOfWork>();
-            var mediatorMock = new Mock<IMediator>();
-
             uowMock.Setup(x =>
                 x.GameSessions.GetByIdAsync(
                     session.Id,
@@ -35,6 +33,7 @@ namespace BackgammonTest.GameSessions.StartGameSession
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
+            var mediatorMock = new Mock<IMediator>();
             mediatorMock.Setup(x =>
                 x.Send(
                     It.IsAny<DetermineStartingPlayerCommand>(),

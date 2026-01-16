@@ -1,6 +1,5 @@
 ﻿using Common.Enums.Game;
 using Common.Enums.GameSession;
-using Common.Exceptions;
 using Domain.GameLogic;
 using Domain.GamePlayer;
 using Domain.GameSession.Results;
@@ -35,7 +34,7 @@ namespace Domain.GameSession
             EnsureExactlyTwoPlayers();
             EnsurePlayerIsInSession(forfeitingPlayerId);
 
-            var winner = Players.Single(p => p.Id != forfeitingPlayerId);
+            var winner = Players.First(p => p.Id != forfeitingPlayerId);
 
             var resultType = GameResultEvaluator.Evaluate(
                 boardState,
@@ -54,13 +53,6 @@ namespace Domain.GameSession
             var existingPlayer = Players
                 .FirstOrDefault(p => p.UserId == userId);
 
-            if (existingPlayer == null &&   // TODO: refactor
-                CurrentPhase != GamePhase.WaitingForPlayers)
-            {
-                throw new BusinessRuleException(
-                    $"Cannot join session in phase {CurrentPhase}.");
-            }
-
             if (existingPlayer != null)
             {
                 existingPlayer.IsConnected = true;
@@ -69,10 +61,7 @@ namespace Domain.GameSession
                 return JoinResult.Rejoined(existingPlayer);
             }
 
-            if (Players.Count >= 2)
-            {
-                throw new BusinessRuleException("Session is full.");
-            }
+            EnsureCanJoin();
 
             var newPlayer = Players.Count == 0
                 ? GamePlayerFactory.CreateHost(Id, userId, now)
@@ -81,6 +70,39 @@ namespace Domain.GameSession
             Players.Add(newPlayer);
 
             return JoinResult.Joined(newPlayer);
+        }
+
+        public StartingPlayerResult DetermineStartingPlayer(
+            IStartingPlayerRoller roller,
+            DateTimeOffset now)
+        {
+            EnsureNotFinished();
+            EnsureCanDetermineStartingPlayer();
+
+            var roll = roller.Roll();
+
+            var player1 = Players.ElementAt(0);
+            var player2 = Players.ElementAt(1);
+
+            player1.StartingRoll = roll.Player1Roll;
+            player2.StartingRoll = roll.Player2Roll;
+
+            var startingPlayer =
+                roll.Player1Roll > roll.Player2Roll
+                    ? player1
+                    : player2;
+
+            CurrentPlayerId = startingPlayer.Id;
+            CurrentPhase = GamePhase.MoveCheckers;
+            LastUpdatedAt = now;
+
+            return new StartingPlayerResult(
+                [
+                    (player1.Id, roll.Player1Roll),
+                    (player2.Id, roll.Player2Roll)
+                ],
+                startingPlayer.Id
+            );
         }
 
         public bool CanStartGame()

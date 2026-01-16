@@ -3,7 +3,9 @@ using Application.GameSessions.Realtime;
 using Application.Interfaces;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
+using Common.Exceptions;
 using Domain.GamePlayer;
+using Domain.GameSession;
 using FluentAssertions;
 using Moq;
 
@@ -30,13 +32,10 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 );
 
             var playerRepoMock = new Mock<IGamePlayerRepository>();
-            var uowMock = new Mock<IUnitOfWork>();
-            var diceMock = new Mock<IDiceService>();
-            var notifierMock = new Mock<IGameSessionNotifier>();
-
             playerRepoMock.Setup(x => x.GetPlayersBySessionAsync(session.Id, false))
                 .ReturnsAsync(session.Players.ToList());
 
+            var uowMock = new Mock<IUnitOfWork>();
             uowMock.Setup(x =>
                 x.GameSessions.GetByIdAsync(
                     session.Id,
@@ -50,30 +49,32 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
-            diceMock.Setup(x => x.RollDistinctPair())
-                .Returns((6, 3));
-
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x => x.StartingPlayerDetermined(
                     It.IsAny<Guid>(),
                     It.IsAny<(Guid, int)[]>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+            startingPlayerRollerMock
+                .Setup(x => x.Roll())
+                .Returns(new StartingPlayerRoll(6, 3));
+
             var handler = new DetermineStartingPlayerCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                diceMock.Object,
-                dateTimeProvider);
+                dateTimeProvider,
+                startingPlayerRollerMock.Object);
 
             var command = new DetermineStartingPlayerCommand(session.Id);
 
             // Act
-            await handler.Handle(command, default);
+            await Assert.ThrowsAsync<BusinessRuleException>(() =>
+                handler.Handle(command, default));
 
             // Assert
             uowMock.Verify(x => x.CommitAsync(), Times.Never);
-
-            diceMock.Verify(x => x.RollDistinctPair(), Times.Never);
 
             notifierMock.Verify(x =>
                 x.StartingPlayerDetermined(
@@ -94,20 +95,17 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 GamePhase.DeterminingStartingPlayer,
                 dateTimeProvider.UtcNow);
 
-            var player1 = session.Players.Single(p => p.IsHost);
-            var player2 = session.Players.Single(p => !p.IsHost);
+            var player1 = session.Players.First(p => p.IsHost);
+            var player2 = session.Players.First(p => !p.IsHost);
 
             var playerRepoMock = new Mock<IGamePlayerRepository>();
-            var uowMock = new Mock<IUnitOfWork>();
-            var diceMock = new Mock<IDiceService>();
-            var notifierMock = new Mock<IGameSessionNotifier>();
-
             playerRepoMock.Setup(x =>
                 x.GetPlayersBySessionAsync(
                     session.Id,
                     false))
                 .ReturnsAsync(session.Players.ToList());
 
+            var uowMock = new Mock<IUnitOfWork>();
             uowMock.Setup(x =>
                 x.GameSessions.GetByIdAsync(
                     session.Id,
@@ -121,20 +119,23 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
-            diceMock.Setup(x => x.RollDistinctPair())
-                .Returns((6, 3));
-
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x => x.StartingPlayerDetermined(
                     It.IsAny<Guid>(),
                     It.IsAny<(Guid, int)[]>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+            startingPlayerRollerMock
+                .Setup(x => x.Roll())
+                .Returns(new StartingPlayerRoll(6, 3));
+
             var handler = new DetermineStartingPlayerCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                diceMock.Object,
-                dateTimeProvider);
+                dateTimeProvider,
+                startingPlayerRollerMock.Object);
 
             var command = new DetermineStartingPlayerCommand(session.Id);
 

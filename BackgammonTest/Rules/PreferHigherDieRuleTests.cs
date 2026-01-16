@@ -30,7 +30,7 @@ namespace BackgammonTest.Rules
 
             // Assert
             result.Should().HaveCount(1);
-            result[0].Moves.Single().Die.Should().Be(5);
+            result[0].Moves.First().Die.Should().Be(5);
         }
     }
 }

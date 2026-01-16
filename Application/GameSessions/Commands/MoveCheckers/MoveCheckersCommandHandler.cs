@@ -44,7 +44,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             var boardState = _boardStateFactory.Create(session);
-            var diceRoll = session.GetCurrentDiceRoll(); ;
+            var diceRoll = session.GetCurrentDiceRoll();
 
             var possibleSequences =
                 _moveSequenceGenerator.Generate(boardState, diceRoll);

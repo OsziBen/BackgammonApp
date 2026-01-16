@@ -25,8 +25,6 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
             };
 
             var uowMock = new Mock<IUnitOfWork>();
-            var notifierMock = new Mock<IGameSessionNotifier>();
-
             uowMock.Setup(x =>
                     x.GamePlayers.GetByIdAsync(
                         player.Id,
@@ -37,6 +35,7 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x => x.PlayerDisconnected(
                     player.GameSessionId,
                     player.Id,
@@ -74,7 +73,6 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
             var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var uowMock = new Mock<IUnitOfWork>();
-
             uowMock.Setup(x =>
                 x.GamePlayers.GetByIdAsync(
                     It.IsAny<Guid>(),

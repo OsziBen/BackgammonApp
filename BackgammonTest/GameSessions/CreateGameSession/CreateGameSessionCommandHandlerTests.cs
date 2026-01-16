@@ -16,9 +16,9 @@ namespace BackgammonTest.GameSessions.CreateGameSession
             // Arrange
             var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
-            var uowMock = new Mock<IUnitOfWork>();
             var repoMock = new Mock<IGameSessionRepository>();
 
+            var uowMock = new Mock<IUnitOfWork>();
             uowMock.Setup(x => x.GameSessions)
                 .Returns(repoMock.Object);
 
@@ -63,9 +63,9 @@ namespace BackgammonTest.GameSessions.CreateGameSession
             // Arrange
             var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
-            var uowMock = new Mock<IUnitOfWork>();
             var repoMock = new Mock<IGameSessionRepository>();
 
+            var uowMock = new Mock<IUnitOfWork>();
             uowMock.Setup(x => x.GameSessions)
                 .Returns(repoMock.Object);
 
@@ -90,7 +90,7 @@ namespace BackgammonTest.GameSessions.CreateGameSession
 
             // Assert
             await act.Should()
-                .ThrowAsync<InvalidOperationException>();
+                .ThrowAsync<InvalidOperationException>();   // TODO: custom exception
         }
     }
 }

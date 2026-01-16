@@ -2,6 +2,7 @@
 using Application.GameSessions.Commands.StartGameSession;
 using Application.Interfaces;
 using BackgammonTest.GameSessions.Shared;
+using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
@@ -75,7 +76,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             session.Players.Should().HaveCount(1);
 
-            var player = session.Players.Single();
+            var player = session.Players.First();
             player.UserId.Should().Be(userId);
             player.IsHost.Should().BeTrue();
 
@@ -235,7 +236,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             await act.Should()
                 .ThrowAsync<BusinessRuleException>()
-                .WithMessage("Session is full.");
+                .Where(e => e.ErrorCode == FunctionCode.SessionFull);
         }
     }
 }

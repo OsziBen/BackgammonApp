@@ -6,7 +6,6 @@ namespace Domain.GameLogic
     public class DiceRoll
     {
         public IReadOnlyList<int> Values { get; }
-
         public bool IsDouble { get; }
 
         public DiceRoll(IEnumerable<int> values)
@@ -24,14 +23,14 @@ namespace Domain.GameLogic
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidDiceRoll,
-                    "Dice roll must contain exactly 2 values");
+                    "Dice roll must contain exactly 2 values.");
             }
 
             if (dice.Any(d => d < 1 || d > 6))
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidDiceRollValues,
-                    "Dice values must be between 1 and 6");
+                    "Dice values must be between 1 and 6.");
             }
 
             IsDouble = dice[0] == dice[1];
@@ -41,7 +40,17 @@ namespace Domain.GameLogic
                 : dice;
         }
 
-        public int MaxMoves => Values.Count;
+        public DiceRoll(int die1, int die2)
+        {
+            if (die1 < 1 || die1 > 6 || die2 < 1 || die2 > 6)
+                throw new ArgumentOutOfRangeException();
+
+            IsDouble = die1 == die2;
+
+            Values = IsDouble
+                ? new[] { die1, die1, die1, die1 }
+                : new[] { die1, die2 };
+        }
 
         public IEnumerable<IEnumerable<int>> GetPermutations()
         {

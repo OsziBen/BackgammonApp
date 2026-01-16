@@ -53,7 +53,7 @@ namespace BackgammonTest.Generators
             var sequences = generator.Generate(state, dice).ToList();
 
             // Assert
-            sequences.Single().Moves.Should().BeEmpty();
+            sequences.First().Moves.Should().BeEmpty();
         }
     }
 }

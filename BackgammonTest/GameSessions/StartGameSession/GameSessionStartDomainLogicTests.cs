@@ -49,7 +49,7 @@ namespace BackgammonTest.GameSessions.StartGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished);
         }
 
         [Fact]
@@ -68,7 +68,8 @@ namespace BackgammonTest.GameSessions.StartGameSession
 
             // Assert
             act.Should()
-                .Throw<BusinessRuleException>();
+                .Throw<BusinessRuleException>()
+                .Where(e => e.ErrorCode == FunctionCode.InvalidGamePhase);
         }
 
         [Fact]
@@ -94,7 +95,8 @@ namespace BackgammonTest.GameSessions.StartGameSession
 
             // Assert
             act.Should()
-                .Throw<BusinessRuleException>();
+                .Throw<BusinessRuleException>()
+                .Where(e => e.ErrorCode == FunctionCode.InsufficientPlayerNumber);
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using Application.GameSessions.Guards;
-using Application.GameSessions.Realtime;
+﻿using Application.GameSessions.Realtime;
 using Application.GameSessions.Responses;
 using Application.Interfaces;
 using Application.Shared;
 using Application.Shared.Time;
-using Common.Enums.GameSession;
+using Domain.GameLogic;
 using Domain.GameSession;
 using MediatR;
 
@@ -14,19 +13,19 @@ namespace Application.GameSessions.Commands.RollDice
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
-        private readonly IDiceService _diceService;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IDiceRoller _diceRoller;
 
         public RollDiceCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
-            IDiceService diceService,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IDiceRoller diceRoller)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
-            _diceService = diceService;
             _timeProvider = timeProvider;
+            _diceRoller = diceRoller;
         }
 
         public async Task<RollDiceResult> Handle(
@@ -39,38 +38,23 @@ namespace Application.GameSessions.Commands.RollDice
 
             var now = _timeProvider.UtcNow;
 
-            GameSessionGuards.EnsureNotFinished(session);
-            GamePhaseGuards.EnsurePhase(
-                session,
-                GamePhase.RollDice);
-            GameSessionStateGuards.EnsureNoActiveDice(session);
-            RollDiceGuards.EnsureCurrentPlayer(
-                session,
-                request.PlayerId);
+            var diceRoll = session.RollDice(
+                request.PlayerId,
+                _diceRoller,
+                now);
 
-            // DOBÁS
-            var die1 = _diceService.Roll();
-            var die2 = _diceService.Roll();
-
-            var movesCount = die1 == die2 ? 4 : 2;
-
-            session.LastDiceRoll = new[] { die1, die2 };
-            session.CurrentPhase = GamePhase.MoveCheckers;
-            session.LastUpdatedAt = now;
-
-            //_uow.GameSessions.Update(session);
             await _uow.CommitAsync();
 
             await _gameSessionNotifier.DiceRolled(
                 session.Id,
                 request.PlayerId,
-                die1,
-                die2);
+                diceRoll.Values[0],
+                diceRoll.IsDouble ? diceRoll.Values[0] : diceRoll.Values[1]);
 
             return new RollDiceResult(
-                die1,
-                die2,
-                movesCount);
+                diceRoll.Values[0],
+                diceRoll.IsDouble ? diceRoll.Values[0] : diceRoll.Values[1],
+                diceRoll.Values.Count);
         }
     }
 }

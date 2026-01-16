@@ -30,7 +30,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             result.Player.IsHost.Should().BeTrue();
 
             session.Players.Should().HaveCount(1);
-            session.Players.Single(p => p.IsHost).UserId.Should().Be(userId);
+            session.Players.First(p => p.IsHost).UserId.Should().Be(userId);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             result.Player.IsHost.Should().BeFalse();
 
             session.Players.Should().HaveCount(2);
-            session.Players.Single(p => !p.IsHost).UserId.Should().Be(secondUserId);
+            session.Players.First(p => !p.IsHost).UserId.Should().Be(secondUserId);
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("Session is full.");
+                .Where(e => e.ErrorCode == FunctionCode.SessionFull);
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished);
         }
 
         [Fact]
@@ -146,7 +146,7 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("Cannot join session in phase RollDice.");
+                .Where(e => e.ErrorCode == FunctionCode.InvalidGamePhase);
         }
 
     }

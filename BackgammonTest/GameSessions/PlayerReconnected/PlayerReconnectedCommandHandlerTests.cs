@@ -25,8 +25,6 @@ namespace BackgammonTest.GameSessions.PlayerReconnected
             };
 
             var uowMock = new Mock<IUnitOfWork>();
-            var notifierMock = new Mock<IGameSessionNotifier>();
-
             uowMock.Setup(x =>
                 x.GamePlayers.GetByIdAsync(
                     player.Id,
@@ -37,6 +35,7 @@ namespace BackgammonTest.GameSessions.PlayerReconnected
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x =>
                 x.PlayerReconnected(
                     player.GameSessionId,
@@ -82,8 +81,6 @@ namespace BackgammonTest.GameSessions.PlayerReconnected
             };
 
             var uowMock = new Mock<IUnitOfWork>();
-            var notifierMock = new Mock<IGameSessionNotifier>();
-
             uowMock.Setup(x =>
                 x.GamePlayers.GetByIdAsync(
                     player.Id,
@@ -91,6 +88,13 @@ namespace BackgammonTest.GameSessions.PlayerReconnected
                     false))
                 .ReturnsAsync(player);
 
+            var notifierMock = new Mock<IGameSessionNotifier>();
+            notifierMock.Setup(x =>
+                x.PlayerReconnected(
+                    player.GameSessionId,
+                    player.Id,
+                    It.IsAny<DateTimeOffset>()))
+                .Returns(Task.CompletedTask);
 
             var handler = new PlayerReconnectedCommandHandler(
                 uowMock.Object,
