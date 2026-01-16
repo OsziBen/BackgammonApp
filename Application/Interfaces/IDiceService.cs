@@ -3,6 +3,5 @@
     public interface IDiceService
     {
         int Roll();
-        (int, int) RollDistinctPair();
     }
 }
