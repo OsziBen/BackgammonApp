@@ -22,9 +22,11 @@
         GameAlreadyFinished = 4005,
         NotYourTurn = 4006,
         InvalidMove = 4007,
-        InvalidDiceRoll = 4007,
-        InvalidDiceRollValues = 4008,
-        PlayerNotInSession = 4009,
+        InvalidDiceRoll = 4008,
+        InvalidDiceRollValues = 4009,
+        PlayerNotInSession = 4010,
+        DiceAlreadyRolled = 4011,
+        InsufficientPlayerNumber = 4012,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
