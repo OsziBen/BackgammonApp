@@ -2,7 +2,6 @@
 using Application.Interfaces;
 using Application.Shared;
 using Application.Shared.Time;
-using Common.Constants;
 using Domain.GameSession;
 using MediatR;
 
@@ -12,19 +11,19 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
     {
         private readonly IUnitOfWork _uow;
         private readonly IGameSessionNotifier _gameSessionNotifier;
-        private readonly IDiceService _diceService;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IStartingPlayerRoller _startingPlayerRoller;
 
         public DetermineStartingPlayerCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
-            IDiceService diceService,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IStartingPlayerRoller startingPlayerRoller)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
-            _diceService = diceService;
             _timeProvider = timeProvider;
+            _startingPlayerRoller = startingPlayerRoller;
         }
 
         public async Task<Unit> Handle(
@@ -37,19 +36,8 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
 
             var now = _timeProvider.UtcNow;
 
-            var players = await _uow.GamePlayers
-                .GetPlayersBySessionAsync(session.Id, asNoTracking: false);
-
-            if (players.Count < GameSessionConstants.MaxPlayers)
-            {
-                return Unit.Value;
-            }
-
-            var (roll1, roll2) = _diceService.RollDistinctPair();
-
             var result = session.DetermineStartingPlayer(
-                roll1,
-                roll2,
+                _startingPlayerRoller,
                 now);
 
             await _uow.CommitAsync();
@@ -57,7 +45,7 @@ namespace Application.GameSessions.Commands.DetermineStartingPlayer
             await _gameSessionNotifier.StartingPlayerDetermined(
                 session.Id,
                 result.Rolls.ToArray(),
-                result.StarttingPlayerId);
+                result.StartingPlayerId);
 
             return Unit.Value;
         }
