@@ -176,8 +176,8 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                 GamePhase.MoveCheckers,
                 timeProvider.UtcNow);
 
-            var currentPlayer = session.Players.Single(p => p.IsHost);
-            var nextPlayer = session.Players.Single(p => !p.IsHost);
+            var currentPlayer = session.Players.First(p => p.IsHost);
+            var nextPlayer = session.Players.First(p => !p.IsHost);
 
             session.CurrentPlayerId = currentPlayer.Id;
             session.LastDiceRoll = new[] { 6, 3 };
@@ -259,8 +259,8 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                 GamePhase.MoveCheckers,
                 timeProvider.UtcNow);
 
-            var currentPlayer = session.Players.Single(p => p.IsHost);
-            var enemyPlayer = session.Players.Single(p => !p.IsHost);
+            var currentPlayer = session.Players.First(p => p.IsHost);
+            var enemyPlayer = session.Players.First(p => !p.IsHost);
 
             session.CurrentPlayerId = currentPlayer.Id;
             session.LastDiceRoll = new[] { 6, 3 };

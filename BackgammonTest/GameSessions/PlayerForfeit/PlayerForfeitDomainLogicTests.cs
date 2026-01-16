@@ -22,7 +22,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 dateTimeProvider.UtcNow);
 
             var forfeitingPlayer = session.Players.First();
-            var winner = session.Players.Single(p => p.Id != forfeitingPlayer.Id);
+            var winner = session.Players.First(p => p.Id != forfeitingPlayer.Id);
 
             var boardState = BoardStateBuilder
                 .Default()
