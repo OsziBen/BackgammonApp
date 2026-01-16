@@ -9,6 +9,8 @@ using Common.Enums.GameSession;
 using Common.Exceptions;
 using FluentAssertions;
 using Moq;
+using System.Numerics;
+using System.Reflection;
 
 namespace BackgammonTest.GameSessions.PlayerForfeit
 {
@@ -26,7 +28,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 fixedNow);
 
             var forfeitingPlayer = session.Players.First();
-            var winner = session.Players.Single(p => p.Id != forfeitingPlayer.Id);
+            var winner = session.Players.First(p => p.Id != forfeitingPlayer.Id);
 
             var boardState = BoardStateBuilder.Default().Build();
 
@@ -47,6 +49,13 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
+            notifierMock.Setup(x =>
+                x.GameFinished(
+                    session.Id,
+                    winner.Id,
+                    GameFinishReason.Forfeit,
+                    GameResultType.SimpleVictory))
+                .Returns(Task.CompletedTask);
 
             var handler = new PlayerForfeitCommandHandler(
                 uowMock.Object,
@@ -87,6 +96,8 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 GamePhase.MoveCheckers,
                 dateTimeProvider.UtcNow);
 
+            var winner = session.Players.First();
+
             var outsiderId = Guid.NewGuid();
 
             var boardFactoryMock = new Mock<IBoardStateFactory>();
@@ -103,6 +114,13 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 .ReturnsAsync(session);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
+            notifierMock.Setup(x =>
+                x.GameFinished(
+                    session.Id,
+                    winner.Id,
+                    GameFinishReason.Forfeit,
+                    GameResultType.SimpleVictory))
+                .Returns(Task.CompletedTask);
 
             var handler = new PlayerForfeitCommandHandler(
                 uowMock.Object,

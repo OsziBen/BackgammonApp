@@ -3,7 +3,9 @@ using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
+using Domain.GameSession;
 using FluentAssertions;
+using Moq;
 
 namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 {
@@ -20,13 +22,17 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 GamePhase.DeterminingStartingPlayer,
                 dateTimeProvider.UtcNow);
 
-            var player1 = session.Players.Single(p => p.IsHost);
-            var player2 = session.Players.Single(p => !p.IsHost);
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+            startingPlayerRollerMock
+                .Setup(x => x.Roll())
+                .Returns(new StartingPlayerRoll(6, 3));
+
+            var player1 = session.Players.First(p => p.IsHost);
+            var player2 = session.Players.First(p => !p.IsHost);
 
             // Act
             var result = session.DetermineStartingPlayer(
-                roll1: 6,
-                roll2: 2,
+                startingPlayerRollerMock.Object,
                 dateTimeProvider.UtcNow);
 
             // Assert
@@ -35,37 +41,28 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             session.LastUpdatedAt.Should().Be(fixedNow);
 
             player1.StartingRoll.Should().Be(6);
-            player2.StartingRoll.Should().Be(2);
+            player2.StartingRoll.Should().Be(3);
 
-            result.StarttingPlayerId.Should().Be(player1.Id);
+            result.StartingPlayerId.Should().Be(player1.Id);
             result.Rolls.Should().BeEquivalentTo(new[]
             {
                 (player1.Id, 6),
-                (player2.Id, 2)
+                (player2.Id, 3)
             });
         }
 
         [Fact]
-        public void DetermineStartingPlayer_Should_Throw_When_Same_Dice_Values()
+        public void StartingPlayerRoll_Should_Throw_When_Rolls_Are_Equal()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
-
-            var session = TestGameSessionFactory.CreateValidSession(
-                GamePhase.DeterminingStartingPlayer,
-                dateTimeProvider.UtcNow);
 
             // Act
-            var act = () => session.DetermineStartingPlayer(
-                5,
-                5,
-                dateTimeProvider.UtcNow);
+            var act = () => new StartingPlayerRoll(3, 3);
 
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("Starting rolls must be distinct");
+                .Where(e => e.ErrorCode == FunctionCode.InvalidDiceRollValues);
         }
 
         [Fact]
@@ -79,16 +76,20 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 GamePhase.WaitingForPlayers,
                 dateTimeProvider.UtcNow);
 
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+            startingPlayerRollerMock
+                .Setup(x => x.Roll())
+                .Returns(new StartingPlayerRoll(6, 3));
+
             // Act
             var act = () => session.DetermineStartingPlayer(
-                3,
-                5,
+                startingPlayerRollerMock.Object,
                 dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("*Expected phase*");
+                .Where(e => e.ErrorCode == FunctionCode.InvalidGamePhase);
         }
 
         [Fact]
@@ -102,16 +103,17 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 GamePhase.GameFinished,
                 dateTimeProvider.UtcNow);
 
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+
             // Act
             var act = () => session.DetermineStartingPlayer(
-                4,
-                1,
+                startingPlayerRollerMock.Object,
                 dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished); ;
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished);
         }
 
         [Theory]
@@ -128,6 +130,8 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                 GamePhase.DeterminingStartingPlayer,
                 dateTimeProvider.UtcNow);
 
+            var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
+
             for (int i = 0; i < count; i++)
             {
                 session.Players.Add(
@@ -139,14 +143,13 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
 
             // Act
             var act = () => session.DetermineStartingPlayer(
-                2,
-                5,
+                startingPlayerRollerMock.Object,
                 dateTimeProvider.UtcNow);
 
             // Assert
             act.Should()
                 .Throw<BusinessRuleException>()
-                .WithMessage("*Exactly two players*");
+                .Where(e => e.ErrorCode == FunctionCode.InsufficientPlayerNumber);
         }
     }
 }
