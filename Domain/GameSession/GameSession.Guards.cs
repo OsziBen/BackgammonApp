@@ -11,7 +11,7 @@ namespace Domain.GameSession
             if (Players.Count != 2)
             {
                 throw new BusinessRuleException(
-                    FunctionCode.BusinessRuleViolation,
+                    FunctionCode.InsufficientPlayerNumber,
                     "Exactly two players are required.");
             }
         }
@@ -55,17 +55,46 @@ namespace Domain.GameSession
             }
         }
 
-
         private void EnsureCurrentPlayer(Guid playerId)
         {
             if (CurrentPlayerId != playerId)
             {
                 throw new BusinessRuleException(
                     FunctionCode.NotYourTurn,
-                    "Only the current player can move.");
+                    "Only the current player can perform this action.");
             }
         }
 
+        private void EnsureCurrentPlayerIsSet()
+        {
+            if (CurrentPlayerId == null)
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidGameState,
+                    "Current player is not set");
+        }
+
+        private void EnsureNoActiveDice()
+        {
+            if (LastDiceRoll != null)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.DiceAlreadyRolled,
+                    "Dice already rolled for this turn.");
+            }
+        }
+
+
+        private void EnsureCanJoin()
+        {
+            EnsurePhase(GamePhase.WaitingForPlayers);
+
+            if (Players.Count >= 2)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.SessionFull,
+                    "Session is full.");
+            }
+        }
 
         private void EnsureCanStartGame()
         {
