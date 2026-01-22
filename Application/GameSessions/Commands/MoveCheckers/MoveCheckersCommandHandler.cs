@@ -69,7 +69,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
                 clientSequence,
                 request.PlayerId,
                 now,
-                out var resultType);
+                out var outcome);
 
             session.UpdateBoardState(
                 BoardStateMapper.ToJson(session, nextState));
@@ -78,13 +78,13 @@ namespace Application.GameSessions.Commands.MoveCheckers
 
             await _uow.CommitAsync();
 
-            if (session.IsFinished)
+            if (outcome != null)
             {
                 await _gameSessionNotifier.GameFinished(
                     session.Id,
                     session.WinnerPlayerId!.Value,
                     GameFinishReason.Victory,
-                    resultType!.Value);
+                    outcome);
             }
             else
             {
