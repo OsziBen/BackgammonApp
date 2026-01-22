@@ -1,6 +1,6 @@
-﻿using Common.Enums.Game;
-using Domain.GameLogic;
+﻿using Domain.GameLogic;
 using Domain.GameLogic.Extensions;
+using Domain.GameSession.Results;
 
 namespace Domain.GameSession
 {
@@ -11,7 +11,7 @@ namespace Domain.GameSession
             MoveSequence moveSequence,
             Guid playerId,
             DateTimeOffset now,
-            out GameResultType? resultType)
+            out GameOutcome? outcome)
         {
             EnsureCanMoveCheckers();
             EnsureCurrentPlayer(playerId);
@@ -23,23 +23,21 @@ namespace Domain.GameSession
                 nextState = nextState.Apply(move);
             }
 
-            var currentPlayer = GetCurrentPlayer();
-            var winnerColor = currentPlayer.Color;
+            var winnerColor = GetPlayerColor(GetCurrentPlayer().Id);
 
             if (nextState.TryEvaluateVictory(
                 winnerColor,
-                out var gameResult))
+                out var resultType))
             {
-                resultType = GameResultEvaluator.Evaluate(
-                    nextState,
-                    winnerColor,
+                outcome = GameResultEvaluator.CreateOutcome(
+                    resultType,
                     DoublingCubeValue);
 
                 Finish(CurrentPlayerId!.Value, now);
             }
             else
             {
-                resultType = null;
+                outcome = null;
                 EndTurn(now);
             }
 
