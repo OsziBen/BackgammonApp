@@ -2,6 +2,7 @@
 using Application.GameSessions.Requests;
 using Common.Enums.Game;
 using Common.Enums.GameSession;
+using Domain.GameSession.Results;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Hubs;
 
@@ -47,11 +48,37 @@ namespace WebAPI.Realtime
                         Die2 = die2
                     });
 
+        public Task DoublingCubeAccepted(
+            Guid sessionId,
+            Guid acceptingPlayerId,
+            int cubeValue)
+            => _hub.Clients
+                .Group(sessionId.ToString())
+                .SendAsync("DoublingCubeAccepted", new
+                {
+                    SessionId = sessionId,
+                    AcceptingPlayerId = acceptingPlayerId,
+                    CubeValue = cubeValue
+                });
+
+        public Task DoublingCubeOffered(
+            Guid sessionId,
+            Guid playerId,
+            int cubeValue)
+            => _hub.Clients
+            .Group(sessionId.ToString())
+            .SendAsync("DoublingCubeOffered", new
+            {
+                SessionId = sessionId,
+                PlayerId = playerId,
+                CubeValue = cubeValue
+            });
+
         public Task GameFinished(
             Guid sessionId,
             Guid winnerPlayerId,
             GameFinishReason reason,
-            GameResultType resultType)
+            GameOutcome outcome)
             => _hub.Clients
             .Group(sessionId.ToString())
             .SendAsync("GameFinished", new
@@ -59,7 +86,7 @@ namespace WebAPI.Realtime
                 SessionId = sessionId,
                 WinnerPlayerId = winnerPlayerId,
                 Reason = reason.ToString(),
-                ResultType = resultType
+                Outcome = outcome
             });
 
         public Task GameStarted(

@@ -11,6 +11,7 @@ using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameLogic;
 using Domain.GameLogic.Generators;
+using Domain.GameSession.Results;
 using FluentAssertions;
 using Moq;
 
@@ -329,7 +330,7 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                     session.Id,
                     currentPlayer.Id,
                     GameFinishReason.Victory,
-                    GameResultType.SimpleVictory),
+                    new GameOutcome(GameResultType.SimpleVictory, 1)),
                 Times.Once);
         }
     }

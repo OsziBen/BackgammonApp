@@ -3,7 +3,7 @@ using Domain.GameSession;
 
 namespace Application.Realtime
 {
-    public sealed class RuntimeBoardStateSnapshotMapper
+    public class RuntimeBoardStateSnapshotMapper
     {
         public static RuntimeBoardStateSnapshot Map(
             GameSession session,

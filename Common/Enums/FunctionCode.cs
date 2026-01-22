@@ -27,6 +27,10 @@
         PlayerNotInSession = 4010,
         DiceAlreadyRolled = 4011,
         InsufficientPlayerNumber = 4012,
+        PlayerDoesNotPossessDoublingCube = 4013,
+        CrawfordRuleInEffect = 4014,
+        DoublingCubeDisabled = 4015,
+        InvalidPlayer = 4016,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,

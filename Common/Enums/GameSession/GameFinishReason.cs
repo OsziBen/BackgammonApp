@@ -4,7 +4,7 @@
     {
         Victory,
         Forfeit,
-        CubeRejected,
+        CubeDeclined,
         Timeout
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Requests;
 using Common.Enums.Game;
 using Common.Enums.GameSession;
+using Domain.GameSession.Results;
 
 namespace Application.GameSessions.Realtime
 {
@@ -45,6 +46,16 @@ namespace Application.GameSessions.Realtime
             Guid sessionId,
             Guid winnerPlayerId,
             GameFinishReason reason,
-            GameResultType gameResult);
+            GameOutcome outcome);
+
+        Task DoublingCubeOffered(
+            Guid sessionId,
+            Guid playerId,
+            int cubeValue);
+
+        Task DoublingCubeAccepted(
+            Guid sessionId,
+            Guid acceptingPlayerId,
+            int cubeValue);
     }
 }

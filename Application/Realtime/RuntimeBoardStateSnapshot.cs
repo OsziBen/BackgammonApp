@@ -4,7 +4,7 @@ using Domain.GameLogic;
 
 namespace Application.Realtime
 {
-    public sealed class RuntimeBoardStateSnapshot
+    public class RuntimeBoardStateSnapshot
     {
         public Dictionary<int, CheckerPosition> Points { get; init; } = [];
         public int BarWhite { get; init; }

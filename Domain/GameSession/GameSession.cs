@@ -1,4 +1,5 @@
 ﻿using Common.Enums;
+using Common.Enums.BoardState;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Common.Models;
@@ -21,6 +22,7 @@ namespace Domain.GameSession
 
         public int? DoublingCubeValue { get; set; }
         public Guid? DoublingCubeOwnerPlayerId { get; set; }
+        public bool CrawfordRuleApplies { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? StartedAt { get; set; }
@@ -49,7 +51,7 @@ namespace Domain.GameSession
                     "CurrentPlayerId is not set");
             }
 
-            var player = Players.SingleOrDefault(
+            var player = Players.FirstOrDefault(
                 p => p.Id == CurrentPlayerId.Value);
 
             if (player == null)
@@ -59,6 +61,38 @@ namespace Domain.GameSession
             }
 
             return player;
+        }
+
+        private GamePlayer.GamePlayer GetOpponent(Guid playerId)
+        {
+            EnsureExactlyTwoPlayers();
+
+            var opponent = Players.FirstOrDefault(p => p.Id != playerId);
+
+            if (opponent == null)
+            {
+                throw new InvalidOperationException(
+                    $"Opponent of player {playerId} not found.");
+            }
+
+            return opponent;
+        }
+
+        private Guid GetOpponentId(Guid playerId)
+            => GetOpponent(playerId).Id;
+
+        private PlayerColor GetPlayerColor(Guid playerId)
+        {
+            var player = Players.SingleOrDefault(p => p.Id == playerId);
+
+            if (player == null)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.PlayerNotInSession,
+                    "Player is not part of this session.");
+            }
+
+            return player.Color;
         }
 
         public DiceRoll GetCurrentDiceRoll()
@@ -74,5 +108,18 @@ namespace Domain.GameSession
 
             return new DiceRoll(LastDiceRoll);
         }
+
+        private void EvaluateCrawfordRule()
+        {
+            if (!Settings.CrawfordRuleEnabled)
+            {
+                CrawfordRuleApplies = false;
+                return;
+            }
+
+            // TODO: real Crawford logic (not MVP)
+            CrawfordRuleApplies = false;
+        }
+
     }
 }
