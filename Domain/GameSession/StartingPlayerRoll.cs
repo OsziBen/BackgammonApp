@@ -3,7 +3,7 @@ using Common.Exceptions;
 
 namespace Domain.GameSession
 {
-    public sealed class StartingPlayerRoll
+    public class StartingPlayerRoll
     {
         public int Player1Roll { get; }
         public int Player2Roll { get; }
