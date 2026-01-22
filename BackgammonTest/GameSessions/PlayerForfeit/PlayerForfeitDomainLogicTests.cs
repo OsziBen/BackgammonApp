@@ -4,6 +4,7 @@ using Common.Enums;
 using Common.Enums.Game;
 using Common.Enums.GameSession;
 using Common.Exceptions;
+using Domain.GameSession.Results;
 using FluentAssertions;
 
 namespace BackgammonTest.GameSessions.PlayerForfeit
@@ -38,7 +39,10 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
             session.IsFinished.Should().BeTrue();
             session.WinnerPlayerId.Should().Be(winner.Id);
 
-            result.Should().Be(GameResultType.SimpleVictory);
+            result.Should().BeEquivalentTo(new GameOutcome(
+                GameResultType.GammonVictory,
+                2
+            ));
         }
 
         [Fact]

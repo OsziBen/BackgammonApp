@@ -7,6 +7,7 @@ using Common.Enums;
 using Common.Enums.Game;
 using Common.Enums.GameSession;
 using Common.Exceptions;
+using Domain.GameSession.Results;
 using FluentAssertions;
 using Moq;
 using System.Numerics;
@@ -54,7 +55,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                     session.Id,
                     winner.Id,
                     GameFinishReason.Forfeit,
-                    GameResultType.SimpleVictory))
+                    new GameOutcome(GameResultType.SimpleVictory, 1)))
                 .Returns(Task.CompletedTask);
 
             var handler = new PlayerForfeitCommandHandler(
@@ -81,7 +82,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                     session.Id,
                     winner.Id,
                     GameFinishReason.Forfeit,
-                    It.IsAny<GameResultType>()),
+                    It.IsAny<GameOutcome>()),
                 Times.Once);
         }
 
@@ -119,7 +120,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                     session.Id,
                     winner.Id,
                     GameFinishReason.Forfeit,
-                    GameResultType.SimpleVictory))
+                    new GameOutcome(GameResultType.SimpleVictory, 1)))
                 .Returns(Task.CompletedTask);
 
             var handler = new PlayerForfeitCommandHandler(
