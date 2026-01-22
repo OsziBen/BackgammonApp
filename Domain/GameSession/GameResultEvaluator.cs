@@ -1,36 +1,27 @@
-﻿using Common.Enums.BoardState;
-using Common.Enums.Game;
-using Domain.GameLogic;
+﻿using Common.Enums.Game;
+using Domain.GameSession.Results;
 
 namespace Domain.GameSession
 {
     public static class GameResultEvaluator
     {
-        public static GameResultType Evaluate(
-            BoardState boardState,
-            PlayerColor winnerColor,
+        public static GameOutcome CreateOutcome(
+            GameResultType resultType,
             int? doublingCubeValue)
         {
-            if (!boardState.TryEvaluateVictory(winnerColor, out var baseResult))
+            var basePoints = resultType switch
             {
-                baseResult = GameResultType.SimpleVictory;
-            }
+                GameResultType.SimpleVictory => 1,
+                GameResultType.GammonVictory => 2,
+                GameResultType.BackgammonVictory => 3,
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-            return ApplyDoublingCube(baseResult, doublingCubeValue);
-        }
+            var multiplier = doublingCubeValue ?? 1;
 
-        private static GameResultType ApplyDoublingCube(
-            GameResultType result,
-            int? cubeValue)
-        {
-            if (cubeValue == null || cubeValue == 1)
-            {
-                return result;
-            }
-
-            // TODO: multiply logic
-
-            return result;
+            return new GameOutcome(
+                resultType,
+                basePoints * multiplier);
         }
     }
 }
