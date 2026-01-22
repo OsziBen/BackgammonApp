@@ -83,7 +83,6 @@ namespace Domain.GameSession
             }
         }
 
-
         private void EnsureCanJoin()
         {
             EnsurePhase(GamePhase.WaitingForPlayers);
@@ -93,6 +92,66 @@ namespace Domain.GameSession
                 throw new BusinessRuleException(
                     FunctionCode.SessionFull,
                     "Session is full.");
+            }
+        }
+
+        private void EnsureDoublingCubeEnabled()
+        {
+            if (!Settings.DoublingCubeEnabled)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.DoublingCubeDisabled,
+                    "Doubling cube is disabled for this session.");
+            }
+        }
+
+        private void EnsurePlayerMayUseDoublingCube(Guid playerId)
+        {
+            if (DoublingCubeOwnerPlayerId == null)
+                return;
+
+            if (DoublingCubeOwnerPlayerId == playerId)
+                return;
+
+            throw new BusinessRuleException(
+                FunctionCode.PlayerDoesNotPossessDoublingCube,
+                "Player does not have the right to offer the doubling cube.");
+        }
+
+
+        private void EnsureCanOfferDoublingCube(Guid playerId)
+        {
+            EnsureNotFinished();
+            EnsurePhase(GamePhase.TurnStart);
+            EnsureCurrentPlayer(playerId);
+            EnsureDoublingCubeEnabled();
+            EnsurePlayerMayUseDoublingCube(playerId);
+        }
+
+        private void EnsureCanAcceptDoublingCube(Guid playerId)
+        {
+            EnsureNotFinished();
+            EnsurePhase(GamePhase.CubeOffered);
+            EnsurePlayerIsInSession(playerId);
+
+            if (playerId == CurrentPlayerId)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidPlayer,
+                    "Offering player cannot accept their own cube.");
+            }
+        }
+        private void EnsureCanDeclineDoublingCube(Guid playerId)
+        {
+            EnsureNotFinished();
+            EnsurePhase(GamePhase.CubeOffered);
+            EnsurePlayerIsInSession(playerId);
+
+            if (playerId == CurrentPlayerId)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidPlayer,
+                    "Offering player cannot decline their own cube.");
             }
         }
 
