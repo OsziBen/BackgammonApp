@@ -25,6 +25,12 @@ namespace Domain.GameLogic
             return true;
         }
 
+        public GameResultType EvaluateForfeitResult(
+            PlayerColor forfeitingPlayer)
+        {
+            return EvaluateResult(forfeitingPlayer);
+        }
+
         private GameResultType EvaluateResult(PlayerColor loser)
         {
             if (HasAnyCheckersOff(loser))
