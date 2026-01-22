@@ -30,11 +30,19 @@ namespace BackgammonTest.GameSessions.Shared
 
         public static GameSession CreateValidSession(
             GamePhase phase,
-            DateTimeOffset? now = null)
+            DateTimeOffset? now = null,
+            bool doublingCubeEnabled = true)
         {
             var time = now ?? DateTimeOffset.UtcNow;
 
             var session = CreateEmptySession(phase, now);
+
+            session.Settings = new GameSessionSettings
+            {
+                DoublingCubeEnabled = doublingCubeEnabled
+            };
+
+            session.DoublingCubeValue = session.Settings.DoublingCubeEnabled ? 1 : null;
 
             session.Players.Add(
                 GamePlayerFactory.CreateHost(
