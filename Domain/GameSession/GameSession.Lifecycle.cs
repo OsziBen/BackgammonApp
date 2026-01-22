@@ -12,9 +12,16 @@ namespace Domain.GameSession
         {
             EnsureCanStartGame();
 
+            ApplyMatchRules();
+
             CurrentPhase = GamePhase.DeterminingStartingPlayer;
             StartedAt ??= now;
             LastUpdatedAt = now;
+        }
+
+        private void ApplyMatchRules()
+        {
+            EvaluateCrawfordRule();
         }
 
         public void Finish(Guid winnerPlayerId, DateTimeOffset now)
@@ -25,7 +32,7 @@ namespace Domain.GameSession
             CurrentPhase = GamePhase.GameFinished;
         }
 
-        public GameResultType Forfeit(
+        public GameOutcome Forfeit(
             Guid forfeitingPlayerId,
             BoardState boardState,
             DateTimeOffset now)
@@ -34,16 +41,21 @@ namespace Domain.GameSession
             EnsureExactlyTwoPlayers();
             EnsurePlayerIsInSession(forfeitingPlayerId);
 
-            var winner = Players.First(p => p.Id != forfeitingPlayerId);
+            var forfeitingPlayer = Players
+                .First(p => p.Id == forfeitingPlayerId);
 
-            var resultType = GameResultEvaluator.Evaluate(
-                boardState,
-                winner.Color,
+            var winner = GetOpponent(forfeitingPlayerId);
+
+            var resultType = boardState.EvaluateForfeitResult(
+                forfeitingPlayer.Color);
+
+            var outcome = GameResultEvaluator.CreateOutcome(
+                resultType,
                 DoublingCubeValue);
 
             Finish(winner.Id, now);
 
-            return resultType;
+            return outcome;
         }
 
         public JoinResult JoinPlayer(Guid userId, DateTimeOffset now)
