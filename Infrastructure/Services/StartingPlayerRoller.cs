@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Domain.GameSession;
+using Domain.GameSession.Services;
 
 namespace Infrastructure.Services
 {
