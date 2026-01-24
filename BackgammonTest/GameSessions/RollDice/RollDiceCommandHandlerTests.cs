@@ -1,12 +1,13 @@
 ﻿using Application.GameSessions.Commands.RollDice;
 using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameLogic;
-using Domain.GameSession;
+using Domain.GameSession.Services;
 using FluentAssertions;
 using Moq;
 
@@ -18,8 +19,7 @@ namespace BackgammonTest.GameSessions.RollDice
         public async Task Handle_Should_Roll_Dice_And_Notify()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.DeterminingStartingPlayer,
@@ -37,27 +37,31 @@ namespace BackgammonTest.GameSessions.RollDice
             session.EndTurn(timeProvider.UtcNow);
 
             var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var sessionWriteRepoMock = new Mock<IGameSessionWriteRepository>();
+
+            sessionWriteRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
 
-            uowMock.Setup(x => x.CommitAsync())
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(sessionWriteRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
-            notifierMock.Setup(x =>
-                    x.DiceRolled(
-                        session.Id,
-                        session.CurrentPlayerId!.Value,
-                        4,
-                        2))
+            notifierMock
+                .Setup(x => x.DiceRolled(
+                    session.Id,
+                    session.CurrentPlayerId!.Value,
+                    4,
+                    2))
                 .Returns(Task.CompletedTask);
 
-            var rollerMock = new Mock<IDiceRoller>();
-            rollerMock
+            var diceRollerMock = new Mock<IDiceRoller>();
+            diceRollerMock
                 .Setup(x => x.Roll())
                 .Returns(new DiceRoll(4, 2));
 
@@ -65,7 +69,7 @@ namespace BackgammonTest.GameSessions.RollDice
                 uowMock.Object,
                 notifierMock.Object,
                 timeProvider,
-                rollerMock.Object);
+                diceRollerMock.Object);
 
             var command = new RollDiceCommand(
                 session.Id,
@@ -95,32 +99,29 @@ namespace BackgammonTest.GameSessions.RollDice
         public async Task Handle_Should_Throw_When_Game_Is_Finished()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
                 timeProvider.UtcNow);
 
             var uowMock = new Mock<IUnitOfWork>();
-
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var gameSessionsWriteMock = new Mock<IGameSessionWriteRepository>();
+            gameSessionsWriteMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
+            uowMock.Setup(x => x.GameSessionsWrite).Returns(gameSessionsWriteMock.Object);
 
-            var rollerMock = new Mock<IDiceRoller>();
-            rollerMock
+            var diceRollerMock = new Mock<IDiceRoller>();
+            diceRollerMock
                 .Setup(x => x.Roll())
-                .Returns(new DiceRoll(3, 5));
+                .Returns(new DiceRoll(4, 2));
 
             var handler = new RollDiceCommandHandler(
                 uowMock.Object,
                 Mock.Of<IGameSessionNotifier>(),
                 timeProvider,
-                rollerMock.Object);
+                diceRollerMock.Object);
 
             var command = new RollDiceCommand(
                 session.Id,
@@ -134,5 +135,6 @@ namespace BackgammonTest.GameSessions.RollDice
                 .ThrowAsync<BusinessRuleException>()
                 .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished);
         }
+
     }
 }

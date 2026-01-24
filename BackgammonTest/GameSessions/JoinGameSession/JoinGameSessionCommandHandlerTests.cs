@@ -1,6 +1,8 @@
 ﻿using Application.GameSessions.Commands.JoinGameSession;
 using Application.GameSessions.Commands.StartGameSession;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GamePlayer;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums;
 using Common.Enums.GameSession;
@@ -14,56 +16,65 @@ namespace BackgammonTest.GameSessions.JoinGameSession
 {
     public class JoinGameSessionCommandHandlerTests
     {
+        private static (
+            Mock<IUnitOfWork>,
+            Mock<IGameSessionReadRepository>,
+            Mock<IGamePlayerWriteRepository>,
+            Mock<IMediator>
+            ) CreateMocks()
+        {
+            var uowMock = new Mock<IUnitOfWork>();
+            var sessionReadRepoMock = new Mock<IGameSessionReadRepository>();
+            var playerWriteRepoMock = new Mock<IGamePlayerWriteRepository>();
+            var mediatorMock = new Mock<IMediator>();
+
+            uowMock
+                .Setup(x => x.GamePlayersWrite)
+                .Returns(playerWriteRepoMock.Object);
+
+            return (uowMock, sessionReadRepoMock, playerWriteRepoMock, mediatorMock);
+        }
+
         private static JoinGameSessionCommandHandler CreateHandler(
             Mock<IUnitOfWork> uowMock,
             Mock<IMediator> mediatorMock,
-            FakedateTimeProvider dateTimeProvider)
+            FakedateTimeProvider dateTimeProvider,
+            Mock<IGameSessionReadRepository> sessionReadRepoMock)
         {
-            uowMock.Setup(x => x.CommitAsync())
-                .ReturnsAsync(1);
-
             return new JoinGameSessionCommandHandler(
                 uowMock.Object,
                 mediatorMock.Object,
-                dateTimeProvider);
-        }
-
-        private static (Mock<IUnitOfWork> uowMock, Mock<IGameSessionRepository> sessionRepoMock, Mock<IGamePlayerRepository> playerRepoMock, Mock<IMediator> mediatorMock) CreateMocks()
-        {
-            var uowMock = new Mock<IUnitOfWork>();
-            var sessionRepoMock = new Mock<IGameSessionRepository>();
-            var playerRepoMock = new Mock<IGamePlayerRepository>();
-            var mediatorMock = new Mock<IMediator>();
-
-            uowMock.Setup(x => x.GameSessions).Returns(sessionRepoMock.Object);
-            uowMock.Setup(x => x.GamePlayers).Returns(playerRepoMock.Object);
-
-            return (uowMock, sessionRepoMock, playerRepoMock, mediatorMock);
+                dateTimeProvider,
+                sessionReadRepoMock.Object);
         }
 
         [Fact]
         public async Task Handle_Should_Join_As_First_Player_When_Session_Is_Empty()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var userId = Guid.NewGuid();
 
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
 
             sessionRepoMock
-                .Setup(x => x.GetBySessionCodeAsync(
-                    session.SessionCode,
-                    true,
-                    false))
+                .Setup(x => x.GetBySessionCodeAsync(session.SessionCode))
                 .ReturnsAsync(session);
 
-            var handler = CreateHandler(uowMock, mediatorMock, dateTimeProvider);
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
+                mediatorMock,
+                timeProvider,
+                sessionRepoMock);
 
             var command = new JoinGameSessionCommand(
                 session.SessionCode,
@@ -95,12 +106,11 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public async Task Handle_Should_Join_As_Second_Player_And_Start_Game()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             session.Players.Add(new GamePlayer
             {
@@ -114,13 +124,18 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
 
             sessionRepoMock
-                .Setup(x => x.GetBySessionCodeAsync(
-                    session.SessionCode,
-                    true,
-                    false))
+                .Setup(x => x.GetBySessionCodeAsync(session.SessionCode))
                 .ReturnsAsync(session);
 
-            var handler = CreateHandler(uowMock, mediatorMock, dateTimeProvider);
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
+                mediatorMock,
+                timeProvider,
+                sessionRepoMock);
 
             var command = new JoinGameSessionCommand(
                 session.SessionCode,
@@ -157,25 +172,29 @@ namespace BackgammonTest.GameSessions.JoinGameSession
                 IsConnected = false
             };
 
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             session.Players.Add(existingPlayer);
 
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
 
             sessionRepoMock
-                .Setup(x => x.GetBySessionCodeAsync(
-                    session.SessionCode,
-                    true,
-                    false))
+                .Setup(x => x.GetBySessionCodeAsync(session.SessionCode))
                 .ReturnsAsync(session);
 
-            var handler = CreateHandler(uowMock, mediatorMock, dateTimeProvider);
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
+                mediatorMock,
+                timeProvider,
+                sessionRepoMock);
 
             var command = new JoinGameSessionCommand(
                 session.SessionCode,
@@ -204,12 +223,11 @@ namespace BackgammonTest.GameSessions.JoinGameSession
         public async Task Handle_Should_Throw_When_Session_Is_Full()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             session.Players.Add(new GamePlayer { UserId = Guid.NewGuid() });
             session.Players.Add(new GamePlayer { UserId = Guid.NewGuid() });
@@ -217,13 +235,18 @@ namespace BackgammonTest.GameSessions.JoinGameSession
             var (uowMock, sessionRepoMock, playerRepoMock, mediatorMock) = CreateMocks();
 
             sessionRepoMock
-                .Setup(x => x.GetBySessionCodeAsync(
-                    session.SessionCode,
-                    true,
-                    false))
+                .Setup(x => x.GetBySessionCodeAsync(session.SessionCode))
                 .ReturnsAsync(session);
 
-            var handler = CreateHandler(uowMock, mediatorMock, dateTimeProvider);
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
+                mediatorMock,
+                timeProvider,
+                sessionRepoMock);
 
             var command = new JoinGameSessionCommand(
                 session.SessionCode,

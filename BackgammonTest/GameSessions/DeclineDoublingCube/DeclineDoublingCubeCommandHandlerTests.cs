@@ -1,11 +1,11 @@
 ﻿using Application.GameSessions.Commands.DeclineDoublingCube;
 using Application.GameSessions.Realtime;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using BackgammonTest.TestBuilders;
-using Common.Enums.Game;
 using Common.Enums.GameSession;
-using Domain.GameLogic;
 using Domain.GameSession.Results;
 using Moq;
 
@@ -35,19 +35,29 @@ namespace BackgammonTest.GameSessions.DeclineDoublingCube
                 .WithOff(offeringPlayer.Color, 15)
                 .Build();
 
-            var boardStateFactoryMock = new Mock<IBoardStateFactory>(MockBehavior.Strict);
+            var boardStateFactoryMock = new Mock<IBoardStateFactory>();
             boardStateFactoryMock
                 .Setup(x => x.Create(session))
                 .Returns(boardState);
 
-            var uowMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(session.Id, false, false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
-            uowMock.Setup(x => x.CommitAsync())
+
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
-            var notifierMock = new Mock<IGameSessionNotifier>(MockBehavior.Strict);
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x =>
                     x.GameFinished(
                         session.Id,

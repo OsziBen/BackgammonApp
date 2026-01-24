@@ -1,6 +1,8 @@
 ﻿using Application.GameSessions.Commands.DetermineStartingPlayer;
 using Application.GameSessions.Commands.StartGameSession;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GamePlayer;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
 using FluentAssertions;
@@ -16,21 +18,28 @@ namespace BackgammonTest.GameSessions.StartGameSession
         {
             // Arrange
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(fixedNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
+
+            var playerWriteRepoMock = new Mock<IGamePlayerWriteRepository>();
+
+            var gameSessionsWriteMock = new Mock<IGameSessionWriteRepository>();
+            gameSessionsWriteMock
+            .Setup(x => x.GetByIdAsync(session.Id))
+            .ReturnsAsync(session);
 
             var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
-                .ReturnsAsync(session);
-
-            uowMock.Setup(x => x.CommitAsync())
+            uowMock
+                .Setup(x => x.GamePlayersWrite)
+                .Returns(playerWriteRepoMock.Object);
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionsWriteMock.Object);
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
             var mediatorMock = new Mock<IMediator>();
@@ -43,7 +52,7 @@ namespace BackgammonTest.GameSessions.StartGameSession
             var handler = new StartGameSessionCommandHandler(
                 uowMock.Object,
                 mediatorMock.Object,
-                dateTimeProvider);
+                timeProvider);
 
             var command = new StartGameSessionCommand(session.Id);
 

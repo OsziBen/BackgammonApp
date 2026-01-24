@@ -1,6 +1,8 @@
 ﻿using Application.GameSessions.Commands.PlayerForfeit;
 using Application.GameSessions.Realtime;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using BackgammonTest.TestBuilders;
 using Common.Enums;
@@ -10,8 +12,6 @@ using Common.Exceptions;
 using Domain.GameSession.Results;
 using FluentAssertions;
 using Moq;
-using System.Numerics;
-using System.Reflection;
 
 namespace BackgammonTest.GameSessions.PlayerForfeit
 {
@@ -21,12 +21,11 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
         public async Task Handle_Should_Forfeit_Game_And_Notify()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
-                fixedNow);
+                timeProvider.UtcNow);
 
             var forfeitingPlayer = session.Players.First();
             var winner = session.Players.First(p => p.Id != forfeitingPlayer.Id);
@@ -38,15 +37,21 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 .Setup(x => x.Create(session))
                 .Returns(boardState);
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(
-                        session.Id,
-                        false,
-                        false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
 
-            uowMock.Setup(x => x.CommitAsync())
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
@@ -61,7 +66,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
             var handler = new PlayerForfeitCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider,
+                timeProvider,
                 boardFactoryMock.Object);
 
             var command = new PlayerForfeitCommand(
@@ -90,12 +95,11 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
         public async Task Handle_Should_Throw_When_Player_Not_In_Session()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var winner = session.Players.First();
 
@@ -106,13 +110,22 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
                 .Setup(x => x.Create(session))
                 .Returns(BoardStateBuilder.Default().Build());
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
+
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x =>
@@ -126,7 +139,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
             var handler = new PlayerForfeitCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider,
+                timeProvider,
                 boardFactoryMock.Object);
 
             var command = new PlayerForfeitCommand(

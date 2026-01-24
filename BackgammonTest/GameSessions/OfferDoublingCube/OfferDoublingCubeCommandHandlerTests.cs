@@ -1,7 +1,9 @@
 ﻿using Application.GameSessions.Commands.OfferDoublingCube;
 using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
+using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using FluentAssertions;
@@ -15,8 +17,7 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
         public async Task Handle_Should_Offer_Cube_And_Notify()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.TurnStart,
@@ -28,15 +29,21 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
             var currentCubeValue = session.DoublingCubeValue!.Value;
             var offeredValue = currentCubeValue * 2;
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(
-                        session.Id,
-                        false,
-                        false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
 
-            uowMock.Setup(x => x.CommitAsync())
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
@@ -74,20 +81,28 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
         public async Task Handle_Should_Throw_When_Domain_Rule_Fails()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
                 timeProvider.UtcNow);
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
+
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
 
             var handler = new OfferDoublingCubeCommandHandler(
                 uowMock.Object,
@@ -103,7 +118,8 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
 
             // Assert
             await act.Should()
-                .ThrowAsync<BusinessRuleException>();
+                .ThrowAsync<BusinessRuleException>()
+                .Where(e => e.ErrorCode == FunctionCode.GameAlreadyFinished);
         }
     }
 }
