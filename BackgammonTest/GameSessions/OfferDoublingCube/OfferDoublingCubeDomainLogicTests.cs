@@ -39,8 +39,7 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
         public void OfferDoublingCube_Should_Throw_When_Not_TurnStart_Phase()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -63,8 +62,7 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
         public void OfferDoublingCube_Should_Throw_When_Player_Is_Not_Current_Player()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.TurnStart,
@@ -92,8 +90,7 @@ namespace BackgammonTest.GameSessions.OfferDoublingCube
         public void OfferDoublingCube_Should_Throw_When_Game_Is_Already_Finished()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
