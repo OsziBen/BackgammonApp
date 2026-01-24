@@ -2,6 +2,9 @@
 using Application.GameSessions.Realtime;
 using Application.GameSessions.Requests;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
+using Application.Shared.Time;
 using BackgammonTest.GameSessions.Shared;
 using BackgammonTest.TestBuilders;
 using Common.Enums;
@@ -11,6 +14,7 @@ using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameLogic;
 using Domain.GameLogic.Generators;
+using Domain.GameSession;
 using Domain.GameSession.Results;
 using FluentAssertions;
 using Moq;
@@ -19,34 +23,64 @@ namespace BackgammonTest.GameSessions.MoveCheckers
 {
     public class MoveCheckersCommandHandlerTests
     {
+        private static (
+            Mock<IUnitOfWork> uowMock,
+            Mock<IGameSessionWriteRepository> sessionWriteRepoMock
+            ) CreateUowWithSession(GameSession session)
+        {
+            var sessionWriteRepoMock = new Mock<IGameSessionWriteRepository>();
+            sessionWriteRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
+                .ReturnsAsync(session);
+
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(sessionWriteRepoMock.Object);
+
+            return (uowMock, sessionWriteRepoMock);
+        }
+
+        private static MoveCheckersCommandHandler CreateHandler(
+            Mock<IUnitOfWork> uowMock,
+            IBoardStateFactory boardStateFactory,
+            IMoveSequenceGenerator sequenceGenerator,
+            IGameSessionNotifier notifierMock,
+            IDateTimeProvider timeProvider)
+        {
+            return new MoveCheckersCommandHandler(
+                uowMock.Object,
+                boardStateFactory,
+                sequenceGenerator,
+                notifierMock,
+                timeProvider);
+        }
+
         [Fact]
         public async Task Handle_Should_Throw_When_Not_In_MoveCheckers_Phase()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.RollDice,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var currentPlayer = session.Players.First();
             session.CurrentPlayerId = currentPlayer.Id;
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(
-                        session.Id,
-                        false,
-                        false))
-                .ReturnsAsync(session);
+            var (uowMock, _) = CreateUowWithSession(session);
 
-            var handler = new MoveCheckersCommandHandler(
-                uowMock.Object,
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
                 Mock.Of<IBoardStateFactory>(),
                 Mock.Of<IMoveSequenceGenerator>(),
                 Mock.Of<IGameSessionNotifier>(),
-                dateTimeProvider);
+                timeProvider);
 
             var command = new MoveCheckersCommand(
                 session.Id,
@@ -66,8 +100,7 @@ namespace BackgammonTest.GameSessions.MoveCheckers
         public async Task Handle_Should_Throw_When_No_Dice_Rolled()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -77,16 +110,14 @@ namespace BackgammonTest.GameSessions.MoveCheckers
             session.CurrentPlayerId = currentPlayer.Id;
             session.LastDiceRoll = null;
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(
-                        session.Id,
-                        false,
-                        false))
-                .ReturnsAsync(session);
+            var (uowMock, _) = CreateUowWithSession(session);
 
-            var handler = new MoveCheckersCommandHandler(
-                uowMock.Object,
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
+
+            var handler = CreateHandler(
+                uowMock,
                 Mock.Of<IBoardStateFactory>(),
                 Mock.Of<IMoveSequenceGenerator>(),
                 Mock.Of<IGameSessionNotifier>(),
@@ -110,8 +141,7 @@ namespace BackgammonTest.GameSessions.MoveCheckers
         public async Task Handle_Should_Throw_When_Move_Sequence_Is_Invalid()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -135,21 +165,17 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                     x.Generate(boardState, It.IsAny<DiceRoll>()))
                 .Returns(Array.Empty<MoveSequence>());
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(
-                        session.Id,
-                        false,
-                        false))
-                .ReturnsAsync(session);
+            var (uowMock, _) = CreateUowWithSession(session);
 
-            var notifierMock = new Mock<IGameSessionNotifier>();
+            uowMock
+                .Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
 
-            var handler = new MoveCheckersCommandHandler(
-                uowMock.Object,
+            var handler = CreateHandler(
+                uowMock,
                 boardFactoryMock.Object,
                 sequenceGeneratorMock.Object,
-                notifierMock.Object,
+                Mock.Of<IGameSessionNotifier>(),
                 timeProvider);
 
             var command = new MoveCheckersCommand(
@@ -170,8 +196,7 @@ namespace BackgammonTest.GameSessions.MoveCheckers
         public async Task Handle_Should_Apply_Move_And_End_Turn()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -199,28 +224,25 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                 .Setup(x => x.Generate(boardState, It.IsAny<DiceRoll>()))
                 .Returns(new[]
                 {
-            new MoveSequence(new[]
-            {
-                new Move(1, 7, 6)
-            })
+                    new MoveSequence(new[]
+                    {
+                        new Move(1, 7, 6)
+                    })
                 });
-
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock
-                .Setup(x => x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
-                .ReturnsAsync(session);
-
-            uowMock
-                .Setup(x => x.CommitAsync())
-                .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
 
-            var handler = new MoveCheckersCommandHandler(
-                uowMock.Object,
+            notifierMock.Setup(x =>
+                x.CheckersMoved(
+                    session.Id,
+                    currentPlayer.Id,
+                    It.IsAny<IReadOnlyList<MoveDto>>()))
+                .Returns(Task.CompletedTask);
+
+            var (uowMock, _) = CreateUowWithSession(session);
+
+            var handler = CreateHandler(
+                uowMock,
                 boardFactoryMock.Object,
                 sequenceGeneratorMock.Object,
                 notifierMock.Object,
@@ -253,8 +275,7 @@ namespace BackgammonTest.GameSessions.MoveCheckers
         public async Task Handle_Should_Finish_Game_When_Game_Over()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -290,22 +311,19 @@ namespace BackgammonTest.GameSessions.MoveCheckers
                     })
                 });
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock
-                .Setup(x => x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
-                .ReturnsAsync(session);
-
-            uowMock
-                .Setup(x => x.CommitAsync())
-                .ReturnsAsync(1);
-
             var notifierMock = new Mock<IGameSessionNotifier>();
 
-            var handler = new MoveCheckersCommandHandler(
-                uowMock.Object,
+            notifierMock.Setup(x =>
+                x.CheckersMoved(
+                    session.Id,
+                    currentPlayer.Id,
+                    It.IsAny<IReadOnlyList<MoveDto>>()))
+                .Returns(Task.CompletedTask);
+
+            var (uowMock, _) = CreateUowWithSession(session);
+
+            var handler = CreateHandler(
+                uowMock,
                 boardFactoryMock.Object,
                 sequenceGeneratorMock.Object,
                 notifierMock.Object,

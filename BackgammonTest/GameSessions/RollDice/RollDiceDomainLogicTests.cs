@@ -43,8 +43,7 @@ namespace BackgammonTest.GameSessions.RollDice
         public void RollDice_Should_Throw_When_Game_Is_Finished()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
@@ -71,8 +70,7 @@ namespace BackgammonTest.GameSessions.RollDice
         public void RollDice_Should_Throw_When_Not_In_RollDice_Phase()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
@@ -101,8 +99,7 @@ namespace BackgammonTest.GameSessions.RollDice
         public void RollDice_Should_Throw_When_Player_Is_Not_Current_Player()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.RollDice,
@@ -135,8 +132,7 @@ namespace BackgammonTest.GameSessions.RollDice
         public void RollDice_Should_Throw_When_Dice_Already_Rolled()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.RollDice,

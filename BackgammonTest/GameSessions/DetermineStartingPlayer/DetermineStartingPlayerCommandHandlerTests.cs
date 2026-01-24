@@ -1,11 +1,12 @@
 ﻿using Application.GameSessions.Commands.DetermineStartingPlayer;
 using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
-using Domain.GameSession;
+using Domain.GameSession.Services;
 using FluentAssertions;
 using Moq;
 
@@ -17,35 +18,28 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         public async Task Handle_Should_Do_Nothing_When_Not_Enough_Players()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.DeterminingStartingPlayer,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             session.Players.Add(
                 GamePlayerFactory.CreateHost(
                     session.Id,
                     Guid.NewGuid(),
-                    dateTimeProvider.UtcNow)
+                    timeProvider.UtcNow)
                 );
 
-            var playerRepoMock = new Mock<IGamePlayerRepository>();
-            playerRepoMock.Setup(x => x.GetPlayersBySessionAsync(session.Id, false))
-                .ReturnsAsync(session.Players.ToList());
-
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var sessionWriteRepoMock = new Mock<IGameSessionWriteRepository>();
+            sessionWriteRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
 
-            uowMock.Setup(x => x.GamePlayers)
-                .Returns(playerRepoMock.Object);
-
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(sessionWriteRepoMock.Object);
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
@@ -64,7 +58,7 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             var handler = new DetermineStartingPlayerCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider,
+                timeProvider,
                 startingPlayerRollerMock.Object);
 
             var command = new DetermineStartingPlayerCommand(session.Id);
@@ -88,34 +82,24 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         public async Task Handle_Should_Determine_Starting_Player_And_Notify()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.DeterminingStartingPlayer,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
-            var player1 = session.Players.First(p => p.IsHost);
-            var player2 = session.Players.First(p => !p.IsHost);
+            var host = session.Players.First(p => p.IsHost);
+            var opponent = session.Players.First(p => !p.IsHost);
 
-            var playerRepoMock = new Mock<IGamePlayerRepository>();
-            playerRepoMock.Setup(x =>
-                x.GetPlayersBySessionAsync(
-                    session.Id,
-                    false))
-                .ReturnsAsync(session.Players.ToList());
-
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GameSessions.GetByIdAsync(
-                    session.Id,
-                    false,
-                    false))
+            var sessionWriteRepoMock = new Mock<IGameSessionWriteRepository>();
+            sessionWriteRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
 
-            uowMock.Setup(x => x.GamePlayers)
-                .Returns(playerRepoMock.Object);
-
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(sessionWriteRepoMock.Object);
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
@@ -134,7 +118,7 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             var handler = new DetermineStartingPlayerCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider,
+                timeProvider,
                 startingPlayerRollerMock.Object);
 
             var command = new DetermineStartingPlayerCommand(session.Id);
@@ -150,13 +134,13 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
                     session.Id,
                     It.Is<(Guid playerId, int value)[]>(rolls =>
                         rolls.Length == 2 &&
-                        rolls.Any(r => r.playerId == player1.Id && r.value == 6) &&
-                        rolls.Any(r => r.playerId == player2.Id && r.value == 3)),
-                    It.Is<Guid>(id => id == player1.Id)),
+                        rolls.Any(r => r.playerId == host.Id && r.value == 6) &&
+                        rolls.Any(r => r.playerId == opponent.Id && r.value == 3)),
+                    It.Is<Guid>(id => id == host.Id)),
                 Times.Once);
 
             session.CurrentPhase.Should().Be(GamePhase.MoveCheckers);
-            session.CurrentPlayerId.Should().Be(player1.Id);
+            session.CurrentPlayerId.Should().Be(host.Id);
         }
     }
 }

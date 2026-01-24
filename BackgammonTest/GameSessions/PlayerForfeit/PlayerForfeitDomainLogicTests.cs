@@ -15,12 +15,11 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
         public void Forfeit_Should_Finish_Game_And_Return_Result()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.MoveCheckers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var forfeitingPlayer = session.Players.First();
             var winner = session.Players.First(p => p.Id != forfeitingPlayer.Id);
@@ -33,7 +32,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
             // Act
             var result = session.Forfeit(
                 forfeitingPlayer.Id,
-                boardState, dateTimeProvider.UtcNow);
+                boardState, timeProvider.UtcNow);
 
             // Assert
             session.IsFinished.Should().BeTrue();
@@ -49,14 +48,11 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
         public void Forfeit_Should_Throw_When_Game_Already_Finished()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
-                dateTimeProvider.UtcNow);
-
-            //session.IsFinished = true;
+                timeProvider.UtcNow);
 
             var playerId = session.Players.First().Id;
 
@@ -64,7 +60,7 @@ namespace BackgammonTest.GameSessions.PlayerForfeit
             Action act = () => session.Forfeit(
                 playerId,
                 BoardStateBuilder.Default().Build(),
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             // Assert
             act.Should()

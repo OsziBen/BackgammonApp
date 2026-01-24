@@ -2,5 +2,5 @@
 
 namespace Application.GameSessions.Commands.PlayerTimeoutExpired
 {
-    public record PlayerTimeoutExpiredCommand(Guid GamePlayerId) : IRequest;
+    public record PlayerTimeoutExpiredCommand(Guid GamePlayerId) : IRequest<Unit>;
 }

@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Commands.PlayerDisconnected;
 using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GamePlayer;
 using BackgammonTest.GameSessions.Shared;
 using Domain.GamePlayer;
 using FluentAssertions;
@@ -15,7 +16,7 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
         {
             // Arrange
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(fixedNow);
 
             var player = new GamePlayer
             {
@@ -24,13 +25,15 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
                 IsConnected = true
             };
 
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                    x.GamePlayers.GetByIdAsync(
-                        player.Id,
-                        false,
-                        false))
+            var playerWriteRepoMock = new Mock<IGamePlayerWriteRepository>();
+            playerWriteRepoMock
+                .Setup(x => x.GetByIdAsync(player.Id))
                 .ReturnsAsync(player);
+
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock
+                .Setup(x => x.GamePlayersWrite)
+                .Returns(playerWriteRepoMock.Object);
 
             uowMock.Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
@@ -45,7 +48,7 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
             var handler = new PlayerDisconnectedCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider);
+                timeProvider);
 
             var command = new PlayerDisconnectedCommand(player.Id);
 
@@ -70,22 +73,24 @@ namespace BackgammonTest.GameSessions.PlayerDisconnected
         public async Task Handle_Should_Do_Nothing_When_Player_NotFound()
         {
             // Arrange
-            var dateTimeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
+
+            var playerWriteRepoMock = new Mock<IGamePlayerWriteRepository>();
 
             var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(x =>
-                x.GamePlayers.GetByIdAsync(
-                    It.IsAny<Guid>(),
-                    false,
-                    false))
-                .ReturnsAsync(() => null);
+            uowMock
+                .Setup(x => x.GamePlayersWrite)
+                .Returns(playerWriteRepoMock.Object);
+
+            uowMock.Setup(x => x.CommitAsync())
+                .ReturnsAsync(1);
 
             var notifierMock = new Mock<IGameSessionNotifier>();
 
             var handler = new PlayerDisconnectedCommandHandler(
                 uowMock.Object,
                 notifierMock.Object,
-                dateTimeProvider);
+                timeProvider);
 
             var command = new PlayerDisconnectedCommand(Guid.NewGuid());
 

@@ -46,7 +46,7 @@ namespace BackgammonTest.Generators
             var state = BoardStateBuilder.Default()
                 .WithCurrentPlayer(player)
                 .WithChecker(player == PlayerColor.White ? 24 : 1, player)
-                .WithChecker(player == PlayerColor.White ? 23 : 2, player )
+                .WithChecker(player == PlayerColor.White ? 23 : 2, player)
                 .WithChecker(player == PlayerColor.White ? 18 : 7, player)
                 .WithOff(player, 12)
                 .Build();

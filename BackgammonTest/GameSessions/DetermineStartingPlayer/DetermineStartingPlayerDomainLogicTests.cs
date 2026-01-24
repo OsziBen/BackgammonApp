@@ -3,7 +3,7 @@ using Common.Enums;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GamePlayer;
-using Domain.GameSession;
+using Domain.GameSession.Services;
 using FluentAssertions;
 using Moq;
 
@@ -16,11 +16,11 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         {
             // Arrange
             var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(fixedNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.DeterminingStartingPlayer,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
             startingPlayerRollerMock
@@ -33,7 +33,7 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             // Act
             var result = session.DetermineStartingPlayer(
                 startingPlayerRollerMock.Object,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             // Assert
             session.CurrentPhase.Should().Be(GamePhase.MoveCheckers);
@@ -69,12 +69,11 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         public void DetermineStartingPlayer_Should_Throw_When_Wrong_Phase()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.WaitingForPlayers,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
             startingPlayerRollerMock
@@ -84,7 +83,7 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             // Act
             var act = () => session.DetermineStartingPlayer(
                 startingPlayerRollerMock.Object,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -96,19 +95,18 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         public void DetermineStartingPlayer_Should_Throw_When_Finished()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.GameFinished,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
 
             // Act
             var act = () => session.DetermineStartingPlayer(
                 startingPlayerRollerMock.Object,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             // Assert
             act.Should()
@@ -123,12 +121,11 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
         public void DetermineStartingPlayer_Should_Throw_When_Player_Count_Invalid(int count)
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var dateTimeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateEmptySession(
                 GamePhase.DeterminingStartingPlayer,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             var startingPlayerRollerMock = new Mock<IStartingPlayerRoller>();
 
@@ -136,15 +133,15 @@ namespace BackgammonTest.GameSessions.DetermineStartingPlayer
             {
                 session.Players.Add(
                     i == 0
-                    ? GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow)
-                    : GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), dateTimeProvider.UtcNow)
+                    ? GamePlayerFactory.CreateHost(session.Id, Guid.NewGuid(), timeProvider.UtcNow)
+                    : GamePlayerFactory.CreateGuest(session.Id, Guid.NewGuid(), timeProvider.UtcNow)
                 );
             }
 
             // Act
             var act = () => session.DetermineStartingPlayer(
                 startingPlayerRollerMock.Object,
-                dateTimeProvider.UtcNow);
+                timeProvider.UtcNow);
 
             // Assert
             act.Should()

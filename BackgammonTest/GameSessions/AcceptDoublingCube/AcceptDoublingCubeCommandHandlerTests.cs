@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Commands.AcceptDoublingCube;
 using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using BackgammonTest.GameSessions.Shared;
 using Common.Enums.GameSession;
 using Moq;
@@ -13,8 +14,7 @@ namespace BackgammonTest.GameSessions.AcceptDoublingCube
         public async Task Handle_Should_Accept_Cube_Commit_And_Notify()
         {
             // Arrange
-            var fixedNow = new DateTimeOffset(2025, 1, 10, 12, 0, 0, TimeSpan.Zero);
-            var timeProvider = new FakedateTimeProvider(fixedNow);
+            var timeProvider = new FakedateTimeProvider(DateTimeOffset.UtcNow);
 
             var session = TestGameSessionFactory.CreateValidSession(
                 GamePhase.CubeOffered,
@@ -27,14 +27,24 @@ namespace BackgammonTest.GameSessions.AcceptDoublingCube
             session.DoublingCubeValue = 2;
             session.DoublingCubeOwnerPlayerId = offeringPlayer.Id;
 
-            var uowMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
-            uowMock.Setup(x =>
-                    x.GameSessions.GetByIdAsync(session.Id, false, false))
+            var gameSessionRepoMock =
+                new Mock<IGameSessionWriteRepository>();
+
+            gameSessionRepoMock
+                .Setup(x => x.GetByIdAsync(session.Id))
                 .ReturnsAsync(session);
-            uowMock.Setup(x => x.CommitAsync())
+
+            var uowMock = new Mock<IUnitOfWork>();
+
+            uowMock
+                .Setup(x => x.GameSessionsWrite)
+                .Returns(gameSessionRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.CommitAsync())
                 .ReturnsAsync(1);
 
-            var notifierMock = new Mock<IGameSessionNotifier>(MockBehavior.Strict);
+            var notifierMock = new Mock<IGameSessionNotifier>();
             notifierMock.Setup(x =>
                     x.DoublingCubeAccepted(
                         session.Id,

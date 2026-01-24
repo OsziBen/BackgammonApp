@@ -1,7 +1,13 @@
-﻿using Application.Interfaces;
-using Domain.AppRole;
+﻿using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GamePlayer;
+using Application.Interfaces.Repository.GameSession;
+using Application.Interfaces.Repository.GroupMembershipRole;
+using Application.Interfaces.Repository.User;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore.Storage;
+using Infrastructure.Repositories.GamePlayer;
+using Infrastructure.Repositories.GameSession;
+using Infrastructure.Repositories.GroupMembershipRole;
+using Infrastructure.Repositories.User;
 
 namespace Infrastructure.Repositories
 {
@@ -9,82 +15,30 @@ namespace Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        private bool _disposed;
-        private IDbContextTransaction? _currentTransaction;
-
-        public IUserRepository Users { get; }
-        public IBaseRepository<AppRole> AppRoles { get; }
-        public IGroupMembershipRoleRepository GroupMembershipRoles { get; }
-        
-        public IGameSessionRepository GameSessions { get; }
-        public IGamePlayerRepository GamePlayers { get; }
-        // többi repo
+        public IGameSessionWriteRepository GameSessionsWrite { get; }
+        public IGamePlayerWriteRepository GamePlayersWrite { get; }
+        public IUserWriteRepository UsersWrite { get; }
+        public IGroupMembershipRoleWriteRepository GroupMembershipRolesWrite { get; }
+        // repositories
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
 
-            Users = new UserRepository(_context);
-            AppRoles = new BaseRepository<AppRole>(_context);
-            GroupMembershipRoles = new GroupMembershipRoleRepository(_context);
-            
-            GameSessions = new GameSessionRepository(_context);
-            GamePlayers = new GamePlayerRepository(_context);
-            // többi repo
+            GameSessionsWrite = new GameSessionWriteRepository(context);
+            GamePlayersWrite = new GamePlayerWriteRepository(context);
+            UsersWrite = new UserWriteRepository(context);
+            GroupMembershipRolesWrite = new GroupMembershipRoleWriteRepository(context);
+            // repositories
         }
 
-        public async Task<int> CommitAsync()
-        {
-            if (_currentTransaction == null)
-            {
-                _currentTransaction = await _context.Database.BeginTransactionAsync();
-            }
-
-            try
-            {
-                int result = await _context.SaveChangesAsync();
-                await _currentTransaction.CommitAsync();
-                _currentTransaction.Dispose();
-                _currentTransaction = null;
-
-                return result;
-            }
-            catch
-            {
-                await RollbackAsync();
-
-                throw;
-            }
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _currentTransaction?.Dispose();
-                    _context.Dispose();
-                }
-
-                _disposed = true;
-            }
-        }
+        public Task<int> CommitAsync()
+            => _context.SaveChangesAsync();
 
         public void Dispose()
         {
-            Dispose(true);
+            _context.Dispose();
             GC.SuppressFinalize(this);
-        }
-
-        public async Task RollbackAsync()
-        {
-            if (_currentTransaction != null)
-            {
-                await _currentTransaction.RollbackAsync();
-                _currentTransaction.Dispose();
-                _currentTransaction = null;
-            }
         }
     }
 }

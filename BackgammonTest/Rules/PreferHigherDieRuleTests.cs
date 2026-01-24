@@ -23,7 +23,7 @@ namespace BackgammonTest.Rules
             };
 
             var rule = new PreferHigherDieRule();
-            var roll = new DiceRoll(new[] {3, 5});
+            var roll = new DiceRoll(new[] { 3, 5 });
 
             // Act
             var result = rule.Apply(seqences, roll).ToList();

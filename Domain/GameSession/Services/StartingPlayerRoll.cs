@@ -1,7 +1,7 @@
 ﻿using Common.Enums;
 using Common.Exceptions;
 
-namespace Domain.GameSession
+namespace Domain.GameSession.Services
 {
     public class StartingPlayerRoll
     {

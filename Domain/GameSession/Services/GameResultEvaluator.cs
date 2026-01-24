@@ -1,7 +1,7 @@
 ﻿using Common.Enums.Game;
 using Domain.GameSession.Results;
 
-namespace Domain.GameSession
+namespace Domain.GameSession.Services
 {
     public static class GameResultEvaluator
     {
