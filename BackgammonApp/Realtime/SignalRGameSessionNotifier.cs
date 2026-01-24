@@ -1,6 +1,5 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.GameSessions.Requests;
-using Common.Enums.Game;
 using Common.Enums.GameSession;
 using Domain.GameSession.Results;
 using Microsoft.AspNetCore.SignalR;
@@ -99,47 +98,44 @@ namespace WebAPI.Realtime
                     StartingPlayerId = startingPlayerId
                 });
 
-        public async Task PlayerDisconnected(
+        public Task PlayerDisconnected(
             Guid sessionId,
             Guid playerId,
             DateTimeOffset disconnectedAt)
-        {
-            await _hub.Clients
+            => _hub.Clients
                 .Group(sessionId.ToString())
                 .SendAsync("PlayerDisconnected", new
                 {
                     PlayerId = playerId,
                     DisconnectedAt = disconnectedAt
                 });
-        }
 
-        public async Task PlayerReconnected(
+
+        public Task PlayerReconnected(
             Guid sessionId,
             Guid playerId,
             DateTimeOffset reconnectedAt)
-        {
-            await _hub.Clients
+            => _hub.Clients
                 .Group(sessionId.ToString())
                 .SendAsync("PlayerReconnected", new
                 {
                     PlayerId = playerId,
                     ReconnectedAt = reconnectedAt
                 });
-        }
 
-        public async Task PlayerTimeoutExpired(
+
+        public Task PlayerTimeoutExpired(
             Guid sessionId,
             Guid timedOutPlayerId,
             Guid? winnerPlayerId)
-        {
-            await _hub.Clients
+            => _hub.Clients
                 .Group(sessionId.ToString())
                 .SendAsync("PlayerTimeoutExpired", new
                 {
                     TimedOutPlayerId = timedOutPlayerId,
                     WinnerPlayerId = winnerPlayerId
                 });
-        }
+        
 
         public Task StartingPlayerDetermined(
             Guid sessionId,
