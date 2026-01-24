@@ -1,5 +1,5 @@
 ﻿using Application.GameSessions.Realtime;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
 using Application.Shared.Time;
 using MediatR;
 
@@ -25,10 +25,8 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
             PlayerDisconnectedCommand request,
             CancellationToken cancellationToken)
         {
-            var player = await _uow.GamePlayers
-                .GetByIdAsync(
-                    request.GamePlayerId,
-                    asNoTracking: false);
+            var player = await _uow.GamePlayersWrite
+                .GetByIdAsync(request.GamePlayerId);
 
             if (player == null)
             {

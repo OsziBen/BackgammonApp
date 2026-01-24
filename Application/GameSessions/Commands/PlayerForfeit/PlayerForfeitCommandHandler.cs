@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.Interfaces;
+using Application.Interfaces.Repository;
 using Application.Shared;
 using Application.Shared.Time;
 using Common.Enums.GameSession;
@@ -31,10 +32,8 @@ namespace Application.GameSessions.Commands.PlayerForfeit
             PlayerForfeitCommand request,
             CancellationToken cancellationToken)
         {
-            var session = await _uow.GameSessions
-                .GetByIdAsync(
-                    request.SessionId,
-                    asNoTracking: false)
+            var session = await _uow.GameSessionsWrite
+                .GetByIdAsync(request.SessionId)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             var now = _timeProvider.UtcNow;

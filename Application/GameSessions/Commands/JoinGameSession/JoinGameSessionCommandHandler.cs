@@ -1,6 +1,7 @@
 ﻿using Application.GameSessions.Commands.StartGameSession;
 using Application.GameSessions.Responses;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using Application.Shared;
 using Application.Shared.Time;
 using Domain.GameSession;
@@ -13,26 +14,26 @@ namespace Application.GameSessions.Commands.JoinGameSession
         private readonly IUnitOfWork _uow;
         private readonly IMediator _mediator;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IGameSessionReadRepository _gameSessionReadRepository;
 
         public JoinGameSessionCommandHandler(
             IUnitOfWork uow,
             IMediator mediator,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IGameSessionReadRepository gameSessionReadRepository)
         {
             _uow = uow;
             _mediator = mediator;
             _timeProvider = timeProvider;
+            _gameSessionReadRepository = gameSessionReadRepository;
         }
 
         public async Task<GameSessionSnapshotResponse> Handle(
             JoinGameSessionCommand request,
             CancellationToken cancellationToken)
         {
-            var session = await _uow.GameSessions
-                .GetBySessionCodeAsync(
-                    request.SessionCode,
-                    includePlayers: true,
-                    asNoTracking: false)
+            var session = await _gameSessionReadRepository
+                .GetBySessionCodeAsync(request.SessionCode)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionCode);
 
             var now = _timeProvider.UtcNow;
@@ -41,11 +42,11 @@ namespace Application.GameSessions.Commands.JoinGameSession
 
             if (!joinResult.IsRejoin)
             {
-                await _uow.GamePlayers.AddAsync(joinResult.Player);
+                await _uow.GamePlayersWrite.AddAsync(joinResult.Player);
             }
             else
             {
-                _uow.GamePlayers.Update(joinResult.Player);
+                _uow.GamePlayersWrite.Update(joinResult.Player);
             }
 
             session.LastUpdatedAt = now;
