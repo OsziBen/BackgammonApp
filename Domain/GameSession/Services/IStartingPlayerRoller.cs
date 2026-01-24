@@ -1,4 +1,4 @@
-﻿namespace Domain.GameSession
+﻿namespace Domain.GameSession.Services
 {
     public interface IStartingPlayerRoller
     {
