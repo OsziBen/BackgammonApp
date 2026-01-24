@@ -1,6 +1,9 @@
 ﻿using Application.GameSessions.Services.SessionCodeGenerator;
-using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.GameSession;
 using Application.Shared.Time;
+using Common.Enums;
+using Common.Exceptions;
 using Domain.GameSession;
 using MediatR;
 
@@ -11,25 +14,32 @@ namespace Application.GameSessions.Commands.CreateGameSession
         private readonly IUnitOfWork _uow;
         private readonly ISessionCodeGenerator _sessionCodeGenerator;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IGameSessionReadRepository _gameSessionReadRepository;
 
         public CreateGameSessionCommandHandler(
             IUnitOfWork uow,
             ISessionCodeGenerator sessionCodeGenerator,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IGameSessionReadRepository gameSessionReadRepository)
         {
             _uow = uow;
             _sessionCodeGenerator = sessionCodeGenerator;
             _timeProvider = timeProvider;
+            _gameSessionReadRepository = gameSessionReadRepository;
         }
 
         public async Task<Guid> Handle(
             CreateGameSessionCommand request,
             CancellationToken cancellationToken)
         {
-            var hasActiveSession = await _uow.GameSessions.HasActiveSession(request.HostPlayerId);
+            var hasActiveSession =
+                await _gameSessionReadRepository
+                    .HasActiveSession(request.HostPlayerId);
 
-            if (hasActiveSession) {
-                throw new InvalidOperationException(    // TODO: custom exception
+            if (hasActiveSession)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.SessionAlreadyStarted,
                     "Player already has an active game session.");
             }
 
@@ -41,7 +51,7 @@ namespace Application.GameSessions.Commands.CreateGameSession
                 request.Settings,
                 now);
 
-            await _uow.GameSessions.AddAsync(session);
+            await _uow.GameSessionsWrite.AddAsync(session);
             await _uow.CommitAsync();
 
             return session.Id;
