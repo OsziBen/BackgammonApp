@@ -1,5 +1,8 @@
-﻿using Application.GameSessions.Commands.JoinGameSession;
+﻿using Application.GameSessions.Commands.AcceptDoublingCube;
+using Application.GameSessions.Commands.DeclineDoublingCube;
+using Application.GameSessions.Commands.JoinGameSession;
 using Application.GameSessions.Commands.MoveCheckers;
+using Application.GameSessions.Commands.OfferDoublingCube;
 using Application.GameSessions.Commands.PlayerDisconnected;
 using Application.GameSessions.Commands.PlayerForfeit;
 using Application.GameSessions.Commands.PlayerReconnected;
@@ -74,12 +77,36 @@ namespace WebAPI.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task RollDice(Guid sessionId)      // lesz majd duplázó akció is, azok a kör elején választhatók (ha nem, akkor automatikusan dobás)
+        public async Task RollDice(Guid sessionId)
         {
             var playerId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
                 new RollDiceCommand(sessionId, playerId));
+        }
+
+        public async Task OfferDoublingCube(Guid sessionId)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new OfferDoublingCubeCommand(sessionId, playerId));
+        }
+
+        public async Task AcceptDoublingCube(Guid sessionId)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new AcceptDoublingCubeCommand(sessionId, playerId));
+        }
+
+        public async Task DeclineDoublingCube(Guid sessionId)
+        {
+            var playerId = this.GetCurrentPlayerId(_connections);
+
+            await _mediator.Send(
+                new DeclineDoublingCubeCommand(sessionId, playerId));
         }
 
         public async Task MoveCheckers(
