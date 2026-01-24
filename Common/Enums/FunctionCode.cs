@@ -31,6 +31,7 @@
         CrawfordRuleInEffect = 4014,
         DoublingCubeDisabled = 4015,
         InvalidPlayer = 4016,
+        SessionAlreadyStarted = 4017,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
