@@ -1,22 +1,12 @@
-using Application.GameSessions.Services.SessionCodeGenerator;
-using Application.Interfaces;
-using Application.Shared.Time;
-using Domain.GameLogic;
-using Domain.GameLogic.Generators;
-using Domain.GameSession;
+using Application.ExtensionMethods;
 using Infrastructure.Data;
-using Infrastructure.Realtime.Factories;
-using Infrastructure.Repositories;
-using Infrastructure.Services;
-using Infrastructure.Shared.Time;
+using Infrastructure.ExtensionMethods;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Extensions;
 using WebAPI.Hubs;
 using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.ConfigureSerilog();
 
@@ -25,7 +15,6 @@ builder.Services.AddControllers();
 builder.Services.ConfigureApiVersioning(builder.Configuration);
 builder.Services.ConfigureMediatRServices();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -34,23 +23,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddRealtimeServices();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IGroupMembershipRoleRepository, GroupMembershipRoleRepository>();
-builder.Services.AddScoped<IBoardStateFactory, BoardStateFactory>();
-builder.Services.AddScoped<IMoveSequenceGenerator, MoveSequenceGenerator>();
-builder.Services.AddScoped<ISessionCodeGenerator, SessionCodeGenerator>();
-builder.Services.AddScoped<IDiceRoller,DiceRollerAdapter>();
-builder.Services.AddScoped<IStartingPlayerRoller, StartingPlayerRoller>();
-
-builder.Services.AddSingleton<IDiceService, DiceService>();
-builder.Services.AddSingleton<IDateTimeProvider, SystemdateTimeProvider>();
-
-// TODO: extension method(s)
+builder.Services
+    .AddApplication()
+    .AddPersistence()
+    .AddSystemServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
