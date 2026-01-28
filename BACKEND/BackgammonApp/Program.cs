@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureSerilog();
 
 builder.Services.AddControllers();
+builder.Services.AddAppConfig(builder.Configuration);
 
 builder.Services.ConfigureApiVersioning(builder.Configuration);
 builder.Services.ConfigureMediatRServices();
@@ -36,12 +37,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.ConfigureCORS();
+
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseConfiguredSerilogRequestLogging();
 
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
