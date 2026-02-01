@@ -1,0 +1,76 @@
+<!-- Alapállapot: gomb -->
+<button *ngIf="!showForm" (click)="toggleForm()">Create New Session</button>
+
+<!-- Form -->
+<div *ngIf="showForm">
+  <h2>Create Game Session</h2>
+
+  <!-- Session created success -->
+  <div *ngIf="createdSessionId; else formTemplate">
+    <p><strong>Session created successfully!</strong></p>
+    <p>
+      <strong>Session ID:</strong>
+      <code>{{ createdSessionId }}</code>
+    </p>
+    <button (click)="toggleForm()">Back</button>
+  </div>
+
+  <ng-template #formTemplate>
+    <form [formGroup]="form">
+      <div>
+        <label>
+          Target points:
+          <input type="number" formControlName="targetPoints" />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <input type="checkbox" formControlName="doublingCubeEnabled" />
+          Doubling cube enabled
+        </label>
+      </div>
+
+      <!-- Clock section -->
+      <fieldset style="margin-top: 1rem; border: 1px solid #ccc; padding: 1rem">
+        <legend>Clock settings</legend>
+
+        <label>
+          <input type="checkbox" formControlName="clockEnabled" />
+          Enable clock
+        </label>
+
+        <div style="margin-left: 1.5rem">
+          <label>
+            Match time per player (seconds):
+            <input
+              type="number"
+              formControlName="matchTimePerPlayerInSeconds"
+            />
+          </label>
+          <br />
+          <label>
+            Start of turn delay (seconds):
+            <input
+              type="number"
+              formControlName="startOfTurnDelayPerPlayerInSeconds"
+            />
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- Crawford rule (disabled) -->
+      <div>
+        <label>
+          <input type="checkbox" formControlName="crawfordRuleEnabled" />
+          Crawford rule enabled
+        </label>
+      </div>
+
+      <hr />
+
+      <button type="button" (click)="toggleForm()">Back</button>
+      <button type="button" (click)="create()">Create</button>
+    </form>
+  </ng-template>
+</div>

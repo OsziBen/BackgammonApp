@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { BackgammonComponent } from './features/backgammon/backgammon.component';
+import { MainLayoutComponent } from './core/layout/main-layout/main-layout.component';
+import { DashboardComponent } from './features/dashboard/pages/dashboard.component';
+import { BackgammonPageComponent } from './features/backgammon/pages/backgammon-page/backgammon-page.component';
 
 export const routes: Routes = [
   {
@@ -10,7 +10,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'backgammon', component: BackgammonComponent },
+      { path: 'backgammon', component: BackgammonPageComponent },
     ],
   },
   {

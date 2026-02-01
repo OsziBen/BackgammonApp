@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using WebAPI.Helpers;
 
 namespace WebAPI.Extensions
 {
@@ -29,6 +30,11 @@ namespace WebAPI.Extensions
                     options.GroupNameFormat = "'v'VVV";
                     options.SubstituteApiVersionInUrl = true;
                 });
+
+            services.AddControllers(options =>
+            {
+                options.Conventions.Add(new ApiVersionRouteConvention());
+            });
 
             return services;
         }
