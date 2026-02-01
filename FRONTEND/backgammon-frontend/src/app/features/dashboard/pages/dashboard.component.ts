@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppApiService } from '../../shared/services/app-api.service';
 import { ToastrService } from 'ngx-toastr';
+import { AppApiService } from '../../../shared/services/app-api.service';
 
 @Component({
   selector: 'app-dashboard',
