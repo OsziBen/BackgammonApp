@@ -1,4 +1,5 @@
-﻿using Application.GameSessions.Services.SessionCodeGenerator;
+﻿using Application.GameSessions.Responses;
+using Application.GameSessions.Services.SessionCodeGenerator;
 using Application.Interfaces.Repository;
 using Application.Interfaces.Repository.GameSession;
 using Application.Shared.Time;
@@ -9,7 +10,7 @@ using MediatR;
 
 namespace Application.GameSessions.Commands.CreateGameSession
 {
-    public class CreateGameSessionCommandHandler : IRequestHandler<CreateGameSessionCommand, Guid>
+    public class CreateGameSessionCommandHandler : IRequestHandler<CreateGameSessionCommand, CreateGameSessionResponse>
     {
         private readonly IUnitOfWork _uow;
         private readonly ISessionCodeGenerator _sessionCodeGenerator;
@@ -28,7 +29,7 @@ namespace Application.GameSessions.Commands.CreateGameSession
             _gameSessionReadRepository = gameSessionReadRepository;
         }
 
-        public async Task<Guid> Handle(
+        public async Task<CreateGameSessionResponse> Handle(
             CreateGameSessionCommand request,
             CancellationToken cancellationToken)
         {
@@ -47,6 +48,7 @@ namespace Application.GameSessions.Commands.CreateGameSession
             var now = _timeProvider.UtcNow;
 
             var session = GameSessionFactory.Create(
+                request.HostPlayerId,
                 sessionCode,
                 request.Settings,
                 now);
@@ -54,7 +56,10 @@ namespace Application.GameSessions.Commands.CreateGameSession
             await _uow.GameSessionsWrite.AddAsync(session);
             await _uow.CommitAsync();
 
-            return session.Id;
+            return new CreateGameSessionResponse {
+                SessionId = session.Id,
+                SessionCode = session.SessionCode
+            };
         }
     }
 }
