@@ -2,7 +2,7 @@
 {
     public class GameSessionSettings
     {
-        public int TargerPoints { get; init; } = 1;
+        public int TargetPoints { get; init; } = 1;
 
         public bool DoublingCubeEnabled { get; init; }
 

@@ -11,7 +11,8 @@ namespace Domain.GameSession
     {
         public Guid? MatchId { get; set; }
         public Guid? CurrentGameId { get; set; }
-        
+        public Guid CreatedByUserId { get; set; }
+
         public string SessionCode { get; set; } = null!;
         public GameSessionSettings Settings { get; set; } = null!;
 
@@ -29,6 +30,9 @@ namespace Domain.GameSession
         public DateTimeOffset? FinishedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
 
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
+
         public bool IsFinished { get; set; }
         public Guid? WinnerPlayerId { get; set; }
 
@@ -36,6 +40,7 @@ namespace Domain.GameSession
         public Game.Game? CurrentGame { get; set; }
         public GamePlayer.GamePlayer? WinnerPlayer { get; set; }
         public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
+        // TODO: nav. prop. to User and back (Sessions)
 
 
         public void UpdateBoardState(string boardStateSnapshot)

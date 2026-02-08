@@ -859,6 +859,9 @@ namespace Infrastructure.Data
                            .IsRequired(false)
                            .OnDelete(DeleteBehavior.Restrict);
 
+                gameSession.Property(gs => gs.CreatedByUserId)
+                           .IsRequired();
+
                 gameSession.Property(gs => gs.SessionCode)
                            .HasMaxLength(20)
                            .IsRequired();
@@ -870,9 +873,15 @@ namespace Infrastructure.Data
                 gameSession.Property(gs => gs.IsFinished)
                            .HasDefaultValue(false);
 
+                gameSession.Property(gs => gs.IsDeleted)
+                           .HasDefaultValue(false);
+
+                gameSession.Property(gs => gs.DeletedAt)
+                           .IsRequired(false);
+
                 gameSession.OwnsOne(gs => gs.Settings, settings =>
                 {
-                    settings.Property(s => s.TargerPoints)
+                    settings.Property(s => s.TargetPoints)
                             .HasDefaultValue(1)
                             .IsRequired();
 

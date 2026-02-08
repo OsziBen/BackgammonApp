@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './core/layout/main-layout/main-layout.component';
+import { MainLayoutComponent } from './core/layouts/main-layout/main-layout.component';
 import { DashboardComponent } from './features/dashboard/pages/dashboard.component';
-import { BackgammonPageComponent } from './features/backgammon/pages/backgammon-page/backgammon-page.component';
 
 export const routes: Routes = [
   {
@@ -10,11 +9,14 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'backgammon', component: BackgammonPageComponent },
+      {
+        path: 'backgammon',
+        loadComponent: () =>
+          import('./features/game-session/pages/game-session-management/game-session-management-page.component').then(
+            (m) => m.GameSessionManagementPageComponent,
+          ),
+      },
     ],
   },
-  {
-    path: '**',
-    redirectTo: 'dashboard',
-  },
+  { path: '**', redirectTo: 'dashboard' },
 ];
