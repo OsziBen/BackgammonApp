@@ -1,7 +1,8 @@
-﻿using Domain.GameSession;
+﻿using Application.GameSessions.Responses;
+using Domain.GameSession;
 using MediatR;
 
 namespace Application.GameSessions.Commands.CreateGameSession
 {
-    public record CreateGameSessionCommand(Guid HostPlayerId, GameSessionSettings Settings) : IRequest<Guid>;
+    public record CreateGameSessionCommand(Guid HostPlayerId, GameSessionSettings Settings) : IRequest<CreateGameSessionResponse>;
 }
