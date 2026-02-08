@@ -5,6 +5,7 @@ namespace Domain.GameSession
     public static class GameSessionFactory
     {
         public static GameSession Create(
+            Guid userId,
             string sessionCode,
             GameSessionSettings settings,
             DateTimeOffset now)
@@ -14,6 +15,7 @@ namespace Domain.GameSession
                 Id = Guid.NewGuid(),
                 MatchId = null,
                 CurrentGameId = null,
+                CreatedByUserId = userId,
 
                 SessionCode = sessionCode,
                 Settings = settings,
@@ -30,6 +32,9 @@ namespace Domain.GameSession
                 LastUpdatedAt = now,
                 StartedAt = null,
                 FinishedAt = null,
+
+                IsDeleted = false,
+                DeletedAt = null,
 
                 IsFinished = false,
                 WinnerPlayerId = null
