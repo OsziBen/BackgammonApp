@@ -16,7 +16,7 @@ namespace Application.GameSessions.Commands.CreateGameSession.Validators
 
             When(x => x.Settings != null, () =>
             {
-                RuleFor(x => x.Settings.TargerPoints)
+                RuleFor(x => x.Settings.TargetPoints)
                     .GreaterThan(0)
                     .WithMessage("Target points must be greater than zero.");
 
