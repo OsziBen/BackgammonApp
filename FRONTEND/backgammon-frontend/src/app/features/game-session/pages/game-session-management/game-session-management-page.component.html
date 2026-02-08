@@ -1,0 +1,38 @@
+<h1>Game Session</h1>
+
+<div *ngIf="loading$ | async">Loading...</div>
+
+<div *ngIf="error$ | async as error" style="color: red">
+  {{ error }}
+</div>
+
+<!-- nincs aktív session -->
+<app-create-game-session
+  *ngIf="!(activeSession$ | async) && !(loading$ | async)"
+  (sessionCreated)="onSessionCreated($event)"
+></app-create-game-session>
+
+<!-- VAN aktív session -->
+<app-active-game-session
+  *ngIf="activeSession$ | async as activeSession"
+  [session]="activeSession"
+  (delete)="onDeleteSession($event)"
+></app-active-game-session>
+
+<!-- van aktív session
+<section *ngIf="activeSession$ | async as activeSession">
+  <h2>Active Session</h2>
+
+  <p><strong>ID:</strong> {{ activeSession.sessionId }}</p>
+  <p><strong>Code:</strong> {{ activeSession.sessionCode }}</p>
+  <p>
+    <strong>Created:</strong>
+    {{ activeSession.createdAt | date: 'short' }}
+  </p>
+
+  <h3>Settings</h3>
+  <pre>{{ activeSession.settings | json }}</pre>
+
+  <button disabled>Join (soon)</button>
+  <button (click)="onDeleteSession(activeSession.sessionId)">Delete</button>
+</section> -->
