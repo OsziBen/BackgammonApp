@@ -1,0 +1,51 @@
+<h2>Create Game Session</h2>
+
+<form [formGroup]="form">
+  <div>
+    <label>
+      Target points:
+      <input type="number" formControlName="targetPoints" />
+    </label>
+  </div>
+
+  <div>
+    <label>
+      <input type="checkbox" formControlName="doublingCubeEnabled" />
+      Doubling cube enabled
+    </label>
+  </div>
+
+  <fieldset style="margin-top: 1rem">
+    <legend>Clock</legend>
+
+    <label>
+      <input type="checkbox" formControlName="clockEnabled" />
+      Enable clock
+    </label>
+
+    <div>
+      <input
+        type="number"
+        placeholder="Match time (sec)"
+        formControlName="matchTimePerPlayerInSeconds"
+      />
+    </div>
+
+    <div>
+      <input
+        type="number"
+        placeholder="Turn delay (sec)"
+        formControlName="startOfTurnDelayPerPlayerInSeconds"
+      />
+    </div>
+  </fieldset>
+
+  <div>
+    <label>
+      <input type="checkbox" formControlName="crawfordRuleEnabled" />
+      Crawford rule enabled
+    </label>
+  </div>
+
+  <button type="button" (click)="create()">Create</button>
+</form>
