@@ -45,7 +45,7 @@ namespace BackgammonTest.GameSessions.CreateGameSession
                 Guid.NewGuid(),
                 new GameSessionSettings
                 {
-                    TargerPoints = 3,
+                    TargetPoints = 3,
                     DoublingCubeEnabled = true
                 }
             );
@@ -96,7 +96,7 @@ namespace BackgammonTest.GameSessions.CreateGameSession
                 Guid.NewGuid(),
                 new GameSessionSettings
                 {
-                    TargerPoints = 3,
+                    TargetPoints = 3,
                     DoublingCubeEnabled = true
                 });
 
