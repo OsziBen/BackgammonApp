@@ -11,6 +11,14 @@ namespace Infrastructure.Repositories.GameSession
         public GameSessionReadRepository(ApplicationDbContext context)
             : base(context) { }
 
+        public Task<Domain.GameSession.GameSession?> GetActiveByUserIdAsync(Guid userId)
+            => Query()
+                .Include(gs => gs.Players)
+                .FirstOrDefaultAsync(gs =>
+                    !gs.IsDeleted &&
+                    !gs.IsFinished &&
+                    gs.CreatedByUserId == userId);
+
         public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id)
             => Query()
                 .Include(gs => gs.Players)

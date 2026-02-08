@@ -16,6 +16,11 @@ namespace Infrastructure.Repositories.GameSession
         public async Task AddAsync(Domain.GameSession.GameSession session)
             => await _context.GameSessions.AddAsync(session);
 
+        public Task<Domain.GameSession.GameSession?> GetByIdAndUserIdAsync(Guid sessionId, Guid userId)
+            => _context.GameSessions
+                .Include(gs => gs.Players)
+                .FirstOrDefaultAsync(gs => gs.Id == sessionId && gs.CreatedByUserId == userId);
+
         public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id)
             => _context.GameSessions
                 .Include(gs => gs.Players)
