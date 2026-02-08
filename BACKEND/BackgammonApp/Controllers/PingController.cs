@@ -3,7 +3,7 @@
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/ping")]
+    [Route("ping")]
     public class PingController : ControllerBase
     {
         [HttpGet]
