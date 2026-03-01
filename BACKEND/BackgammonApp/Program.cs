@@ -1,6 +1,7 @@
 using Application.ExtensionMethods;
 using Infrastructure.Data;
 using Infrastructure.ExtensionMethods;
+using Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Extensions;
 using WebAPI.Hubs;
@@ -12,12 +13,12 @@ builder.ConfigureSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddAppConfig(builder.Configuration);
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.ConfigureApiVersioning(builder.Configuration);
 builder.Services.ConfigureMediatRServices();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerExplorer();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext")));
@@ -31,11 +32,7 @@ builder.Services
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.ConfigureSwaggerExplorer();
 
 app.UseHttpsRedirection();
 
@@ -51,6 +48,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<GameSessionHub>("/hubs/game-session");
+app.MapHub<GameSessionHub>("/hubs/game-session").RequireAuthorization();
 
 app.Run();

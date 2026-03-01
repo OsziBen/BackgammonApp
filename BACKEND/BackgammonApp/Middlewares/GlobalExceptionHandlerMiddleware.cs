@@ -79,6 +79,7 @@ namespace WebAPI.Middlewares
                         NotFoundException => HttpStatusCode.NotFound,
                         ForbiddenException => HttpStatusCode.Forbidden,
                         BusinessRuleException => HttpStatusCode.Conflict,
+                        UnauthorizedException => HttpStatusCode.Unauthorized,
                         _ => HttpStatusCode.InternalServerError
                     };
 
