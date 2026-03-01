@@ -1,4 +1,5 @@
 ﻿using Common.Enums.GameSession;
+using Domain.GamePlayer;
 
 namespace Domain.GameSession
 {
@@ -10,7 +11,7 @@ namespace Domain.GameSession
             GameSessionSettings settings,
             DateTimeOffset now)
         {
-            return new GameSession
+            var session = new GameSession
             {
                 Id = Guid.NewGuid(),
                 MatchId = null,
@@ -37,8 +38,15 @@ namespace Domain.GameSession
                 DeletedAt = null,
 
                 IsFinished = false,
-                WinnerPlayerId = null
+                FinishReason = null,
+                WinnerPlayerId = null,
+
+                Players = []
             };
+
+            session.Players.Add(GamePlayerFactory.CreateHost(session.Id, userId));
+
+            return session;
         }
     }
 }
