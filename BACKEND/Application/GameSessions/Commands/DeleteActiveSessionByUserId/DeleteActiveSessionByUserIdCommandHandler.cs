@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Repository;
+﻿using Application.Interfaces.Common;
+using Application.Interfaces.Repository;
 using Application.Shared.Time;
 using Common.Enums;
 using Common.Exceptions;
@@ -10,28 +11,35 @@ namespace Application.GameSessions.Commands.DeleteActiveSessionByUserId
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly ICurrentUser _currentUser;
 
         public DeleteActiveSessionByUserIdCommandHandler(
             IUnitOfWork uow,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            ICurrentUser currentUser)
         {
             _uow = uow;
             _timeProvider = timeProvider;
+            _currentUser = currentUser;
         }
 
         public async Task<Unit> Handle(DeleteActiveSessionByUserIdCommand request, CancellationToken cancellationToken)
         {
-            var session = await _uow.GameSessionsWrite.GetByIdAsync(request.SessionId);
+            var session = await _uow.GameSessionsWrite.GetByIdAsync(request.SessionId, cancellationToken);
 
             if (session == null)
             {
                 throw new NotFoundException(FunctionCode.ResourceNotFound, "Session not found");
             }
 
-            session.IsDeleted = true;
-            session.DeletedAt = _timeProvider.UtcNow;
+            if (session.CreatedByUserId != request.UserId)
+            {
+                throw new ForbiddenException(FunctionCode.AccessDenied, "You have no right to do this.");
+            }
 
-            await _uow.CommitAsync();
+            session.MarkDeleted(_timeProvider.UtcNow);
+
+            await _uow.CommitAsync(cancellationToken);
 
             return Unit.Value;
         }

@@ -15,9 +15,7 @@ namespace Application.GameSessions.Commands.GetActiveSessionByUserId
 
         public async Task<GetActiveSessionByUserIdResponse?> Handle(GetActiveSessionByUserIdCommand request, CancellationToken cancellationToken)
         {
-            // TODO: userId ellenőrzése
-
-            var session = await _gameSessionReadRepository.GetActiveByUserIdAsync(request.UserId);
+            var session = await _gameSessionReadRepository.GetActiveByUserIdAsync(request.UserId, cancellationToken);
 
             return session == null ? null : new GetActiveSessionByUserIdResponse
             {

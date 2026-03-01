@@ -6,10 +6,6 @@ namespace Application.GameSessions.Commands.CreateGameSession.Validators
     {
         public CreateGameSessionCommandValidator()
         {
-            RuleFor(x => x.HostPlayerId)
-                .NotEmpty()
-                .WithMessage("Host player is required.");
-
             RuleFor(x => x.Settings)
                 .NotNull()
                 .WithMessage("Game session settings are required.");
