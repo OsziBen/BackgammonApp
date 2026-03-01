@@ -17,10 +17,5 @@ namespace Domain.GameLogic
 
         public CheckerPosition Clone()
             => new CheckerPosition(Owner, Count);
-
-        public CheckerPosition With(
-            PlayerColor? owner,
-            int count)
-            => new CheckerPosition(Owner, count);
     }
 }

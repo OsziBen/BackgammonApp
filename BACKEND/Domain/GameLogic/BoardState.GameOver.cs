@@ -1,5 +1,6 @@
 ﻿using Common.Enums.BoardState;
 using Common.Enums.Game;
+using Domain.GameLogic.Constants;
 
 namespace Domain.GameLogic
 {
@@ -7,7 +8,7 @@ namespace Domain.GameLogic
     {
         public bool TryEvaluateVictory(
             PlayerColor winner,
-            out GameResultType resultType)
+            out GameResultType? resultType)
         {
             var loser = winner == PlayerColor.White
                 ? PlayerColor.Black
@@ -15,7 +16,7 @@ namespace Domain.GameLogic
 
             if (!HasWinnerCheckersOff(winner))
             {
-                resultType = default;
+                resultType = null;
 
                 return false;
             }
@@ -46,13 +47,10 @@ namespace Domain.GameLogic
             return GameResultType.GammonVictory;
         }
 
-        private static bool IsInHomeBoard(PlayerColor player, int point)
-            => player == PlayerColor.White ? point >= 19 : point <= 6;
-
         private bool HasCheckerInHomeBoard(PlayerColor player)
             => Points.Any(p =>
                 p.Value.Owner == player &&
-                IsInHomeBoard(player, p.Key));
+                BoardConstants.IsHomeBoard(p.Key, player));
 
         private bool HasAnyCheckersOff(PlayerColor player)
              => player == PlayerColor.White

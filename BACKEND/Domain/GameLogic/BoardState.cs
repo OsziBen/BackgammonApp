@@ -26,5 +26,22 @@ namespace Domain.GameLogic
             OffBlack = offBlack;
             CurrentPlayer = currentPlayer;
         }
+
+        public BoardState With(
+            Dictionary<int, CheckerPosition>? points = null,
+            int? barWhite = null,
+            int? barBlack = null,
+            int? offWhite = null,
+            int? offBlack = null,
+            PlayerColor? currentPlayer = null)
+        {
+            return new BoardState(
+                points ?? Points.ToDictionary(p => p.Key, p => p.Value.Clone()),
+                barWhite ?? BarWhite,
+                barBlack ?? BarBlack,
+                offWhite ?? OffWhite,
+                offBlack ?? OffBlack,
+                currentPlayer ?? CurrentPlayer);
+        }
     }
 }
