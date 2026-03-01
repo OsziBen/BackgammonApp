@@ -11,7 +11,7 @@ namespace Domain.User
         public required string EmailAddress { get; set; }
         public required string PasswordHash { get; set; }
         public required DateOnly DateOfBirth { get; set; }
-        public required string ProfilePictureUrl { get; set; }
+        public string? ProfilePictureUrl { get; set; }
         public Guid AppRoleId { get; set; }
         public int Rating { get; set; }
         public int ExperiencePoints { get; set; }
@@ -35,6 +35,7 @@ namespace Domain.User
         public ICollection<Match.Match> MatchesAsBlack { get; set; } = [];
         public ICollection<Tournament.Tournament> OrganizedTournaments { get; set; } = [];
         public ICollection<TournamentParticipant.TournamentParticipant> TournamentParticipations { get; set; } = [];
+        public ICollection<GameSession.GameSession> GameSessions { get; set; } = [];
         public ICollection<GamePlayer.GamePlayer> GamePlayers { get; set; } = [];
     }
 }
