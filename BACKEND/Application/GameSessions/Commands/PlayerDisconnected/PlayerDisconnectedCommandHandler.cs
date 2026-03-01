@@ -1,6 +1,11 @@
 ﻿using Application.GameSessions.Realtime;
+using Application.GameSessions.Responses;
+using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces.Repository;
+using Application.Shared;
 using Application.Shared.Time;
+using Common.Enums.GameSession;
+using Domain.GamePlayer;
 using MediatR;
 
 namespace Application.GameSessions.Commands.PlayerDisconnected
@@ -8,17 +13,20 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
     public class PlayerDisconnectedCommandHandler : IRequestHandler<PlayerDisconnectedCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
-        private readonly IGameSessionNotifier _notifier;
+        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
 
         public PlayerDisconnectedCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier notifier,
-            IDateTimeProvider timeProvider)
+            IGameSessionNotifier gameSessionNotifier,
+            IDateTimeProvider timeProvider,
+            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
         {
             _uow = uow;
-            _notifier = notifier;
+            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
+            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
         }
 
         public async Task<Unit> Handle(
@@ -26,7 +34,8 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
             CancellationToken cancellationToken)
         {
             var player = await _uow.GamePlayersWrite
-                .GetByIdAsync(request.GamePlayerId);
+                .GetByIdAsync(request.GamePlayerId, cancellationToken)
+                .GetOrThrowAsync(nameof(GamePlayer), request.GamePlayerId);
 
             if (player == null)
             {
@@ -35,15 +44,17 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
 
             var now = _timeProvider.UtcNow;
 
-            player.IsConnected = false;
-            player.LastConnectedAt = now;
+            player.Disconnect(now);
 
-            await _uow.CommitAsync();
+            await _uow.CommitAsync(cancellationToken);
 
-            await _notifier.PlayerDisconnected(
+            await _gameSessionNotifier.SessionUpdated(
                 player.GameSessionId,
-                player.Id,
-                now);
+                new SessionUpdatedMessage
+                {
+                    EventType = SessionEventType.PlayerDisconnected,
+                    Snapshot = _gameSessionSnapshotFactory.Create(player.GameSession)
+                });
 
             return Unit.Value;
         }

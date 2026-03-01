@@ -1,8 +1,12 @@
-﻿using Application.GameSessions.Commands.DetermineStartingPlayer;
+﻿using Application.GameSessions.Realtime;
+using Application.GameSessions.Responses;
+using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces.Repository;
 using Application.Shared;
 using Application.Shared.Time;
+using Common.Enums.GameSession;
 using Domain.GameSession;
+using Domain.GameSession.Services;
 using MediatR;
 
 namespace Application.GameSessions.Commands.StartGameSession
@@ -10,17 +14,23 @@ namespace Application.GameSessions.Commands.StartGameSession
     public class StartGameSessionCommandHandler : IRequestHandler<StartGameSessionCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMediator _mediator;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IGameSessionNotifier _gameSessionNotifier;
+        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IStartingPlayerRoller _startingPlayerRoller;
 
         public StartGameSessionCommandHandler(
             IUnitOfWork uow,
-            IMediator mediator,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IGameSessionNotifier gameSessionNotifier,
+            IGameSessionSnapshotFactory gameSessionSnapshotFactory,
+            IStartingPlayerRoller startingPlayerRoller)
         {
             _uow = uow;
-            _mediator = mediator;
             _timeProvider = timeProvider;
+            _gameSessionNotifier = gameSessionNotifier;
+            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _startingPlayerRoller = startingPlayerRoller;
         }
 
         public async Task<Unit> Handle(
@@ -28,18 +38,29 @@ namespace Application.GameSessions.Commands.StartGameSession
             CancellationToken cancellationToken)
         {
             var session = await _uow.GameSessionsWrite
-                .GetByIdAsync(request.SessionId)
+                .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
+
+            if (!session.CanStartGame())
+            {
+                return Unit.Value;
+            }
 
             var now = _timeProvider.UtcNow;
 
             session.Start(now);
 
-            await _uow.CommitAsync();
+            session.DetermineStartingPlayer(_startingPlayerRoller, now);
 
-            await _mediator.Send(
-                new DetermineStartingPlayerCommand(session.Id),
-                cancellationToken);
+            await _uow.CommitAsync(cancellationToken);
+
+            await _gameSessionNotifier.SessionUpdated(
+                session.Id,
+                new SessionUpdatedMessage
+                {
+                    EventType = SessionEventType.GameStarted,
+                    Snapshot = _gameSessionSnapshotFactory.Create(session)
+                });
 
             return Unit.Value;
         }
