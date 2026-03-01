@@ -23,11 +23,13 @@ namespace Infrastructure.Repositories.GamePlayer
 
         public Task<Domain.GamePlayer.GamePlayer?> GetOpponentAsync(
             Guid sessionId,
-            Guid excludePlayerId)
+            Guid excludePlayerId,
+            CancellationToken cancellationToken)
             => Query()
                 .FirstOrDefaultAsync(gp =>
                     gp.GameSessionId == sessionId &&
-                    gp.UserId != excludePlayerId);
+                    gp.UserId != excludePlayerId,
+                cancellationToken);
 
         public async Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetPlayersBySessionAsync(
             Guid sessionId)
@@ -35,18 +37,22 @@ namespace Infrastructure.Repositories.GamePlayer
                 .Where(gp => gp.GameSessionId == sessionId)
                 .ToListAsync();
 
-        public async Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetExpiredPlayersAsync(DateTimeOffset now, TimeSpan disconnectTimeout)
+        public async Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetExpiredPlayersAsync(
+            DateTimeOffset now,
+            TimeSpan disconnectTimeout,
+            CancellationToken cancellationToken)
         {
             return await Query()
                 .Where(gp =>
                     !gp.IsConnected &&
                     gp.LastConnectedAt != null &&
-                    now - gp.LastConnectedAt > disconnectTimeout)
-                .ToListAsync();
+                    now - gp.LastConnectedAt > disconnectTimeout &&
+                    !gp.GameSession.IsFinished)
+                .ToListAsync(cancellationToken);
         }
 
-        public  Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id)
+        public  Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             =>  Query()
-                .FirstOrDefaultAsync(gp => gp.Id == id);
+                .FirstOrDefaultAsync(gp => gp.Id == id, cancellationToken);
     }
 }

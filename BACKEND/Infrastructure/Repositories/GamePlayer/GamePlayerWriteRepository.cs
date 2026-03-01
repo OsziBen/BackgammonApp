@@ -13,12 +13,13 @@ namespace Infrastructure.Repositories.GamePlayer
             _context = context;
         }
 
-        public Task AddAsync(Domain.GamePlayer.GamePlayer player)
-            => _context.GamePlayers.AddAsync(player).AsTask();
+        public async Task AddAsync(Domain.GamePlayer.GamePlayer player, CancellationToken cancellationToken)
+            => await _context.GamePlayers.AddAsync(player, cancellationToken);
 
-        public Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id)
+        public Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.GamePlayers
-                .FirstOrDefaultAsync(gs => gs.Id == id);
+                .Include(gp => gp.GameSession)
+                .FirstOrDefaultAsync(gp => gp.Id == id, cancellationToken);
 
         public Task<Domain.GamePlayer.GamePlayer?> GetBySessionAndUserAsync(Guid sessionId, Guid userId)
             => _context.GamePlayers
