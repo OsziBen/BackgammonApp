@@ -10,12 +10,17 @@ namespace Infrastructure.Repositories.User
     {
         public UserReadRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<bool> ExistsByUserNameAsync(string userName)
+        public async Task<bool> ExistsByEmailAddressAsync(string emailAddress, CancellationToken cancellationToken)
             => await Query()
-                .AnyAsync(u => u.UserName == userName);
+                .AnyAsync(u => u.EmailAddress == emailAddress, cancellationToken);
 
-        public async Task<Domain.User.User?> GetByEmailAsync(string email)
+        public async Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken)
             => await Query()
-                .FirstOrDefaultAsync(u => u.EmailAddress == email);
+                .AnyAsync(u => u.UserName == userName, cancellationToken);
+
+        public async Task<Domain.User.User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+            => await Query()
+                .Include(u => u.AppRole)
+                .FirstOrDefaultAsync(u => u.EmailAddress == email, cancellationToken);
     }
 }

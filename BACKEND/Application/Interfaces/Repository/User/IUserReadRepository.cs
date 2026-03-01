@@ -2,7 +2,8 @@
 {
     public interface IUserReadRepository
     {
-        Task<Domain.User.User?> GetByEmailAsync(string email);
-        Task<bool> ExistsByUserNameAsync(string userName);
+        Task<Domain.User.User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
+        Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken);
+        Task<bool> ExistsByEmailAddressAsync(string emailAddress, CancellationToken cancellationToken);
     }
 }

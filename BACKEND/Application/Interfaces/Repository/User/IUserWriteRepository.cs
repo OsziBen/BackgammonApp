@@ -2,6 +2,7 @@
 {
     public interface IUserWriteRepository
     {
-        Task<Domain.User.User?> GetByIdAsync(Guid id);
+        Task<Domain.User.User?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task AddAsync(Domain.User.User user, CancellationToken cancellationToken);
     }
 }

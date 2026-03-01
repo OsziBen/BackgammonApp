@@ -13,8 +13,11 @@ namespace Infrastructure.Repositories.User
             _context = context;
         }
 
-        public Task<Domain.User.User?> GetByIdAsync(Guid id)
+        public async Task AddAsync(Domain.User.User user, CancellationToken cancellationToken)
+            => await _context.AddAsync(user, cancellationToken);
+
+        public Task<Domain.User.User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.Users
-                .FirstOrDefaultAsync(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 }
