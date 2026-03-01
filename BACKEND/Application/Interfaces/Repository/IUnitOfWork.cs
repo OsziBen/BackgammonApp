@@ -13,6 +13,6 @@ namespace Application.Interfaces.Repository
         IGroupMembershipRoleWriteRepository GroupMembershipRolesWrite { get; }
         // repositories
 
-        Task<int> CommitAsync();
+        Task<int> CommitAsync(CancellationToken cancellationToken);
     }
 }

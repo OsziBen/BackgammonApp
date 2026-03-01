@@ -32,8 +32,8 @@ namespace Infrastructure.Repositories
             // repositories
         }
 
-        public Task<int> CommitAsync()
-            => _context.SaveChangesAsync();
+        public Task<int> CommitAsync(CancellationToken cancellationToken)
+            => _context.SaveChangesAsync(cancellationToken);
 
         public void Dispose()
         {
