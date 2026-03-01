@@ -2,21 +2,24 @@
 {
     public class JoinResult
     {
+        public Guid SessionId { get; set; }
         public GamePlayer.GamePlayer Player { get; }
         public bool IsRejoin { get; }
 
         private JoinResult(
+            Guid sessionId,
             GamePlayer.GamePlayer player,
             bool isRejoin)
         {
+            SessionId = sessionId;
             Player = player;
             IsRejoin = isRejoin;
         }
 
-        public static JoinResult Joined(GamePlayer.GamePlayer player)
-            => new(player, isRejoin: false);
+        public static JoinResult Joined(Guid sessionId, GamePlayer.GamePlayer player)
+            => new(sessionId, player, isRejoin: false);
 
-        public static JoinResult Rejoined(GamePlayer.GamePlayer player)
-            => new(player, isRejoin: true);
+        public static JoinResult Rejoined(Guid sessionId, GamePlayer.GamePlayer player)
+            => new(sessionId, player, isRejoin: true);
     }
 }
