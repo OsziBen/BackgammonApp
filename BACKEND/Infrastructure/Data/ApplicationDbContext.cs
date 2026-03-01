@@ -97,7 +97,7 @@ namespace Infrastructure.Data
 
                 user.Property(u => u.ProfilePictureUrl)
                     .HasMaxLength(200)
-                    .IsRequired();
+                    .IsRequired(false);
 
                 user.Property(u => u.Rating)
                     .HasDefaultValue(0);
@@ -841,6 +841,12 @@ namespace Infrastructure.Data
             {
                 gameSession.HasKey(gs => gs.Id);
 
+                gameSession.HasOne(gs => gs.Creator)
+                           .WithMany(m => m.GameSessions)
+                           .HasForeignKey(gs => gs.CreatedByUserId)
+                           .IsRequired()
+                           .OnDelete(DeleteBehavior.Restrict);
+
                 gameSession.HasOne(gs => gs.Match)
                            .WithMany(m => m.GameSessions)
                            .HasForeignKey(gs => gs.MatchId)
@@ -873,6 +879,10 @@ namespace Infrastructure.Data
                 gameSession.Property(gs => gs.IsFinished)
                            .HasDefaultValue(false);
 
+                gameSession.Property(gs => gs.FinishReason)
+                           .HasConversion<int>()
+                           .IsRequired(false);
+
                 gameSession.Property(gs => gs.IsDeleted)
                            .HasDefaultValue(false);
 
@@ -900,6 +910,19 @@ namespace Infrastructure.Data
                     settings.Property(s => s.CrawfordRuleEnabled)
                             .IsRequired();
                 });
+
+                gameSession.OwnsOne(gs => gs.FinalOutcome, outcome =>
+                {
+                    outcome.Property(o => o.ResultType)
+                           .HasConversion<int>()
+                           .IsRequired();
+
+                    outcome.Property(o => o.Points)
+                           .IsRequired();
+                });
+
+                gameSession.Navigation(gs => gs.FinalOutcome)
+                           .IsRequired(false);
             });
 
             modelBuilder.Entity<GamePlayer>(gamePlayer =>
