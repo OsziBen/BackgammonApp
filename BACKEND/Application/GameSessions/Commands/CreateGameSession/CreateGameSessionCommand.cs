@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Application.GameSessions.Commands.CreateGameSession
 {
-    public record CreateGameSessionCommand(Guid HostPlayerId, GameSessionSettings Settings) : IRequest<CreateGameSessionResponse>;
+    public record CreateGameSessionCommand(Guid UserId, GameSessionSettings Settings) : IRequest<CreateGameSessionResponse>;
 }

@@ -5,8 +5,8 @@ namespace Application.GameSessions.Responses
     public class GetActiveSessionByUserIdResponse
     {
         public Guid SessionId { get; set; }
-        public string SessionCode { get; set; } = null!;
-        public GameSessionSettings Settings { get; set; } = null!;
+        public required string SessionCode { get; set; }
+        public required GameSessionSettings Settings { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
     }
 }

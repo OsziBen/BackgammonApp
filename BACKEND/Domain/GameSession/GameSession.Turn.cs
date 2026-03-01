@@ -8,12 +8,13 @@ namespace Domain.GameSession
         {
             EnsureCanEndTurn();
 
-            var currentPlayer = Players.First(p => p.Id == CurrentPlayerId);
-            var nextPlayer = Players.First(p => p.Id != currentPlayer.Id);
+            var currentPlayerId = GetOpponentOrThrow(CurrentPlayerId!.Value).Id;
 
-            CurrentPlayerId = nextPlayer.Id;
+            CurrentPlayerId = currentPlayerId;
             LastDiceRoll = null;
-            CurrentPhase = GamePhase.RollDice;
+            CurrentPhase = CanUseDoublingCube(currentPlayerId)
+                ? GamePhase.TurnStart 
+                : GamePhase.RollDice;
             LastUpdatedAt = now;
         }
     }

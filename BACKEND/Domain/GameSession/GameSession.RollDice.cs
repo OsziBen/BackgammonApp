@@ -10,11 +10,7 @@ namespace Domain.GameSession
             IDiceRoller diceRoller,
             DateTimeOffset now)
         {
-            EnsureNotFinished();
-            EnsurePhase(GamePhase.RollDice);
-            EnsureNoActiveDice();
-            EnsureCurrentPlayerIsSet();
-            EnsureCurrentPlayer(playerId);
+            EnsureCanRollDice(playerId);
 
             var diceRoll = diceRoller.Roll();
 

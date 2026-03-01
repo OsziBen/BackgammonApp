@@ -14,25 +14,24 @@ namespace Domain.GameSession
             EnsureCanOfferDoublingCube(playerId);
 
             DoublingCubeValue ??= 1;
-            var offeredValue = DoublingCubeValue!.Value * 2;
 
             CurrentPhase = GamePhase.CubeOffered;
             LastUpdatedAt = now;
 
             return new DoublingCubeOfferResult(
-                offeredValue,
+                DoublingCubeValue!.Value * 2,
                 playerId,
-                GetOpponentId(playerId)
+                GetOpponentOrThrow(playerId).Id
             );
         }
 
         public DoublingCubeAcceptResult AcceptDoublingCube(
-                    Guid playerId,
-                    DateTimeOffset now)
+            Guid playerId,
+            DateTimeOffset now)
         {
             EnsureCanAcceptDoublingCube(playerId);
 
-            var offeringPlayerId = GetOpponentId(playerId);
+            var offeringPlayerId = GetOpponentOrThrow(playerId).Id;
 
             DoublingCubeValue = (DoublingCubeValue ?? 1) * 2;
             DoublingCubeOwnerPlayerId = playerId;
@@ -54,16 +53,14 @@ namespace Domain.GameSession
         {
             EnsureCanDeclineDoublingCube(playerId);
 
-            var winner = GetOpponent(playerId);
-
             var resultType = boardState.EvaluateForfeitResult(
-                forfeitingPlayer: GetPlayerColor(playerId));
+                forfeitingPlayer: GetPlayerOrThrow(playerId).Color);
 
             var outcome = GameResultEvaluator.CreateOutcome(
                 resultType,
                 DoublingCubeValue);
 
-            Finish(winner.Id, now);
+            Finish(GameFinishReason.CubeDeclined, GetOpponentOrThrow(playerId).Id, now);
 
             return outcome;
         }

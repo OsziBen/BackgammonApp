@@ -1,11 +1,10 @@
-﻿using Application.GameSessions.Responses;
+﻿using Domain.GameSession.Results;
 using MediatR;
 
 namespace Application.GameSessions.Commands.JoinGameSession
 {
     public record JoinGameSessionCommand(
         string SessionCode,
-        Guid UserId,
-        string ConnectionId         //ConnectionId is an application-level identifier used later for real-time (SignalR) communication.
-        ) : IRequest<GameSessionSnapshotResponse>;
+        Guid UserId
+        ) : IRequest<JoinResult>;
 }

@@ -1,107 +1,107 @@
-﻿using Common.Enums.GameSession;
-using Domain.GamePlayer;
-using Domain.GameSession;
+﻿//using Common.Enums.GameSession;
+//using Domain.GamePlayer;
+//using Domain.GameSession;
 
-namespace BackgammonTest.GameSessions.Shared
-{
-    public static class TestGameSessionFactory
-    {
-        public static GameSession CreateEmptySession(
-            GamePhase phase,
-            DateTimeOffset? now = null)
-        {
-            var time = now ?? DateTimeOffset.UtcNow;
+//namespace BackgammonTest.GameSessions.Shared
+//{
+//    public static class TestGameSessionFactory
+//    {
+//        public static GameSession CreateEmptySession(
+//            GamePhase phase,
+//            DateTimeOffset? now = null)
+//        {
+//            var time = now ?? DateTimeOffset.UtcNow;
 
-            var session = new GameSession
-            {
-                Id = Guid.NewGuid(),
-                SessionCode = "TEST23",
-                CurrentPhase = phase,
-                CreatedAt = time,
-                LastUpdatedAt = time,
-                Players = [],
-                IsFinished = false
-            };
+//            var session = new GameSession
+//            {
+//                Id = Guid.NewGuid(),
+//                SessionCode = "TEST23",
+//                CurrentPhase = phase,
+//                CreatedAt = time,
+//                LastUpdatedAt = time,
+//                Players = [],
+//                IsFinished = false
+//            };
 
-            ApplyPhaseInvariants(session, phase, time);
+//            ApplyPhaseInvariants(session, phase, time);
 
-            return session;
-        }
+//            return session;
+//        }
 
-        public static GameSession CreateValidSession(
-            GamePhase phase,
-            DateTimeOffset? now = null,
-            bool doublingCubeEnabled = true)
-        {
-            var time = now ?? DateTimeOffset.UtcNow;
+//        public static GameSession CreateValidSession(
+//            GamePhase phase,
+//            DateTimeOffset? now = null,
+//            bool doublingCubeEnabled = true)
+//        {
+//            var time = now ?? DateTimeOffset.UtcNow;
 
-            var session = CreateEmptySession(phase, now);
+//            var session = CreateEmptySession(phase, now);
 
-            session.Settings = new GameSessionSettings
-            {
-                DoublingCubeEnabled = doublingCubeEnabled
-            };
+//            session.Settings = new GameSessionSettings
+//            {
+//                DoublingCubeEnabled = doublingCubeEnabled
+//            };
 
-            session.DoublingCubeValue = session.Settings.DoublingCubeEnabled ? 1 : null;
+//            session.DoublingCubeValue = session.Settings.DoublingCubeEnabled ? 1 : null;
 
-            session.Players.Add(
-                GamePlayerFactory.CreateHost(
-                    session.Id,
-                    Guid.NewGuid(),
-                    time)
-                );
+//            session.Players.Add(
+//                GamePlayerFactory.CreateHost(
+//                    session.Id,
+//                    Guid.NewGuid(),
+//                    time)
+//                );
 
-            session.Players.Add(
-                GamePlayerFactory.CreateGuest(
-                    session.Id,
-                    Guid.NewGuid(),
-                    time)
-                );
+//            session.Players.Add(
+//                GamePlayerFactory.CreateGuest(
+//                    session.Id,
+//                    Guid.NewGuid(),
+//                    time)
+//                );
 
-            ApplyPhaseInvariants(session, phase, time);
+//            ApplyPhaseInvariants(session, phase, time);
 
-            return session;
-        }
+//            return session;
+//        }
 
-        private static void ApplyPhaseInvariants(
-            GameSession session,
-            GamePhase phase,
-            DateTimeOffset now)
-        {
-            session.CurrentPhase = phase;
-            session.LastUpdatedAt = now;
+//        private static void ApplyPhaseInvariants(
+//            GameSession session,
+//            GamePhase phase,
+//            DateTimeOffset now)
+//        {
+//            session.CurrentPhase = phase;
+//            session.LastUpdatedAt = now;
 
-            switch (phase)
-            {
-                case GamePhase.WaitingForPlayers:
-                    session.StartedAt = null;
-                    session.CurrentPlayerId = null;
-                    break;
+//            switch (phase)
+//            {
+//                case GamePhase.WaitingForPlayers:
+//                    session.StartedAt = null;
+//                    session.CurrentPlayerId = null;
+//                    break;
 
-                case GamePhase.DeterminingStartingPlayer:
-                    session.StartedAt ??= now;
-                    break;
+//                case GamePhase.DeterminingStartingPlayer:
+//                    session.StartedAt ??= now;
+//                    break;
 
-                case GamePhase.RollDice:
-                    break;
+//                case GamePhase.RollDice:
+//                    break;
 
-                case GamePhase.MoveCheckers:
-                    session.StartedAt ??= now;
-                    break;
+//                case GamePhase.MoveCheckers:
+//                    session.StartedAt ??= now;
+//                    break;
 
-                case GamePhase.GameFinished:
-                    session.IsFinished = true;
-                    session.FinishedAt ??= now;
-                    break;
+//                case GamePhase.GameFinished:
+//                    session.IsFinished = true;
+//                    session.FinishedAt ??= now;
+//                    break;
 
-                case GamePhase.GameAbandoned:
-                    session.IsFinished = true;
-                    session.FinishedAt ??= now;
-                    break;
+//                case GamePhase.GameAbandoned:
+//                    session.IsFinished = true;
+//                    session.FinishedAt ??= now;
+//                    break;
 
-                default:
-                    break;
-            }
-        }
-    }
-}
+//                default:
+//                    break;
+//            }
+//        }
+//    }
+//}

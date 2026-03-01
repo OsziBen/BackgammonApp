@@ -452,6 +452,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("DoublingCubeValue")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("FinishReason")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset?>("FinishedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -486,6 +489,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("CurrentGameId")
                         .IsUnique();
@@ -1336,7 +1341,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<string>("ProfilePictureUrl")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -1553,6 +1557,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.GameSession.GameSession", b =>
                 {
+                    b.HasOne("Domain.User.User", "Creator")
+                        .WithMany("GameSessions")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Domain.Game.Game", "CurrentGame")
                         .WithOne()
                         .HasForeignKey("Domain.GameSession.GameSession", "CurrentGameId")
@@ -1601,7 +1611,30 @@ namespace Infrastructure.Migrations
                                 .HasForeignKey("GameSessionId");
                         });
 
+                    b.OwnsOne("Domain.GameSession.Results.GameOutcome", "FinalOutcome", b1 =>
+                        {
+                            b1.Property<Guid>("GameSessionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Points")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("ResultType")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("GameSessionId");
+
+                            b1.ToTable("GameSessions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameSessionId");
+                        });
+
+                    b.Navigation("Creator");
+
                     b.Navigation("CurrentGame");
+
+                    b.Navigation("FinalOutcome");
 
                     b.Navigation("Match");
 
@@ -1997,6 +2030,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedMatches");
 
                     b.Navigation("GamePlayers");
+
+                    b.Navigation("GameSessions");
 
                     b.Navigation("GrantedRoles");
 

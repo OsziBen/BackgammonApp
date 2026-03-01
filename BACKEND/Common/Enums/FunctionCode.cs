@@ -32,9 +32,13 @@
         DoublingCubeDisabled = 4015,
         InvalidPlayer = 4016,
         SessionAlreadyStarted = 4017,
+        UserAlreadyInActiveSession = 4018,
+        UserWithEmailAlreadyExists = 4019,
+        UserWithUserNameAlreadyExists = 4020,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
-        MissingPermission = 5001
+        Unauthorized = 5001,
+        MissingPermission = 5002
     }
 }

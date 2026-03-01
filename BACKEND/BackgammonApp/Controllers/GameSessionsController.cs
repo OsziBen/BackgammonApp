@@ -2,6 +2,7 @@
 using Application.GameSessions.Commands.DeleteActiveSessionByUserId;
 using Application.GameSessions.Commands.GetActiveSessionByUserId;
 using Application.GameSessions.Responses;
+using Application.Interfaces.Common;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,14 @@ namespace WebAPI.Controllers
     public class GameSessionsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ICurrentUser _currentUser;
 
-        public GameSessionsController(IMediator mediator)
+        public GameSessionsController(
+            IMediator mediator,
+            ICurrentUser currentUser)
         {
             _mediator = mediator;
+            _currentUser = currentUser;
         }
 
         [HttpPost]
@@ -26,20 +31,28 @@ namespace WebAPI.Controllers
             [FromBody] CreateGameSessionRequest request,
             CancellationToken cancellationToken)
         {
-            var command = new CreateGameSessionCommand(     // todo: extension method to extract current player
-                request.HostPlayerId, request.Settings);
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+                return Unauthorized();
+
+            var command = new CreateGameSessionCommand(
+                userId, request.Settings);
 
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(response);
         }
 
-        [HttpGet(GameSessionConstants.ActiveByUserId)]
-        public async Task<ActionResult<GetActiveSessionByUserIdResponse?>> GetActiveSessionByUserId(
-            [FromRoute] Guid userId,
+        [HttpGet(GameSessionConstants.Active)]
+        public async Task<ActionResult<GetActiveSessionByUserIdResponse?>> GetActiveSessionAsync(
             CancellationToken cancellationToken)
         {
-            // TODO: extension method to extract current player
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+                return Unauthorized();
+
             var command = new GetActiveSessionByUserIdCommand(userId);
 
             var response = await _mediator.Send(command, cancellationToken);
@@ -52,8 +65,12 @@ namespace WebAPI.Controllers
             [FromRoute] Guid sessionId,
             CancellationToken cancellationToken)
         {
-            // TODO: extension method to extract current player
-            var command = new DeleteActiveSessionByUserIdCommand(sessionId);
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+                return Unauthorized();
+
+            var command = new DeleteActiveSessionByUserIdCommand(userId, sessionId);
 
             var response = await _mediator.Send(command, cancellationToken);
 

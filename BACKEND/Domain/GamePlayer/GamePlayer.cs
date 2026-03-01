@@ -18,5 +18,29 @@ namespace Domain.GamePlayer
 
         public GameSession.GameSession GameSession { get; set; } = null!;
         public User.User User { get; set; } = null!;
+
+
+        public void Connect(DateTimeOffset now)
+        {
+            if (IsConnected)
+            {
+                return;
+            }
+
+            IsConnected = true;
+            LastConnectedAt = now;
+        }
+
+        public void Disconnect(DateTimeOffset now)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            IsConnected = false;
+            LastConnectedAt = now;
+        }
+
     }
 }

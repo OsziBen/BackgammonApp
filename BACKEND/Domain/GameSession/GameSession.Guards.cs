@@ -35,6 +35,19 @@ namespace Domain.GameSession
             }
         }
 
+        private void EnsureIsInGameplayPhase()
+        {
+            if (CurrentPhase != GamePhase.TurnStart
+                && CurrentPhase != GamePhase.RollDice
+                && CurrentPhase != GamePhase.MoveCheckers
+                && CurrentPhase != GamePhase.CubeOffered)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidGamePhase,
+                    "Game session is not in progress.");
+            }
+        }
+
         private void EnsureDiceRolled()
         {
             if (LastDiceRoll == null || LastDiceRoll.Length == 0)
@@ -119,6 +132,14 @@ namespace Domain.GameSession
         }
 
 
+        private void EnsureCanForfeit(Guid playerId)
+        {
+            EnsureNotFinished();
+            EnsureIsInGameplayPhase();
+            EnsureExactlyTwoPlayers();
+            EnsurePlayerIsInSession(playerId);
+        }
+
         private void EnsureCanOfferDoublingCube(Guid playerId)
         {
             EnsureNotFinished();
@@ -176,11 +197,21 @@ namespace Domain.GameSession
             EnsureExactlyTwoPlayers();
         }
 
-        private void EnsureCanMoveCheckers()
+        private void EnsureCanMoveCheckers(Guid playerId)
         {
             EnsureNotFinished();
             EnsurePhase(GamePhase.MoveCheckers);
             EnsureDiceRolled();
+            EnsureCurrentPlayer(playerId);
+        }
+
+        private void EnsureCanRollDice(Guid playerId)
+        {
+            EnsureNotFinished();
+            EnsurePhase(GamePhase.RollDice);
+            EnsureNoActiveDice();
+            EnsureCurrentPlayerIsSet();
+            EnsureCurrentPlayer(playerId);
         }
     }
 }

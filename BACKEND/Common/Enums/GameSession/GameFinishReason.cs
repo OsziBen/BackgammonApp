@@ -5,6 +5,7 @@
         Victory,
         Forfeit,
         CubeDeclined,
-        Timeout
+        Timeout,
+        Abandoned
     }
 }

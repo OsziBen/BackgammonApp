@@ -1,9 +1,9 @@
 ﻿using Common.Enums;
-using Common.Enums.BoardState;
 using Common.Enums.GameSession;
 using Common.Exceptions;
 using Common.Models;
 using Domain.GameLogic;
+using Domain.GameSession.Results;
 
 namespace Domain.GameSession
 {
@@ -34,13 +34,15 @@ namespace Domain.GameSession
         public DateTimeOffset? DeletedAt { get; set; }
 
         public bool IsFinished { get; set; }
+        public GameFinishReason? FinishReason { get; set; }
         public Guid? WinnerPlayerId { get; set; }
+        public GameOutcome? FinalOutcome { get; set; }
 
+        public User.User Creator { get; set; } = null!;
         public Match.Match? Match { get; set; }
         public Game.Game? CurrentGame { get; set; }
         public GamePlayer.GamePlayer? WinnerPlayer { get; set; }
         public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
-        // TODO: nav. prop. to User and back (Sessions)
 
 
         public void UpdateBoardState(string boardStateSnapshot)
@@ -48,56 +50,43 @@ namespace Domain.GameSession
             CurrentBoardStateJson = boardStateSnapshot;
         }
 
-        private GamePlayer.GamePlayer GetCurrentPlayer()
+        public void MarkUpdated(DateTimeOffset now)
+            => LastUpdatedAt = now;
+
+        public void MarkDeleted(DateTimeOffset now)
         {
-            if (CurrentPlayerId == null)
-            {
-                throw new InvalidOperationException(
-                    "CurrentPlayerId is not set");
-            }
-
-            var player = Players.FirstOrDefault(
-                p => p.Id == CurrentPlayerId.Value);
-
-            if (player == null)
-            {
-                throw new InvalidOperationException(
-                    $"Current player {CurrentPlayerId} not found in session");
-            }
-
-            return player;
+            IsDeleted = true;
+            DeletedAt = now;
         }
 
-        private GamePlayer.GamePlayer GetOpponent(Guid playerId)
+        public GamePlayer.GamePlayer GetPlayerOrThrow(Guid playerId)
         {
             EnsureExactlyTwoPlayers();
 
-            var opponent = Players.FirstOrDefault(p => p.Id != playerId);
+            var player = Players.FirstOrDefault(p => p.Id == playerId);
 
-            if (opponent == null)
-            {
-                throw new InvalidOperationException(
-                    $"Opponent of player {playerId} not found.");
-            }
-
-            return opponent;
+            return player ?? throw new InvalidOperationException(
+                    $"Player {playerId} not found in session.");
         }
 
-        private Guid GetOpponentId(Guid playerId)
-            => GetOpponent(playerId).Id;
-
-        private PlayerColor GetPlayerColor(Guid playerId)
+        public GamePlayer.GamePlayer GetOpponentOrThrow(Guid playerId)
         {
-            var player = Players.SingleOrDefault(p => p.Id == playerId);
+            EnsureExactlyTwoPlayers();
 
-            if (player == null)
+            var playersArray = Players.ToArray();
+
+            if (playersArray[0].Id == playerId)
             {
-                throw new BusinessRuleException(
-                    FunctionCode.PlayerNotInSession,
-                    "Player is not part of this session.");
+                return playersArray[0];
             }
 
-            return player.Color;
+            if (playersArray[1].Id == playerId)
+            {
+                return playersArray[1];
+            }
+
+            throw new InvalidOperationException(
+                $"Player {playerId} not found in session.");
         }
 
         public DiceRoll GetCurrentDiceRoll()
@@ -114,7 +103,7 @@ namespace Domain.GameSession
             return new DiceRoll(LastDiceRoll);
         }
 
-        private void EvaluateCrawfordRule()
+        public void EvaluateCrawfordRule()
         {
             if (!Settings.CrawfordRuleEnabled)
             {

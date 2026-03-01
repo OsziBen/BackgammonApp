@@ -24,38 +24,43 @@ namespace Domain.GameSession
             EvaluateCrawfordRule();
         }
 
-        public void Finish(Guid winnerPlayerId, DateTimeOffset now)
+        public void Finish(GameFinishReason reason, Guid winnerPlayerId, DateTimeOffset now)
         {
             IsFinished = true;
             FinishedAt = now;
             WinnerPlayerId = winnerPlayerId;
             CurrentPhase = GamePhase.GameFinished;
+            FinishReason = reason;
         }
 
-        public GameOutcome Forfeit(
+        public void Abandon(DateTimeOffset now)
+        {
+            IsFinished = true;
+            FinishedAt = now;
+            WinnerPlayerId = null;
+            CurrentPhase = GamePhase.GameAbandoned;
+            FinishReason = GameFinishReason.Abandoned;
+        }
+
+        public void Forfeit(
             Guid forfeitingPlayerId,
             BoardState boardState,
             DateTimeOffset now)
         {
-            EnsureNotFinished();
-            EnsureExactlyTwoPlayers();
-            EnsurePlayerIsInSession(forfeitingPlayerId);
+            EnsureCanForfeit(forfeitingPlayerId);
 
-            var forfeitingPlayer = Players
-                .First(p => p.Id == forfeitingPlayerId);
+            var forfeitingPlayer = GetPlayerOrThrow(forfeitingPlayerId);
 
-            var winner = GetOpponent(forfeitingPlayerId);
+            var winner = GetOpponentOrThrow(forfeitingPlayerId);
 
             var resultType = boardState.EvaluateForfeitResult(
-                forfeitingPlayer.Color);
+                forfeitingPlayer!.Color);
 
-            var outcome = GameResultEvaluator.CreateOutcome(
+            FinalOutcome = GameResultEvaluator.CreateOutcome(
                 resultType,
                 DoublingCubeValue);
 
-            Finish(winner.Id, now);
-
-            return outcome;
+            Finish(GameFinishReason.Forfeit, winner.Id, now);
         }
 
         public JoinResult JoinPlayer(Guid userId, DateTimeOffset now)
@@ -67,28 +72,27 @@ namespace Domain.GameSession
 
             if (existingPlayer != null)
             {
-                existingPlayer.IsConnected = true;
-                existingPlayer.LastConnectedAt = now;
+                existingPlayer.Connect(now);
 
-                return JoinResult.Rejoined(existingPlayer);
+                return JoinResult.Rejoined(Id, existingPlayer);
             }
 
             EnsureCanJoin();
 
             var newPlayer = Players.Count == 0
-                ? GamePlayerFactory.CreateHost(Id, userId, now)
-                : GamePlayerFactory.CreateGuest(Id, userId, now);
+                ? GamePlayerFactory.CreateHost(Id, userId)
+                : GamePlayerFactory.CreateGuest(Id, userId);
 
             Players.Add(newPlayer);
+            newPlayer.Connect(now);
 
-            return JoinResult.Joined(newPlayer);
+            return JoinResult.Joined(Id, newPlayer);
         }
 
-        public StartingPlayerResult DetermineStartingPlayer(
+        public void DetermineStartingPlayer(
             IStartingPlayerRoller roller,
             DateTimeOffset now)
         {
-            EnsureNotFinished();
             EnsureCanDetermineStartingPlayer();
 
             var roll = roller.Roll();
@@ -106,19 +110,40 @@ namespace Domain.GameSession
 
             CurrentPlayerId = startingPlayer.Id;
             CurrentPhase = GamePhase.MoveCheckers;
+            LastDiceRoll = [roll.Player1Roll, roll.Player2Roll];
             LastUpdatedAt = now;
+        }
 
-            return new StartingPlayerResult(
-                [
-                    (player1.Id, roll.Player1Roll),
-                    (player2.Id, roll.Player2Roll)
-                ],
-                startingPlayer.Id
-            );
+        public bool CanTimeoutPlayer()
+        {
+            if (IsFinished || !IsInActivePlayPhase() || Settings.ClockEnabled)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public bool CanStartGame()
             => Players.Count == 2 &&
                 CurrentPhase == GamePhase.WaitingForPlayers;
+
+        public bool CanUseDoublingCube(Guid playerId)
+        {
+            if (CrawfordRuleApplies || DoublingCubeOwnerPlayerId != playerId)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsInActivePlayPhase()
+        {
+            return CurrentPhase == GamePhase.TurnStart
+                || CurrentPhase == GamePhase.RollDice
+                || CurrentPhase == GamePhase.MoveCheckers
+                || CurrentPhase == GamePhase.CubeOffered;
+        }
     }
 }

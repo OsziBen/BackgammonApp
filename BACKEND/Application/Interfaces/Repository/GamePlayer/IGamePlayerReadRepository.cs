@@ -7,17 +7,20 @@
             Guid userId);
 
         Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(
-            Guid id);
+            Guid id,
+            CancellationToken cancellationToken);
 
         Task<Domain.GamePlayer.GamePlayer?> GetOpponentAsync(
             Guid sessionId,
-            Guid excludePlayerId);
+            Guid excludePlayerId,
+            CancellationToken cancellationToken);
 
         Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetPlayersBySessionAsync(
             Guid sessionId);
 
         Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetExpiredPlayersAsync(
             DateTimeOffset now,
-            TimeSpan disconnectTimeout);
+            TimeSpan disconnectTimeout,
+            CancellationToken cancellationToken);
     }
 }

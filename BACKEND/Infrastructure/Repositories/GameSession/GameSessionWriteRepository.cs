@@ -13,20 +13,15 @@ namespace Infrastructure.Repositories.GameSession
             _context = context;
         }
 
-        public async Task AddAsync(Domain.GameSession.GameSession session)
-            => await _context.GameSessions.AddAsync(session);
+        public async Task AddAsync(Domain.GameSession.GameSession session, CancellationToken cancellationToken)
+            => await _context.GameSessions.AddAsync(session, cancellationToken);
 
-        public Task<Domain.GameSession.GameSession?> GetByIdAndUserIdAsync(Guid sessionId, Guid userId)
+        public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.GameSessions
                 .Include(gs => gs.Players)
-                .FirstOrDefaultAsync(gs => gs.Id == sessionId && gs.CreatedByUserId == userId);
+                .FirstOrDefaultAsync(gs => gs.Id == id, cancellationToken);
 
-        public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id)
-            => _context.GameSessions
-                .Include(gs => gs.Players)
-                .FirstOrDefaultAsync(gs => gs.Id == id);
-
-        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, bool includePlayers = false)
+        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken, bool includePlayers = false)
         {
             IQueryable<Domain.GameSession.GameSession> query = _context.GameSessions;
 
@@ -35,10 +30,7 @@ namespace Infrastructure.Repositories.GameSession
                 query = query.Include(gs => gs.Players);
             }
 
-            return query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode);
+            return query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);
         }
-
-        public void Update(Domain.GameSession.GameSession session)
-            => _context.GameSessions.Update(session);
     }
 }

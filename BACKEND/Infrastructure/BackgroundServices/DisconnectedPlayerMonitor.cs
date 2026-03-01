@@ -34,7 +34,7 @@ namespace Infrastructure.BackgroundServices
                 var now = _timeProvider.UtcNow;
 
                 var expiredPlayers = await playerRepo
-                    .GetExpiredPlayersAsync(now, GameSessionConstants.DisconnectTimeout);
+                    .GetExpiredPlayersAsync(now, GameSessionConstants.DisconnectTimeout, cancellationToken);
 
                 foreach (var player in expiredPlayers)
                 {

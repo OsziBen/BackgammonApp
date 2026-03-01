@@ -35,7 +35,7 @@ namespace Application.GameSessions.Commands.CreateGameSession
         {
             var hasActiveSession =
                 await _gameSessionReadRepository
-                    .HasActiveSession(request.HostPlayerId);
+                    .HasActiveSession(request.UserId, cancellationToken);
 
             if (hasActiveSession)
             {
@@ -44,21 +44,33 @@ namespace Application.GameSessions.Commands.CreateGameSession
                     "Player already has an active game session.");
             }
 
-            var sessionCode = _sessionCodeGenerator.Generate();
+            string sessionCode;
+            do
+            {
+                sessionCode = _sessionCodeGenerator.Generate();
+            }
+            while (await _gameSessionReadRepository
+            .ExistsBySessionCodeAsync(sessionCode, cancellationToken));
+
             var now = _timeProvider.UtcNow;
 
             var session = GameSessionFactory.Create(
-                request.HostPlayerId,
+                request.UserId,
                 sessionCode,
                 request.Settings,
                 now);
 
-            await _uow.GameSessionsWrite.AddAsync(session);
-            await _uow.CommitAsync();
+            await _uow.GameSessionsWrite.AddAsync(session, cancellationToken);
+            await _uow.CommitAsync(cancellationToken);
 
             return new CreateGameSessionResponse {
                 SessionId = session.Id,
-                SessionCode = session.SessionCode
+                SessionCode = session.SessionCode,
+                Settings = session.Settings,
+                CreatedAt = session.CreatedAt,
+                CurrentPhase = session.CurrentPhase,
+                HostUserId = session.CreatedByUserId,
+                PlayersCount = session.Players.Count
             };
         }
     }

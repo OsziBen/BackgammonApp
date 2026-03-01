@@ -1,7 +1,8 @@
 ﻿using Application.GameSessions.Realtime;
+using Application.GameSessions.Responses;
+using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces;
 using Application.Interfaces.Repository;
-using Application.Realtime;
 using Application.Shared;
 using Application.Shared.Time;
 using Common.Enums.GameSession;
@@ -16,23 +17,26 @@ namespace Application.GameSessions.Commands.DeclineDoublingCube
         private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
         private readonly IBoardStateFactory _boardStateFactory;
+        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
 
         public DeclineDoublingCubeCommandHandler(
             IUnitOfWork uow,
             IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
-            IBoardStateFactory boardStateFactory)
+            IBoardStateFactory boardStateFactory,
+            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
         {
             _uow = uow;
             _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
             _boardStateFactory = boardStateFactory;
+            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
         }
 
         public async Task<Unit> Handle(DeclineDoublingCubeCommand request, CancellationToken cancellationToken)
         {
             var session = await _uow.GameSessionsWrite
-                .GetByIdAsync(request.SessionId)
+                .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             var now = _timeProvider.UtcNow;
@@ -43,13 +47,15 @@ namespace Application.GameSessions.Commands.DeclineDoublingCube
                 boardState,
                 now);
 
-            await _uow.CommitAsync();
+            await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.GameFinished(
+            await _gameSessionNotifier.SessionUpdated(
                 session.Id,
-                session.WinnerPlayerId!.Value,
-                GameFinishReason.CubeDeclined,
-                outcome);
+                new SessionUpdatedMessage
+                {
+                    EventType = SessionEventType.DoubleDeclined,
+                    Snapshot = _gameSessionSnapshotFactory.Create(session)
+                });
 
             return Unit.Value;
         }

@@ -5,9 +5,10 @@ using Application.GameSessions.Commands.MoveCheckers;
 using Application.GameSessions.Commands.OfferDoublingCube;
 using Application.GameSessions.Commands.PlayerDisconnected;
 using Application.GameSessions.Commands.PlayerForfeit;
-using Application.GameSessions.Commands.PlayerReconnected;
 using Application.GameSessions.Commands.RollDice;
+using Application.GameSessions.Commands.TryStartGameSession;
 using Application.GameSessions.Requests;
+using Application.Interfaces.Common;
 using Application.Realtime.Connections;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -19,49 +20,36 @@ namespace WebAPI.Hubs
     {
         private readonly IMediator _mediator;
         private readonly IConnectionMapping _connections;
+        private readonly ICurrentUser _currentUser;
 
         public GameSessionHub(
             IMediator mediator,
-            IConnectionMapping connections)
+            IConnectionMapping connections,
+            ICurrentUser currentUser)
         {
             _mediator = mediator;
             _connections = connections;
+            _currentUser = currentUser;
         }
 
         public async Task JoinSession(string sessionCode)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            if (!_currentUser.IsAuthenticated)
+            {
+                throw new HubException("Unauthorized");
+            }
 
             var result = await _mediator.Send(
-                new JoinGameSessionCommand(
-                    sessionCode,
-                    playerId,
-                    Context.ConnectionId
-                ));
+                new JoinGameSessionCommand(sessionCode, _currentUser.UserId));
 
-            _connections.Add(Context.ConnectionId, result.PlayerId);
+            _connections.Add(Context.ConnectionId, result.Player.Id);
 
             await Groups.AddToGroupAsync(
                 Context.ConnectionId,
                 result.SessionId.ToString());
 
-            await Clients.Caller.SendAsync("SessionJoined", result);
-
-            if (result.IsRejoin)
-            {
-                await _mediator.Send(
-                    new PlayerReconnectedCommand(result.PlayerId));
-            }
-            else
-            {
-                await Clients
-                    .GroupExcept(result.SessionId.ToString(), Context.ConnectionId)
-                    .SendAsync("PlayerJoined", new
-                    {
-                        result.PlayerId,
-                        result.PlayerColor
-                    });
-            }
+            await _mediator.Send(
+                new TryStartGameSessionCommand(result.SessionId, result.IsRejoin));
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)

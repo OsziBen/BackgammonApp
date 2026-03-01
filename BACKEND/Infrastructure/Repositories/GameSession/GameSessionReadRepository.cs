@@ -11,28 +11,34 @@ namespace Infrastructure.Repositories.GameSession
         public GameSessionReadRepository(ApplicationDbContext context)
             : base(context) { }
 
-        public Task<Domain.GameSession.GameSession?> GetActiveByUserIdAsync(Guid userId)
+        public Task<bool> ExistsBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken)
+            => Query()
+                .AnyAsync(gs =>
+                    !gs.IsFinished &&
+                    gs.SessionCode == sessionCode, cancellationToken);
+
+        public Task<Domain.GameSession.GameSession?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken)
             => Query()
                 .Include(gs => gs.Players)
                 .FirstOrDefaultAsync(gs =>
                     !gs.IsDeleted &&
                     !gs.IsFinished &&
-                    gs.CreatedByUserId == userId);
+                    gs.Players.Any(p => p.UserId == userId), cancellationToken);
 
         public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id)
             => Query()
                 .Include(gs => gs.Players)
                 .FirstOrDefaultAsync(gs => gs.Id == id);
 
-        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode)
+        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken)
             => Query()
                 .Include(gs => gs.Players)
-                .FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode);
+                .FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);
 
-        public Task<bool> HasActiveSession(Guid playerId)
+        public Task<bool> HasActiveSession(Guid playerId, CancellationToken cancellationToken)
             => Query()
                 .AnyAsync(gs =>
                     !gs.IsFinished &&
-                    gs.Players.Any(p => p.Id == playerId));
+                    gs.Players.Any(p => p.Id == playerId), cancellationToken);
     }
 }

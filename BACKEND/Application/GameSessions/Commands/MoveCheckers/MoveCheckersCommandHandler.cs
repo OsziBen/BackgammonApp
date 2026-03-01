@@ -1,4 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
+using Application.GameSessions.Responses;
+using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces;
 using Application.Interfaces.Repository;
 using Application.Realtime;
@@ -21,19 +23,22 @@ namespace Application.GameSessions.Commands.MoveCheckers
         private readonly IMoveSequenceGenerator _moveSequenceGenerator;
         private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
+        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
 
         public MoveCheckersCommandHandler(
             IUnitOfWork uow,
             IBoardStateFactory boardStateFactory,
             IMoveSequenceGenerator moveSequenceGenerator,
             IGameSessionNotifier gameSessionNotifier,
-            IDateTimeProvider timeProvider)
+            IDateTimeProvider timeProvider,
+            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
         {
             _uow = uow;
             _boardStateFactory = boardStateFactory;
             _moveSequenceGenerator = moveSequenceGenerator;
             _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
+            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
         }
 
         public async Task<Unit> Handle(
@@ -41,7 +46,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
             CancellationToken cancellationToken)
         {
             var session = await _uow.GameSessionsWrite
-                .GetByIdAsync(request.SessionId)
+                .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
             var boardState = _boardStateFactory.Create(session);
@@ -75,25 +80,17 @@ namespace Application.GameSessions.Commands.MoveCheckers
             session.UpdateBoardState(
                 BoardStateMapper.ToJson(session, nextState));
 
-            session.LastUpdatedAt = now;
+            session.MarkUpdated(now);
 
-            await _uow.CommitAsync();
+            await _uow.CommitAsync(cancellationToken);
 
-            if (outcome != null)
-            {
-                await _gameSessionNotifier.GameFinished(
-                    session.Id,
-                    session.WinnerPlayerId!.Value,
-                    GameFinishReason.Victory,
-                    outcome);
-            }
-            else
-            {
-                await _gameSessionNotifier.CheckersMoved(
-                    session.Id,
-                    request.PlayerId,
-                    request.Moves);
-            }
+            await _gameSessionNotifier.SessionUpdated(
+                session.Id,
+                new SessionUpdatedMessage
+                {
+                    EventType = outcome == null ? SessionEventType.CheckerMoved : SessionEventType.GameFinished,
+                    Snapshot = _gameSessionSnapshotFactory.Create(session)
+                });
 
             return Unit.Value;
         }
