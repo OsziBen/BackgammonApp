@@ -485,6 +485,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("WinnerPlayerId")
                         .HasColumnType("uuid");
 

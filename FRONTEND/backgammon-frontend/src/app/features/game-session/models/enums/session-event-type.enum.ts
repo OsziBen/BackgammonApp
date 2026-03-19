@@ -1,0 +1,15 @@
+export enum SessionEventType {
+  PlayerJoined = 0,
+  PlayerReconnected = 1,
+  PlayerDisconnected = 2,
+  GameStarted = 3,
+  DiceRolled = 4,
+  CheckerMoved = 5,
+  DoubleOffered = 6,
+  DoubleAccepted = 7,
+  DoubleDeclined = 8,
+  PlayerResigned = 9,
+  GameFinished = 10,
+  SessionFinished = 11,
+  SessionAbandoned = 12,
+}

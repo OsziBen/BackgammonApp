@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+  <a class="navbar-brand" routerLink="/">Backgammon</a>
+
+  <ul class="navbar-nav ms-auto">
+    <ng-container *ngIf="!isLoggedIn">
+      <li class="nav-item">
+        <button class="btn btn-link nav-link" (click)="openLogin()">
+          Login
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="btn btn-link nav-link" (click)="openRegister()">
+          Register
+        </button>
+      </li>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/profile">Profile</a>
+      </li>
+      <li class="nav-item">
+        <button class="btn btn-sm btn-outline-light ms-2" (click)="logout()">
+          Logout
+        </button>
+      </li>
+    </ng-container>
+  </ul>
+</nav>
+
+<!-- Main content -->
+<router-outlet></router-outlet>
+
+<!-- Modal overlay -->
+<div
+  class="modal-overlay"
+  *ngIf="showLogin || showRegister"
+  (click)="closeModal()"
+>
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()">✕</button>
+
+    <app-login *ngIf="showLogin" (close)="closeModal()"></app-login>
+    <app-registration
+      *ngIf="showRegister"
+      (close)="closeModal()"
+    ></app-registration>
+  </div>
+</div>

@@ -30,11 +30,10 @@
     {{ session.settings.clockEnabled ? 'Enabled' : 'Disabled' }}
   </li>
 
-  <li *ngIf="session.settings.clockEnabled && session.settings.clockSettings">
+  <li *ngIf="session.settings.clockEnabled">
     <strong>Clock settings:</strong>
-    {{ session.settings.clockSettings.matchTimePerPlayerInSeconds }}s +
-    {{ session.settings.clockSettings.startOfTurnDelayPerPlayerInSeconds }}s /
-    move
+    {{ session.settings.matchTimePerPlayerInSeconds }}s +
+    {{ session.settings.startOfTurnDelayPerPlayerInSeconds }}s / move
   </li>
 </ul>
 
