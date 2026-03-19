@@ -9,6 +9,7 @@ namespace Domain.GameSession
 {
     public partial class GameSession : BaseEntity
     {
+        public int Version { get; private set; } = 0;
         public Guid? MatchId { get; set; }
         public Guid? CurrentGameId { get; set; }
         public Guid CreatedByUserId { get; set; }
@@ -44,6 +45,8 @@ namespace Domain.GameSession
         public GamePlayer.GamePlayer? WinnerPlayer { get; set; }
         public ICollection<GamePlayer.GamePlayer> Players { get; set; } = [];
 
+        public void IncrementVersion()
+            => Version++;
 
         public void UpdateBoardState(string boardStateSnapshot)
         {

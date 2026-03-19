@@ -865,6 +865,10 @@ namespace Infrastructure.Data
                            .IsRequired(false)
                            .OnDelete(DeleteBehavior.Restrict);
 
+                gameSession.Property(gs => gs.Version)
+                           //.IsConcurrencyToken()
+                           .IsRequired();
+
                 gameSession.Property(gs => gs.CreatedByUserId)
                            .IsRequired();
 

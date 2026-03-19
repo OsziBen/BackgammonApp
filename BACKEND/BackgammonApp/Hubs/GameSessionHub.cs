@@ -42,6 +42,7 @@ namespace WebAPI.Hubs
             var result = await _mediator.Send(
                 new JoinGameSessionCommand(sessionCode, _currentUser.UserId));
 
+            _connections.Remove(Context.ConnectionId);
             _connections.Add(Context.ConnectionId, result.Player.Id);
 
             await Groups.AddToGroupAsync(

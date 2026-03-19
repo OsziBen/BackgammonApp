@@ -6,6 +6,8 @@ namespace Application.GameSessions.Responses
 {
     public class GameSessionSnapshotResponse
     {
+        public int Version { get; set; }
+
         public Guid SessionId { get; set; }
         public required string SessionCode { get; set; }
         public Guid CreatedByUserId { get; set; }
