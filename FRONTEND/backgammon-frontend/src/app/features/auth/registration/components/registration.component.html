@@ -1,0 +1,114 @@
+<div class="mb-4">
+  <h2 class="text-success">Sign up</h2>
+  <div>
+    Already have an account?
+    <a routerLink="/signin" class="text-decoration-none fw-medium text-success">
+      Sign in
+    </a>
+  </div>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <!-- FIRST NAME -->
+  <div class="mb-3">
+    <input
+      class="form-control"
+      placeholder="First Name"
+      formControlName="firstName"
+    />
+    <div class="text-danger small" *ngIf="hasDisplayableError('firstName')">
+      First name is required.
+    </div>
+  </div>
+
+  <!-- LAST NAME -->
+  <div class="mb-3">
+    <input
+      class="form-control"
+      placeholder="Last Name"
+      formControlName="lastName"
+    />
+    <div class="text-danger small" *ngIf="hasDisplayableError('lastName')">
+      Last name is required.
+    </div>
+  </div>
+
+  <!-- USERNAME -->
+  <div class="mb-3">
+    <input
+      class="form-control"
+      placeholder="Username"
+      formControlName="userName"
+    />
+    <div class="text-danger small" *ngIf="hasDisplayableError('userName')">
+      Username is required.
+    </div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="mb-3">
+    <input
+      class="form-control"
+      placeholder="Email"
+      formControlName="emailAddress"
+    />
+    <div class="text-danger small" *ngIf="hasDisplayableError('emailAddress')">
+      <div *ngIf="form.get('emailAddress')?.hasError('required')">
+        Email is required.
+      </div>
+      <div *ngIf="form.get('emailAddress')?.hasError('email')">
+        Invalid email format.
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE OF BIRTH -->
+  <div class="mb-3">
+    <input type="date" class="form-control" formControlName="dateOfBirth" />
+    <div class="text-danger small" *ngIf="hasDisplayableError('dateOfBirth')">
+      Date of birth is required.
+    </div>
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="mb-3">
+    <input
+      type="password"
+      class="form-control"
+      placeholder="Password"
+      formControlName="password"
+    />
+    <div class="text-danger small" *ngIf="hasDisplayableError('password')">
+      <ng-container [ngSwitch]="passwordErrorKey">
+        <div *ngSwitchCase="'required'">Password is required.</div>
+        <div *ngSwitchCase="'minlength'">Minimum 8 characters required.</div>
+        <div *ngSwitchCase="'pattern'">
+          At least one special character required.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- CONFIRM PASSWORD -->
+  <div class="mb-3">
+    <input
+      type="password"
+      class="form-control"
+      placeholder="Confirm Password"
+      formControlName="confirmPassword"
+    />
+    <div
+      class="text-danger small"
+      *ngIf="
+        hasDisplayableError('confirmPassword') &&
+        form.get('confirmPassword')?.hasError('passwordMismatch')
+      "
+    >
+      Passwords do not match.
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-success w-100">Register</button>
+  </div>
+</form>
