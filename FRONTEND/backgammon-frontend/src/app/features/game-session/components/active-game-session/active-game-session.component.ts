@@ -13,9 +13,9 @@ export class ActiveGameSessionComponent {
   session!: GetActiveSessionResponse;
 
   @Output()
-  delete = new EventEmitter<string>();
+  deleteSession = new EventEmitter<string>();
 
   onDelete(): void {
-    this.delete.emit(this.session.sessionId);
+    this.deleteSession.emit(this.session.sessionId);
   }
 }

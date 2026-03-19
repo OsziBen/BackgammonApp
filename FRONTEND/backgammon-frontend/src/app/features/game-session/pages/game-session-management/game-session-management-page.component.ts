@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
-import { GameSessionFacade } from '../../../../core/states/game-session/game-session.facade';
+import { Component, OnInit, signal } from '@angular/core';
 import { CreateGameSessionComponent } from '../../components/create-game-session/create-game-session.component';
-import { GetActiveSessionResponse } from '../../models/api/responses/get-active-session.response';
-import { GameSessionSettings } from '../../../../core/models/game-session/game-session-settings.model';
 import { ActiveGameSessionComponent } from '../../components/active-game-session/active-game-session.component';
+import { GetActiveSessionResponse } from '../../models/api/responses/get-active-session.response';
+import { GameSessionApiService } from '../../../../core/services/game-session-api.service';
 import { ToastrService } from 'ngx-toastr';
+import { GameSessionSettings } from '../../models/game-session-settings.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-game-session-management-page',
@@ -19,51 +19,80 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './game-session-management-page.component.html',
 })
 export class GameSessionManagementPageComponent implements OnInit {
-  activeSession$!: Observable<GetActiveSessionResponse | null>;
-  loading$!: Observable<boolean>;
-  error$!: Observable<string | null>;
-
-  // ideiglenes, auth később
-  private readonly userId = '11111111-1111-1111-1111-111111111111';
+  // STATE
+  readonly activeSession = signal<GetActiveSessionResponse | null>(null);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
 
   constructor(
-    private readonly facade: GameSessionFacade,
+    private readonly api: GameSessionApiService,
     private readonly toastr: ToastrService,
   ) {}
 
-  ngOnInit(): void {
-    this.activeSession$ = this.facade.activeSession$;
-    this.loading$ = this.facade.loading$;
-    this.error$ = this.facade.error$;
-
-    this.facade.loadActiveSession(this.userId);
+  async ngOnInit(): Promise<void> {
+    await this.loadActiveSession();
   }
 
-  onSessionCreated(settings: GameSessionSettings): void {
-    this.facade.createSession(this.userId, settings).subscribe({
-      next: () => {
-        this.toastr.success(
-          'Game session created successfully',
-          'Session created',
-        );
-      },
-      error: () => {
-        this.toastr.error('Could not create session', 'Error');
-      },
-    });
+  // LOAD ACTIVE SESSION
+  private async loadActiveSession(): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    try {
+      const session = await firstValueFrom(this.api.getActiveSession());
+
+      this.activeSession.set(session);
+    } catch {
+      this.error.set('Could not load active session');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
-  onDeleteSession(sessionId: string): void {
-    this.facade.deleteSession(sessionId).subscribe({
-      next: () => {
-        this.toastr.success(
-          'Game session deleted successfully',
-          'Session removed',
-        );
-      },
-      error: () => {
-        this.toastr.error('Could not delete session', 'Error');
-      },
-    });
+  // CREATE SESSION
+  async onSessionCreated(settings: GameSessionSettings): Promise<void> {
+    this.loading.set(true);
+
+    try {
+      const response = await firstValueFrom(
+        this.api.createSession({ settings }),
+      );
+
+      this.activeSession.set({
+        sessionId: response.sessionId,
+        sessionCode: response.sessionCode,
+        settings: response.settings,
+        createdAt: response.createdAt,
+      });
+
+      this.toastr.success(
+        'Game session created successfully',
+        'Session created',
+      );
+    } catch {
+      this.toastr.error('Could not create session', 'Error');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // DELETE SESSION
+  async onDeleteSession(sessionId: string): Promise<void> {
+    this.loading.set(true);
+
+    try {
+      await firstValueFrom(this.api.softDeleteSession(sessionId));
+
+      this.activeSession.set(null);
+
+      this.toastr.success(
+        'Game session deleted successfully',
+        'Session removed',
+      );
+    } catch {
+      this.toastr.error('Could not delete session', 'Error');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

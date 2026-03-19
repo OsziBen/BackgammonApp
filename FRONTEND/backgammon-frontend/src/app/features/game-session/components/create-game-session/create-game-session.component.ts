@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { GameSessionSettings } from '../../../../core/models/game-session/game-session-settings.model';
+import { GameSessionSettings } from '../../models/game-session-settings.model';
 
 @Component({
   selector: 'app-create-game-session',
@@ -26,24 +26,24 @@ export class CreateGameSessionComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    this.form
-      .get('clockEnabled')!
-      .valueChanges.subscribe((enabled: boolean) => {
-        const matchTime = this.form.get('matchTimePerPlayerInSeconds');
-        const turnDelay = this.form.get('startOfTurnDelayPerPlayerInSeconds');
+    const clockEnabledControl = this.form.get('clockEnabled');
 
-        if (enabled) {
-          matchTime?.enable();
-          turnDelay?.enable();
-        } else {
-          matchTime?.disable();
-          turnDelay?.disable();
-        }
-      });
+    clockEnabledControl?.valueChanges.subscribe((enabled: boolean) => {
+      const matchTime = this.form.get('matchTimePerPlayerInSeconds');
+      const turnDelay = this.form.get('startOfTurnDelayPerPlayerInSeconds');
+
+      if (enabled) {
+        matchTime?.enable();
+        turnDelay?.enable();
+      } else {
+        matchTime?.disable();
+        turnDelay?.disable();
+      }
+    });
   }
 
   create(): void {
-    const settings: GameSessionSettings = this.form.getRawValue();
+    const settings = this.form.getRawValue() as GameSessionSettings;
     this.sessionCreated.emit(settings);
   }
 }

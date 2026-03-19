@@ -1,23 +1,30 @@
 <h1>Game Session</h1>
 
-<div *ngIf="loading$ | async">Loading...</div>
+<div *ngIf="loading()">Loading...</div>
 
-<div *ngIf="error$ | async as error" style="color: red">
-  {{ error }}
+<div *ngIf="error()" style="color: red">
+  {{ error() }}
 </div>
+
+<!-- <div>
+  <app-join-game-session></app-join-game-session>
+
+  <app-session-waiting-room></app-session-waiting-room>
+</div> -->
 
 <!-- nincs aktív session -->
 <app-create-game-session
-  *ngIf="!(activeSession$ | async) && !(loading$ | async)"
+  *ngIf="!activeSession() && !loading()"
   (sessionCreated)="onSessionCreated($event)"
 ></app-create-game-session>
 
 <!-- VAN aktív session -->
 <app-active-game-session
-  *ngIf="activeSession$ | async as activeSession"
-  [session]="activeSession"
-  (delete)="onDeleteSession($event)"
-></app-active-game-session>
+  *ngIf="activeSession()"
+  [session]="activeSession()!"
+  (deleteSession)="onDeleteSession($event)"
+>
+</app-active-game-session>
 
 <!-- van aktív session
 <section *ngIf="activeSession$ | async as activeSession">
