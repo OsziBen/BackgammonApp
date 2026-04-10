@@ -14,9 +14,9 @@ namespace WebAPI.Realtime
             _hub = hub;
         }
 
-        public Task SessionUpdated(Guid sessionId, SessionUpdatedMessage sessionUpdatedMessage)
+        public Task SessionUpdated(Guid playerId, SessionUpdatedMessage sessionUpdatedMessage)
             => _hub.Clients
-                .Group(sessionId.ToString())
+                .User(playerId.ToString())
                 .SendAsync(
                     "SessionUpdated",
                     sessionUpdatedMessage

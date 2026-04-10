@@ -1,4 +1,5 @@
-﻿using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
+using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces;
 using Application.Interfaces.Common;
 using Application.Interfaces.Repository;
@@ -69,6 +70,7 @@ namespace Infrastructure.ExtensionMethods
             services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<IGameSessionBroadcaster, GameSessionBroadcaster>();
 
             services.AddHostedService<DisconnectedPlayerMonitor>();
 

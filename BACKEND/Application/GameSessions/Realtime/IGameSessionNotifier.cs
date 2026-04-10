@@ -5,7 +5,7 @@ namespace Application.GameSessions.Realtime
     public interface IGameSessionNotifier
     {
         Task SessionUpdated(
-            Guid sessionId,
+            Guid playerId,
             SessionUpdatedMessage sessionUpdatedMessage);
     }
 }

@@ -9,6 +9,7 @@ using Application.GameSessions.Commands.RollDice;
 using Application.GameSessions.Commands.TryStartGameSession;
 using Application.GameSessions.Requests;
 using Application.Interfaces.Common;
+using Application.Interfaces.Repository.GameSession;
 using Application.Realtime.Connections;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -21,15 +22,18 @@ namespace WebAPI.Hubs
         private readonly IMediator _mediator;
         private readonly IConnectionMapping _connections;
         private readonly ICurrentUser _currentUser;
+        private readonly IGameSessionReadRepository _gameSessionReadRepository;
 
         public GameSessionHub(
             IMediator mediator,
             IConnectionMapping connections,
-            ICurrentUser currentUser)
+            ICurrentUser currentUser,
+            IGameSessionReadRepository gameSessionReadRepository)
         {
             _mediator = mediator;
             _connections = connections;
             _currentUser = currentUser;
+            _gameSessionReadRepository = gameSessionReadRepository;
         }
 
         public async Task JoinSession(string sessionCode)
@@ -39,18 +43,21 @@ namespace WebAPI.Hubs
                 throw new HubException("Unauthorized");
             }
 
+            var session = await _gameSessionReadRepository
+                .GetBySessionCodeAsync(sessionCode, includePlayers: false, cancellationToken: CancellationToken.None);
+
+            if (session == null) {
+                throw new HubException("Session not found");
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId,
+                session.Id.ToString());
+
             var result = await _mediator.Send(
-                new JoinGameSessionCommand(sessionCode, _currentUser.UserId));
+                new JoinGameSessionCommand(sessionCode, _currentUser.UserId), Context.ConnectionAborted);
 
             _connections.Remove(Context.ConnectionId);
             _connections.Add(Context.ConnectionId, result.Player.Id);
-
-            await Groups.AddToGroupAsync(
-                Context.ConnectionId,
-                result.SessionId.ToString());
-
-            await _mediator.Send(
-                new TryStartGameSessionCommand(result.SessionId, result.IsRejoin));
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -68,52 +75,52 @@ namespace WebAPI.Hubs
 
         public async Task RollDice(Guid sessionId)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new RollDiceCommand(sessionId, playerId));
+                new RollDiceCommand(sessionId, userId));
         }
 
         public async Task OfferDoublingCube(Guid sessionId)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new OfferDoublingCubeCommand(sessionId, playerId));
+                new OfferDoublingCubeCommand(sessionId, userId));
         }
 
         public async Task AcceptDoublingCube(Guid sessionId)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new AcceptDoublingCubeCommand(sessionId, playerId));
+                new AcceptDoublingCubeCommand(sessionId, userId));
         }
 
         public async Task DeclineDoublingCube(Guid sessionId)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new DeclineDoublingCubeCommand(sessionId, playerId));
+                new DeclineDoublingCubeCommand(sessionId, userId));
         }
 
         public async Task MoveCheckers(
             Guid sessionId,
             IReadOnlyList<MoveDto> moves)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new MoveCheckersCommand(sessionId, playerId, moves));
+                new MoveCheckersCommand(sessionId, userId, moves));
         }
 
         public async Task Forfeit(Guid sessionId)
         {
-            var playerId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentPlayerId(_connections);
 
             await _mediator.Send(
-                new PlayerForfeitCommand(sessionId, playerId));
+                new PlayerForfeitCommand(sessionId, userId));
         }
     }
 }

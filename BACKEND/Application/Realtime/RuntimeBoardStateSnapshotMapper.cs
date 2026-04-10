@@ -12,7 +12,7 @@ namespace Application.Realtime
             return new RuntimeBoardStateSnapshot
             {
                 Points = boardState.Points.ToDictionary(
-                    p => p.Key,
+                    p => p.Key.ToString(),
                     p => p.Value.Clone()),
                 BarWhite = boardState.BarWhite,
                 BarBlack = boardState.BarBlack,
