@@ -1,8 +1,11 @@
-﻿using Application.Interfaces.Repository;
+﻿using Application.GameSessions.Commands.TryStartGameSession;
+using Application.GameSessions.Services.GameSessionBroadcaster;
+using Application.Interfaces.Repository;
 using Application.Interfaces.Repository.GameSession;
 using Application.Shared;
 using Application.Shared.Time;
 using Common.Enums;
+using Common.Enums.GameSession;
 using Common.Exceptions;
 using Domain.GameSession;
 using Domain.GameSession.Results;
@@ -15,14 +18,21 @@ namespace Application.GameSessions.Commands.JoinGameSession
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _timeProvider;
         private readonly IGameSessionReadRepository _gameSessionReadRepository;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
+        private readonly IMediator _mediator;
+
         public JoinGameSessionCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider timeProvider,
-            IGameSessionReadRepository gameSessionReadRepository)
+            IGameSessionReadRepository gameSessionReadRepository,
+            IGameSessionBroadcaster gameSessionBroadcaster,
+            IMediator mediator)
         {
             _uow = uow;
             _timeProvider = timeProvider;
             _gameSessionReadRepository = gameSessionReadRepository;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
+            _mediator = mediator;
         }
 
         public async Task<JoinResult> Handle(
@@ -53,8 +63,15 @@ namespace Application.GameSessions.Commands.JoinGameSession
             }
 
             session.MarkUpdated(now);
+            session.IncrementVersion();
 
             await _uow.CommitAsync(cancellationToken);
+
+            var eventType = joinResult.IsRejoin ? SessionEventType.PlayerReconnected : SessionEventType.PlayerJoined;
+
+            await _gameSessionBroadcaster.BroadcastAsync(session, eventType, isRejoin: joinResult.IsRejoin);
+
+            await _mediator.Send(new TryStartGameSessionCommand(session.Id), cancellationToken);
 
             return joinResult;
         }

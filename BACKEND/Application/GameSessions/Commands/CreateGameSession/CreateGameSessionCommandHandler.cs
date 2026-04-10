@@ -65,6 +65,7 @@ namespace Application.GameSessions.Commands.CreateGameSession
 
             return new CreateGameSessionResponse {
                 SessionId = session.Id,
+                Version = session.Version,
                 SessionCode = session.SessionCode,
                 Settings = session.Settings,
                 CreatedAt = session.CreatedAt,

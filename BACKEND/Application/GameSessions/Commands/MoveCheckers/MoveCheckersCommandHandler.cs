@@ -1,6 +1,4 @@
-﻿using Application.GameSessions.Realtime;
-using Application.GameSessions.Responses;
-using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
 using Application.Interfaces;
 using Application.Interfaces.Repository;
 using Application.Realtime;
@@ -21,24 +19,21 @@ namespace Application.GameSessions.Commands.MoveCheckers
         private readonly IUnitOfWork _uow;
         private readonly IBoardStateFactory _boardStateFactory;
         private readonly IMoveSequenceGenerator _moveSequenceGenerator;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public MoveCheckersCommandHandler(
             IUnitOfWork uow,
             IBoardStateFactory boardStateFactory,
             IMoveSequenceGenerator moveSequenceGenerator,
-            IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
             _boardStateFactory = boardStateFactory;
             _moveSequenceGenerator = moveSequenceGenerator;
-            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(
@@ -48,6 +43,10 @@ namespace Application.GameSessions.Commands.MoveCheckers
             var session = await _uow.GameSessionsWrite
                 .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
+
+            var playerId = session.Players
+                .FirstOrDefault(p => p.UserId == request.UserId)?.Id
+                ?? throw new InvalidOperationException("User is not part of this session");
 
             var boardState = _boardStateFactory.Create(session);
             var diceRoll = session.GetCurrentDiceRoll();
@@ -73,7 +72,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
             var nextState = session.ApplyMoveSequence(
                 boardState,
                 clientSequence,
-                request.PlayerId,
+                playerId,
                 now,
                 out var outcome);
 
@@ -81,16 +80,13 @@ namespace Application.GameSessions.Commands.MoveCheckers
                 BoardStateMapper.ToJson(session, nextState));
 
             session.MarkUpdated(now);
+            session.IncrementVersion();
 
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                session.Id,
-                new SessionUpdatedMessage
-                {
-                    EventType = outcome == null ? SessionEventType.CheckerMoved : SessionEventType.GameFinished,
-                    Snapshot = _gameSessionSnapshotFactory.Create(session)
-                });
+            var eventType = outcome == null ? SessionEventType.CheckerMoved : SessionEventType.GameFinished;
+
+            await _gameSessionBroadcaster.BroadcastAsync(session, eventType);
 
             return Unit.Value;
         }

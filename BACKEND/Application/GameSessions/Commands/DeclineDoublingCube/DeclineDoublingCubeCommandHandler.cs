@@ -1,6 +1,4 @@
-﻿using Application.GameSessions.Realtime;
-using Application.GameSessions.Responses;
-using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
 using Application.Interfaces;
 using Application.Interfaces.Repository;
 using Application.Shared;
@@ -14,23 +12,20 @@ namespace Application.GameSessions.Commands.DeclineDoublingCube
     public class DeclineDoublingCubeCommandHandler : IRequestHandler<DeclineDoublingCubeCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
         private readonly IBoardStateFactory _boardStateFactory;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public DeclineDoublingCubeCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
             IBoardStateFactory boardStateFactory,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
-            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
             _boardStateFactory = boardStateFactory;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(DeclineDoublingCubeCommand request, CancellationToken cancellationToken)
@@ -39,23 +34,24 @@ namespace Application.GameSessions.Commands.DeclineDoublingCube
                 .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
+            var playerId = session.Players
+               .FirstOrDefault(p => p.UserId == request.UserId)?.Id
+               ?? throw new InvalidOperationException("User is not part of this session");
+
             var now = _timeProvider.UtcNow;
             var boardState = _boardStateFactory.Create(session);
 
             var outcome = session.DeclineDoublingCube(
-                request.PlayerId,
+                playerId,
                 boardState,
                 now);
 
+            session.MarkUpdated(now);
+            session.IncrementVersion();
+
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                session.Id,
-                new SessionUpdatedMessage
-                {
-                    EventType = SessionEventType.DoubleDeclined,
-                    Snapshot = _gameSessionSnapshotFactory.Create(session)
-                });
+            await _gameSessionBroadcaster.BroadcastAsync(session, SessionEventType.DoubleDeclined);
 
             return Unit.Value;
         }

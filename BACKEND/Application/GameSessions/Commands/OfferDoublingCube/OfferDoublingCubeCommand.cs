@@ -2,5 +2,5 @@
 
 namespace Application.GameSessions.Commands.OfferDoublingCube
 {
-    public record OfferDoublingCubeCommand(Guid SessionId, Guid PlayerId) : IRequest<Unit>;
+    public record OfferDoublingCubeCommand(Guid SessionId, Guid UserId) : IRequest<Unit>;
 }

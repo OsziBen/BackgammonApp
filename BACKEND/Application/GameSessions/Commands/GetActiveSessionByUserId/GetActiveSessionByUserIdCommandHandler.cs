@@ -20,6 +20,7 @@ namespace Application.GameSessions.Commands.GetActiveSessionByUserId
             return session == null ? null : new GetActiveSessionByUserIdResponse
             {
                 SessionId = session.Id,
+                Version = session.Version,
                 SessionCode = session.SessionCode,
                 Settings = session.Settings,
                 CreatedAt = session.CreatedAt

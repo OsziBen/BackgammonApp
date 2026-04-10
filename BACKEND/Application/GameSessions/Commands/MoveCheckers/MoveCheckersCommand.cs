@@ -5,7 +5,7 @@ namespace Application.GameSessions.Commands.MoveCheckers
 {
     public record MoveCheckersCommand(
         Guid SessionId,
-        Guid PlayerId,
+        Guid UserId,
         IReadOnlyList<MoveDto> Moves
         ) : IRequest<Unit>;
 }

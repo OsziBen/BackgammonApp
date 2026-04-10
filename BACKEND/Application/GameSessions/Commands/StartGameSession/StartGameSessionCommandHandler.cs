@@ -1,7 +1,7 @@
-﻿using Application.GameSessions.Realtime;
-using Application.GameSessions.Responses;
-using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
+using Application.Interfaces;
 using Application.Interfaces.Repository;
+using Application.Realtime;
 using Application.Shared;
 using Application.Shared.Time;
 using Common.Enums.GameSession;
@@ -15,22 +15,22 @@ namespace Application.GameSessions.Commands.StartGameSession
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _timeProvider;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
         private readonly IStartingPlayerRoller _startingPlayerRoller;
+        private readonly IBoardStateFactory _boardStateFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public StartGameSessionCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider timeProvider,
-            IGameSessionNotifier gameSessionNotifier,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory,
-            IStartingPlayerRoller startingPlayerRoller)
+            IStartingPlayerRoller startingPlayerRoller,
+            IBoardStateFactory boardStateFactory,
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
             _timeProvider = timeProvider;
-            _gameSessionNotifier = gameSessionNotifier;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
             _startingPlayerRoller = startingPlayerRoller;
+            _boardStateFactory = boardStateFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(
@@ -52,15 +52,17 @@ namespace Application.GameSessions.Commands.StartGameSession
 
             session.DetermineStartingPlayer(_startingPlayerRoller, now);
 
+            var initialBoard = _boardStateFactory.CreateInitial(session);
+
+            session.UpdateBoardState(
+                BoardStateMapper.ToJson(session, initialBoard));
+
+            session.MarkUpdated(now);
+            session.IncrementVersion();
+
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                session.Id,
-                new SessionUpdatedMessage
-                {
-                    EventType = SessionEventType.GameStarted,
-                    Snapshot = _gameSessionSnapshotFactory.Create(session)
-                });
+            await _gameSessionBroadcaster.BroadcastAsync(session, SessionEventType.GameStarted);
 
             return Unit.Value;
         }

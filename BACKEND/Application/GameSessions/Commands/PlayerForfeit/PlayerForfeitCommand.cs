@@ -2,5 +2,5 @@
 
 namespace Application.GameSessions.Commands.PlayerForfeit
 {
-    public record PlayerForfeitCommand(Guid SessionId, Guid PlayerId) : IRequest<Unit>;
+    public record PlayerForfeitCommand(Guid SessionId, Guid UserId) : IRequest<Unit>;
 }
