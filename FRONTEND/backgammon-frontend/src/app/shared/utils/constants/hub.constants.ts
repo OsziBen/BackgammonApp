@@ -4,4 +4,10 @@ export const HUB_EVENTS = {
 
 export const HUB_METHODS = {
   JoinSession: 'JoinSession',
+  RollDice: 'RollDice',
+  MoveCheckers: 'MoveCheckers',
+  OfferDoublingCube: 'OfferDoublingCube',
+  AcceptDoublingCube: 'AcceptDoublingCube',
+  DeclineDoublingCube: 'DeclineDoublingCube',
+  Forfeit: 'Forfeit',
 };
