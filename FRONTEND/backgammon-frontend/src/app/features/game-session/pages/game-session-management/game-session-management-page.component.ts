@@ -7,6 +7,10 @@ import { GameSessionApiService } from '../../../../core/services/game-session-ap
 import { ToastrService } from 'ngx-toastr';
 import { GameSessionSettings } from '../../models/game-session-settings.model';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
+import { JoinSessionComponent } from '../../components/join-game-session/join-game-session.component';
+import { GameSessionFacade } from '../../facade/game-session.facade';
+import { AuthService } from '../../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-game-session-management-page',
@@ -15,6 +19,7 @@ import { firstValueFrom } from 'rxjs';
     CommonModule,
     CreateGameSessionComponent,
     ActiveGameSessionComponent,
+    JoinSessionComponent,
   ],
   templateUrl: './game-session-management-page.component.html',
 })
@@ -27,6 +32,9 @@ export class GameSessionManagementPageComponent implements OnInit {
   constructor(
     private readonly api: GameSessionApiService,
     private readonly toastr: ToastrService,
+    private readonly facade: GameSessionFacade,
+    private readonly authService: AuthService,
+    private readonly router: Router,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -60,6 +68,7 @@ export class GameSessionManagementPageComponent implements OnInit {
 
       this.activeSession.set({
         sessionId: response.sessionId,
+        version: response.version,
         sessionCode: response.sessionCode,
         settings: response.settings,
         createdAt: response.createdAt,
@@ -85,6 +94,8 @@ export class GameSessionManagementPageComponent implements OnInit {
 
       this.activeSession.set(null);
 
+      await this.facade.leaveSession();
+
       this.toastr.success(
         'Game session deleted successfully',
         'Session removed',
@@ -93,6 +104,28 @@ export class GameSessionManagementPageComponent implements OnInit {
       this.toastr.error('Could not delete session', 'Error');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async onJoinSession(sessionCode: string): Promise<void> {
+    const token = this.authService.getToken();
+
+    if (!token) {
+      console.error('No auth token found');
+      return;
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      console.error('User not authenticated');
+      return;
+    }
+    await this.facade.joinSession(sessionCode, token);
+
+    this.router.navigate(['/sessions', sessionCode]);
+    try {
+    } catch (error) {
+      console.error('Join session failed', error);
+      this.toastr.error('Could not join session', 'Error');
     }
   }
 }

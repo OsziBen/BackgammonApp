@@ -6,11 +6,12 @@
   {{ error() }}
 </div>
 
-<!-- <div>
-  <app-join-game-session></app-join-game-session>
+<!-- JOIN mindig elérhető -->
+<app-join-game-session
+  (joinSession)="onJoinSession($event)"
+></app-join-game-session>
 
-  <app-session-waiting-room></app-session-waiting-room>
-</div> -->
+<hr />
 
 <!-- nincs aktív session -->
 <app-create-game-session
@@ -23,23 +24,6 @@
   *ngIf="activeSession()"
   [session]="activeSession()!"
   (deleteSession)="onDeleteSession($event)"
+  (joinSession)="onJoinSession($event)"
 >
 </app-active-game-session>
-
-<!-- van aktív session
-<section *ngIf="activeSession$ | async as activeSession">
-  <h2>Active Session</h2>
-
-  <p><strong>ID:</strong> {{ activeSession.sessionId }}</p>
-  <p><strong>Code:</strong> {{ activeSession.sessionCode }}</p>
-  <p>
-    <strong>Created:</strong>
-    {{ activeSession.createdAt | date: 'short' }}
-  </p>
-
-  <h3>Settings</h3>
-  <pre>{{ activeSession.settings | json }}</pre>
-
-  <button disabled>Join (soon)</button>
-  <button (click)="onDeleteSession(activeSession.sessionId)">Delete</button>
-</section> -->
