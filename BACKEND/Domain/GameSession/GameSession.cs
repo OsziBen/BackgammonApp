@@ -80,12 +80,12 @@ namespace Domain.GameSession
 
             if (playersArray[0].Id == playerId)
             {
-                return playersArray[0];
+                return playersArray[1];
             }
 
             if (playersArray[1].Id == playerId)
             {
-                return playersArray[1];
+                return playersArray[0];
             }
 
             throw new InvalidOperationException(

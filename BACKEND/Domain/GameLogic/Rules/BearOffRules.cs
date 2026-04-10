@@ -1,5 +1,4 @@
-﻿using Common.Enums.BoardState;
-using Domain.GameLogic.Constants;
+﻿using Domain.GameLogic.Constants;
 
 namespace Domain.GameLogic.Rules
 {
@@ -10,33 +9,32 @@ namespace Domain.GameLogic.Rules
             int fromPoint,
             int die)
         {
-            if (!state.AllCheckersInHomeBoard(state.CurrentPlayer))
+            var player = state.CurrentPlayer;
+
+            if (!state.AllCheckersInHomeBoard(player))
             {
                 return false;
             }
 
-            var exactTarget = state.CurrentPlayer == PlayerColor.White
-                ? fromPoint + die
-                : fromPoint - die;
+            var direction = BoardConstants.GetDirection(player);
+            var exactTarget = fromPoint + (die * direction);
 
-            if (exactTarget == BoardConstants.OffBoardPosition)
+            var bearOffTarget = BoardConstants.GetBearOffTarget(player);
+
+            if (exactTarget == bearOffTarget)
             {
                 return true;
             }
 
-            if (state.CurrentPlayer == PlayerColor.White)
+            var hasFurther = state.HasCheckerFurtherFromBearOff(player, fromPoint);
+
+            bool overshoot = direction > 0
+                ? exactTarget > BoardConstants.BoardPoints
+                : exactTarget < 1;
+
+            if (overshoot && !hasFurther)
             {
-                if (exactTarget > 24 && !state.HasCheckerFurtherFromBearOff(PlayerColor.White, fromPoint))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (exactTarget < 1 && !state.HasCheckerFurtherFromBearOff(PlayerColor.Black, fromPoint))
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;

@@ -20,5 +20,10 @@ namespace Domain.GameSession
 
             return diceRoll;
         }
+
+        private bool CanRollDice(Guid playerId)
+            => CurrentPhase == GamePhase.RollDice
+                || (CurrentPhase == GamePhase.TurnStart && CanUseDoublingCube(playerId));
+
     }
 }

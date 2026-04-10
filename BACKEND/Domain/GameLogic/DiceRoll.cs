@@ -19,13 +19,6 @@ namespace Domain.GameLogic
 
             var dice = values.ToList();
 
-            if (dice.Count != 2)
-            {
-                throw new BusinessRuleException(
-                    FunctionCode.InvalidDiceRoll,
-                    "Dice roll must contain exactly 2 values.");
-            }
-
             if (dice.Any(d => d < 1 || d > 6))
             {
                 throw new BusinessRuleException(
@@ -34,6 +27,13 @@ namespace Domain.GameLogic
             }
 
             IsDouble = dice[0] == dice[1];
+
+            if ((!IsDouble && dice.Count != 2) || (IsDouble && dice.Count != 4))
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.InvalidDiceRoll,
+                    "Dice roll must contain exactly 2 or 4 values.");
+            }            
 
             Values = IsDouble
                 ? new[] { dice[0], dice[0], dice[0], dice[0] }

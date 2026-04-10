@@ -16,7 +16,8 @@ namespace Domain.GameSession
             DoublingCubeValue ??= 1;
 
             CurrentPhase = GamePhase.CubeOffered;
-            LastUpdatedAt = now;
+            CurrentPlayerId = GetOpponentOrThrow(playerId).Id;
+            //LastUpdatedAt = now;
 
             return new DoublingCubeOfferResult(
                 DoublingCubeValue!.Value * 2,
@@ -38,7 +39,7 @@ namespace Domain.GameSession
 
             CurrentPlayerId = offeringPlayerId;
             CurrentPhase = GamePhase.RollDice;
-            LastUpdatedAt = now;
+            //LastUpdatedAt = now;
 
             return new DoublingCubeAcceptResult(
                 DoublingCubeValue.Value,

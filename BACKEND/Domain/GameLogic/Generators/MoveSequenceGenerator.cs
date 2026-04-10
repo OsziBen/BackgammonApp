@@ -33,7 +33,7 @@ namespace Domain.GameLogic.Generators
 
             if (!roll.IsDouble)
             {
-                rules.Add(new PreferHigherDieRule()); 
+                rules.Add(new PreferHigherDieRule());
             }
 
             foreach (var rule in rules)
@@ -62,24 +62,24 @@ namespace Domain.GameLogic.Generators
 
             var die = remainingDice[0];
             var usedAnyMove = false;
+            var player = state.CurrentPlayer;
 
             foreach (var from in GetMovablePoints(state))
             {
                 int to = from == BoardConstants.BarPosition
-                    ? CalculateBarEntryTarget(state.CurrentPlayer, die)
-                    : CalculateTarget(state, from, die);
+                    ? CalculateBarEntryTarget(player, die)
+                    : CalculateTarget(player, from, die);
 
-                if (state.CurrentPlayer == PlayerColor.White &&
-                    to > 24 &&
-                    BearOffRules.CanBearOff(state, from, die))
+                if (to < 1 || to > BoardConstants.BoardPoints)
                 {
-                    to = BoardConstants.OffBoardPosition;
-                }
-                else if (state.CurrentPlayer == PlayerColor.Black &&
-                    to < 1 &&
-                    BearOffRules.CanBearOff(state, from, die))
-                {
-                    to = BoardConstants.OffBoardPosition;
+                    if (BearOffRules.CanBearOff(state, from, die))
+                    {
+                        to = BoardConstants.OffBoardPosition;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
 
                 if (!IsLegalMove(state, from, to, die))
@@ -114,7 +114,9 @@ namespace Domain.GameLogic.Generators
 
         private static IEnumerable<int> GetMovablePoints(BoardState state)
         {
-            if (state.HasCheckersOnBar(state.CurrentPlayer))
+            var player = state.CurrentPlayer;
+
+            if (state.HasCheckersOnBar(player))
             {
                 yield return BoardConstants.BarPosition;
                 yield break;
@@ -122,7 +124,7 @@ namespace Domain.GameLogic.Generators
 
             foreach (var point in state.Points)
             {
-                if (point.Value.Owner == state.CurrentPlayer &&
+                if (point.Value.Owner == player &&
                     point.Value.Count > 0)
                 {
                     yield return point.Key;
@@ -131,13 +133,11 @@ namespace Domain.GameLogic.Generators
         }
 
         private static int CalculateTarget(
-            BoardState state,
+            PlayerColor player,
             int from,
             int die)
         {
-            return state.CurrentPlayer == PlayerColor.White
-                ? from + die
-                : from - die;
+            return from + die * BoardConstants.GetDirection(player);
         }
 
         private static int CalculateBarEntryTarget(
@@ -146,7 +146,7 @@ namespace Domain.GameLogic.Generators
         {
             return player == PlayerColor.White
                 ? die
-                : 25 - die;
+                : BoardConstants.BoardPoints + 1 - die;
         }
 
         private static bool IsLegalMove(
@@ -155,28 +155,21 @@ namespace Domain.GameLogic.Generators
             int to,
             int die)
         {
+            var player = state.CurrentPlayer;
+
             if (from == BoardConstants.BarPosition)
             {
-                if (!state.HasCheckersOnBar(state.CurrentPlayer))
-                {
-                    return false;
-                }
-
-                return IsLegalBarEntry(state, to);
+                return state.HasCheckersOnBar(player) && IsLegalBarEntry(state, to);
             }
 
-            if (!state.Points.TryGetValue(from, out var fromPoint))
-            {
-                return false;
-            }
-
-            if (fromPoint.Owner != state.CurrentPlayer ||
+            if (!state.Points.TryGetValue(from, out var fromPoint) ||
+                fromPoint.Owner != player ||
                 fromPoint.Count == 0)
             {
                 return false;
             }
 
-            if (state.HasCheckersOnBar(state.CurrentPlayer))
+            if (state.HasCheckersOnBar(player))
                 return false;
 
             // BEAR OFF
@@ -190,14 +183,7 @@ namespace Domain.GameLogic.Generators
                 return false;
             }
 
-            if (target.Owner != null &&
-                target.Owner != state.CurrentPlayer &&
-                target.Count >= 2)
-            {
-                return false;
-            }
-
-            return true;
+            return target.Owner == null || target.Owner == player || target.Count < 2;
         }
 
         private static bool IsLegalBarEntry(
@@ -209,8 +195,10 @@ namespace Domain.GameLogic.Generators
                 return false;
             }
 
+            var player = state.CurrentPlayer;
+
             if (target.Owner != null &&
-                target.Owner != state.CurrentPlayer &&
+                target.Owner != player &&
                 target.Count >= 2)
             {
                 return false;
@@ -218,7 +206,7 @@ namespace Domain.GameLogic.Generators
 
             return BoardConstants.IsEntryPoint(
                 targetPoint,
-                state.CurrentPlayer);
+                player);
         }
     }
 }
