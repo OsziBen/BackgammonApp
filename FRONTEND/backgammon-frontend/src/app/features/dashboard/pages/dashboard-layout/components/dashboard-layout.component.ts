@@ -21,7 +21,6 @@ import { RegistrationComponent } from '../../../../auth/registration/components/
 })
 export class DashboardLayoutComponent {
   AppRoutes = AppRoutes;
-  modalOpen = false;
   showLogin = false;
   showRegister = false;
 
@@ -32,10 +31,12 @@ export class DashboardLayoutComponent {
 
   openLogin() {
     this.showLogin = true;
+    this.showRegister = false;
   }
 
   openRegister() {
     this.showRegister = true;
+    this.showLogin = false;
   }
 
   closeModal() {

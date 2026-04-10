@@ -2,11 +2,7 @@
   <h2 class="text-success">Sing in</h2>
   <div>
     Don't have an account?
-    <a
-      routerLink="/signup"
-      class="text-decoration-none fw-medium text-success d-inlin-block"
-      >Sign up</a
-    >
+    <a (click)="onSwitchToRegister()" class="auth-link">Sign up</a>
   </div>
 </div>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">

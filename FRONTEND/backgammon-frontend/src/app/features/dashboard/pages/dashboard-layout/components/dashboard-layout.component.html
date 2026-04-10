@@ -17,7 +17,21 @@
 
     <ng-container *ngIf="isLoggedIn">
       <li class="nav-item">
-        <a class="nav-link" routerLink="/profile">Profile</a>
+        <a
+          class="nav-link"
+          [routerLink]="['/', AppRoutes.sessions]"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Game Sessions</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [routerLink]="['/', AppRoutes.profile]"
+          routerLinkActive="active"
+          >Profile</a
+        >
       </li>
       <li class="nav-item">
         <button class="btn btn-sm btn-outline-light ms-2" (click)="logout()">
@@ -40,10 +54,15 @@
   <div class="modal-card" (click)="$event.stopPropagation()">
     <button class="close-btn" (click)="closeModal()">✕</button>
 
-    <app-login *ngIf="showLogin" (close)="closeModal()"></app-login>
+    <app-login
+      *ngIf="showLogin"
+      (close)="closeModal()"
+      (switchToRegister)="openRegister()"
+    ></app-login>
     <app-registration
       *ngIf="showRegister"
       (close)="closeModal()"
+      (switchToLogin)="openLogin()"
     ></app-registration>
   </div>
 </div>

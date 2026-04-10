@@ -27,20 +27,10 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
+    const payload = this.decodeToken();
+    if (!payload) return false;
 
-    try {
-      let base64 = token.split('.')[1];
-      if (!base64) return false;
-      base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-      while (base64.length % 4) base64 += '=';
-      const payload = JSON.parse(atob(base64));
-      return Date.now() < payload.exp * 1000;
-    } catch (err) {
-      console.error('Invalid token format', err);
-      return false;
-    }
+    return Date.now() < payload.exp * 1000;
   }
 
   saveToken(token: string) {
@@ -56,17 +46,46 @@ export class AuthService {
   }
 
   getClaims() {
+    return this.decodeToken();
+  }
+
+  //   interface JwtPayload {
+  //   exp: number;
+  //   sub?: string;
+  //   [key: string]: any;
+  // }
+  // private decodeToken(): JwtPayload | null
+
+  //   getClaims(): JwtPayload | null {
+  //   return this.decodeToken();
+  // }
+
+  // getUserId(): string | null {
+  //   return this.getClaims()?.sub ?? null;
+  // }
+
+  private decodeToken(): any | null {
     const token = this.getToken();
-    if (!token) return null;
+
+    if (!token) {
+      return null;
+    }
 
     try {
       let base64 = token.split('.')[1];
+
+      if (!base64) {
+        return null;
+      }
+
       base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-      while (base64.length % 4) base64 += '=';
+
+      while (base64.length % 4) {
+        base64 += '=';
+      }
 
       return JSON.parse(atob(base64));
-    } catch (err) {
-      console.error('Invalid token format', err);
+    } catch {
       return null;
     }
   }
