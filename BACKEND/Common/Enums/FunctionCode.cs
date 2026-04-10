@@ -35,6 +35,7 @@
         UserAlreadyInActiveSession = 4018,
         UserWithEmailAlreadyExists = 4019,
         UserWithUserNameAlreadyExists = 4020,
+        CannotRollDice = 4021,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
