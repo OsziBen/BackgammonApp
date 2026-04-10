@@ -1,0 +1,16 @@
+<div class="doubling-cube" [class.disabled]="!enabled">
+  <!-- Top: fekete tulajdonos -->
+  <div class="segment top" [class.highlight]="owner === PlayerColor.Black">
+    <span *ngIf="owner === PlayerColor.Black">♟</span>
+  </div>
+
+  <!-- Middle: kocka értéke -->
+  <div class="segment middle">
+    {{ value }}
+  </div>
+
+  <!-- Bottom: fehér tulajdonos -->
+  <div class="segment bottom" [class.highlight]="owner === PlayerColor.White">
+    <span *ngIf="owner === PlayerColor.White">♙</span>
+  </div>
+</div>

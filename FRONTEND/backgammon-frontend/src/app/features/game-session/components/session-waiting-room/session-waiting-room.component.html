@@ -1,0 +1,46 @@
+<section class="waiting-room">
+  <!-- ERROR -->
+  <div *ngIf="store.error()" class="error">
+    {{ store.error() }}
+  </div>
+
+  <!-- CONNECTING -->
+  <div *ngIf="store.connectionState() === ConnectionState.Connecting">
+    <h2>Connecting to session...</h2>
+  </div>
+
+  <!-- CONNECTED -->
+  <div
+    *ngIf="
+      store.connectionState() === ConnectionState.Connected &&
+      store.isWaitingRoom()
+    "
+  >
+    <h2>Waiting Room</h2>
+    <p>
+      Session Code: <strong>{{ store.snapshot()?.sessionCode }}</strong>
+    </p>
+    <p *ngIf="isHost()">You are the host.</p>
+
+    <h3>Players</h3>
+    <ul>
+      <li *ngFor="let player of players()">
+        {{ player.playerId }}
+        <span *ngIf="player.playerId === localPlayerId()"> (You) </span>
+      </li>
+    </ul>
+
+    <button (click)="leave()">Leave session</button>
+  </div>
+
+  <!-- DISCONNECTED -->
+  <div
+    *ngIf="
+      store.connectionState() === ConnectionState.Disconnected &&
+      store.hasSnapshot()
+    "
+  >
+    <h2>Disconnected</h2>
+    <p>Connection closed.</p>
+  </div>
+</section>

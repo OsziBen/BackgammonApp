@@ -1,0 +1,25 @@
+<div
+  class="point"
+  [class.top]="top"
+  [class.clickable]="clickable"
+  [class.target]="target"
+  [class.selected]="selected"
+  (click)="onClick()"
+>
+  <div class="checker-wrapper">
+    <ng-container *ngFor="let checker of checkers; let i = index">
+      <div
+        class="checker"
+        [class.white]="point.color === 0"
+        [class.black]="point.color === 1"
+        [class.highlight]="
+          (top ? i === checkers.length - 1 : i === 0) && selected
+        "
+      >
+        <span *ngIf="checker.isCount" class="count-text">
+          {{ checker.count }}
+        </span>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="modal-overlay">
+  <div class="modal-card">
+    <h2 class="modal-title">
+      {{ canRespond ? 'Opponent offered doubling cube' : 'Choose action' }}
+    </h2>
+
+    <div class="modal-actions">
+      <!-- ROLL -->
+      <button
+        *ngIf="!canRespond"
+        class="btn primary"
+        (click)="onRoll()"
+        [disabled]="!canRoll"
+      >
+        🎲 Roll Dice
+      </button>
+
+      <!-- DOUBLE -->
+      <button
+        *ngIf="!canRespond"
+        class="btn secondary"
+        (click)="onOfferDouble()"
+        [disabled]="!canDouble"
+      >
+        ♟ Offer Double
+      </button>
+
+      <!-- ACCEPT -->
+      <button *ngIf="canRespond" class="btn primary" (click)="onAccept()">
+        ✅ Accept
+      </button>
+
+      <!-- DECLINE -->
+      <button *ngIf="canRespond" class="btn danger" (click)="onDecline()">
+        ❌ Decline
+      </button>
+    </div>
+  </div>
+</div>
