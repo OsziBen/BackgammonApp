@@ -26,6 +26,12 @@ export class TurnStateService {
   readonly remainingDice = computed(() => this._state().remainingDice);
   readonly moves = computed(() => this._state().moves);
 
+  readonly isTurnFinished = computed(() => {
+    return this.remainingDice().length === 0;
+  });
+
+  readonly canUndo = computed(() => this._state().moves.length > 0);
+
   initializeTurn() {
     const board = this.boardSelectors.board();
     const dice = this.session.snapshot()?.lastDiceRoll ?? [];
@@ -68,15 +74,15 @@ export class TurnStateService {
       return;
     }
 
-    const board = structuredClone(state.board);
-
-    applyMove(board, move);
-
     const diceIndex = state.remainingDice.indexOf(move.die);
 
     if (diceIndex === -1) {
       return;
     }
+
+    const board = structuredClone(state.board);
+
+    applyMove(board, move);
 
     const newDice = [...state.remainingDice];
     newDice.splice(diceIndex, 1);
@@ -90,20 +96,42 @@ export class TurnStateService {
     }));
   }
 
-  undo() {
-    const state = this._state();
+  undoAll() {
+    const originalBoard = this.boardSelectors.board();
+    const dice = this.session.snapshot()?.lastDiceRoll ?? [];
 
-    if (state.moves.length === 0) {
+    if (!originalBoard) {
       return;
     }
 
+    const remainingDice =
+      dice.length === 2 && dice[0] === dice[1]
+        ? [dice[0], dice[0], dice[0], dice[0]]
+        : [...dice];
+
+    this._state.update((s) => ({
+      ...s,
+      board: structuredClone(originalBoard),
+      remainingDice,
+      moves: [],
+      selectedPoint: null,
+    }));
+  }
+
+  undo() {
+    const state = this._state();
+
+    if (state.moves.length === 0 || !state.board) {
+      return;
+    }
+
+    const moves = state.moves.slice(0, -1);
     const originalBoard = this.boardSelectors.board();
 
     if (!originalBoard) {
       return;
     }
 
-    const moves = state.moves.slice(0, -1);
     let board = structuredClone(originalBoard);
 
     for (const move of moves) {

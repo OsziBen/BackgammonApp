@@ -14,8 +14,10 @@ export class TurnControllerService {
   onPointClicked(point: number) {
     const selected = this.turnState.selectedPoint();
 
-    if (!selected) {
-      const clickable = this.analysis.clickablePoints();
+    if (selected === null) {
+      const clickable = Object.keys(
+        this.analysis.moveAnalysis().clickablePoints,
+      ).map(Number);
 
       if (clickable.includes(point)) {
         this.turnState.selectPoint(point);
@@ -24,7 +26,8 @@ export class TurnControllerService {
       return;
     }
 
-    const targets = this.analysis.targetPoints();
+    const targets =
+      this.analysis.moveAnalysis().clickablePoints[selected]?.targets || [];
 
     if (targets.includes(point)) {
       this.applyMove(selected, point);
@@ -47,5 +50,9 @@ export class TurnControllerService {
     }
 
     this.turnState.applyMove(move);
+  }
+
+  undoLastMove() {
+    this.turnState.undo();
   }
 }

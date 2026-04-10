@@ -2,6 +2,17 @@ import { computed, Injectable } from '@angular/core';
 import { TurnStateService } from '../state/turn-state.service';
 import { MoveGeneratorService } from './move.generator.service';
 import { MoveSequence } from '../models/turn/move-sequence.model';
+import { Move } from '../models/turn/move.model';
+
+interface TargetInfo {
+  targets: number[];
+  sequences: MoveSequence[];
+}
+
+interface MoveAnalysis {
+  clickablePoints: Record<number, TargetInfo>;
+  maxMovesPerTurn: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +22,12 @@ export class TurnAnalysisService {
     private turnState: TurnStateService,
     private moveGenerator: MoveGeneratorService,
   ) {}
-  // TODO: mi az a signal/computed?
+
   readonly board = computed(() => this.turnState.board());
   readonly dice = computed(() => this.turnState.remainingDice());
-  readonly selectedPoint = computed(() => this.turnState.selectedPoint());
+  readonly moves = computed(() => this.turnState.moves());
 
+  // teljes sequence
   readonly sequences = computed<MoveSequence[]>(() => {
     const board = this.board();
     const dice = this.dice();
@@ -27,46 +39,95 @@ export class TurnAnalysisService {
     return this.moveGenerator.generateAllMoves(board, dice);
   });
 
-  readonly clickablePoints = computed<number[]>(() => {
-    const sequences = this.sequences();
-    const points = new Set<number>();
-
-    for (const seq of sequences) {
-      if (seq.moves.length > 0) {
-        points.add(seq.moves[0].from);
-      }
-    }
-
-    return [...points];
-  });
-
-  readonly targetPoints = computed<number[]>(() => {
-    const selected = this.selectedPoint();
-
-    if (!selected) {
-      return [];
-    }
-
+  // összegyűjti a clickable pontokat és a célpontokat
+  readonly moveAnalysis = computed<MoveAnalysis>(() => {
     const sequences = this.sequences();
 
-    const targets = new Set<number>();
+    const analysis: MoveAnalysis = { clickablePoints: {}, maxMovesPerTurn: 0 };
+
+    let maxMoves = 0;
 
     for (const seq of sequences) {
-      const firstMove = seq.moves[0];
-
-      if (firstMove && firstMove.from === selected) {
-        targets.add(firstMove.to);
+      if (seq.moves.length === 0) {
+        continue;
       }
+
+      // max lépésszám
+      if (seq.moves.length > maxMoves) {
+        maxMoves = seq.moves.length;
+      }
+
+      const move = seq.moves[0];
+
+      if (!analysis.clickablePoints[move.from]) {
+        analysis.clickablePoints[move.from] = {
+          targets: [],
+          sequences: [],
+        };
+      }
+
+      const info = analysis.clickablePoints[move.from];
+
+      if (!info.targets.includes(move.to)) {
+        info.targets.push(move.to);
+      }
+
+      info.sequences.push(seq);
     }
 
-    return [...targets];
+    analysis.maxMovesPerTurn = maxMoves;
+
+    // Debug log
+    console.log('==== MoveAnalysis DEBUG ====');
+    console.log('Clickable Points and Targets:', analysis.clickablePoints);
+    console.log('Max moves per turn:', analysis.maxMovesPerTurn);
+    console.log('============================');
+
+    return analysis;
   });
 
-  isClickable(pointIndex: number): boolean {
-    return this.clickablePoints().includes(pointIndex);
+  hasAnyValidMove(): boolean {
+    return this.sequences().length > 0;
   }
 
-  isTarget(pointIndex: number): boolean {
-    return this.targetPoints().includes(pointIndex);
+  isExactMatch(moves: Move[]): boolean {
+    return this.sequences().some((seq) => {
+      if (seq.moves.length !== moves.length) {
+        return false;
+      }
+
+      return seq.moves.every((m, i) => {
+        const mm = moves[i];
+        return m.from === mm.from && m.to === mm.to && m.die === mm.die;
+      });
+    });
+  }
+
+  isValidPrefix(moves: Move[]): boolean {
+    return this.sequences().some((seq) =>
+      moves.every((m, i) => {
+        const seqMove = seq.moves[i];
+        return (
+          seqMove &&
+          seqMove.from === m.from &&
+          seqMove.to === m.to &&
+          seqMove.die === m.die
+        );
+      }),
+    );
+  }
+
+  getValidSequencesForPrefix(prefix: Move[]): MoveSequence[] {
+    return this.sequences().filter((seq) =>
+      prefix.every((m, i) => {
+        const seqMove = seq.moves[i];
+        return (
+          seqMove &&
+          seqMove.from === m.from &&
+          seqMove.to === m.to &&
+          seqMove.die === m.die
+        );
+      }),
+    );
   }
 }
