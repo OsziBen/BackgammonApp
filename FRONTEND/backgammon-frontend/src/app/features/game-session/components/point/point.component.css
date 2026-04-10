@@ -1,0 +1,135 @@
+.point {
+  position: relative;
+  width: 70px;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* ========================
+   Háromszög (háttér)
+   ======================== */
+.point::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 35px solid transparent;
+  border-right: 35px solid transparent;
+  z-index: 0;
+}
+
+/* FELSŐ */
+.point.top::after {
+  top: 0;
+  border-top: 180px solid #aa7744;
+}
+
+/* ALSÓ */
+.point:not(.top)::after {
+  bottom: 0;
+  border-bottom: 180px solid #aa7744;
+}
+
+/* SZÍNEZÉS */
+.point.top:nth-child(even)::after {
+  border-top-color: #ddccaa;
+}
+
+.point:not(.top):nth-child(even)::after {
+  border-bottom-color: #ddccaa;
+}
+
+/* ========================
+   Checker wrapper
+   ======================== */
+.checker-wrapper {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+:host-context(.quarter.top) .checker-wrapper {
+  top: 0;
+}
+
+:host-context(.quarter.bottom) .checker-wrapper {
+  bottom: 0;
+}
+
+/* ========================
+   Checker
+   ======================== */
+.checker {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 0.5px 0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.checker.white {
+  background: #eee;
+}
+
+.checker.black {
+  background: #111;
+}
+
+/* LEGFONTOSABB: TOP CHECKER HIGHLIGHT */
+.checker.highlight {
+  outline: 3px solid yellow;
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+/* ========================
+   Target háromszög highlight
+   ======================== */
+.point.target::after {
+  filter: drop-shadow(0 0 6px lime);
+}
+
+.point.selected::after {
+  filter: drop-shadow(0 0 6px red);
+}
+
+/* Count */
+.count-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.checker.white .count-text {
+  color: #000;
+}
+
+.checker.checker.black .count-text {
+  color: #fff;
+}
+
+/* HOVER: legfelső korong kiemelése */
+.point:not(.top):hover .checker:first-child {
+  outline: 3px solid lightgreen;
+}
+
+.point.top:hover .checker:last-child {
+  outline: 3px solid lightgreen;
+}
+
+/* Hover -> háromszög kiemelése */
+.point:hover::after {
+  filter: drop-shadow(0 0 6px lightgreen);
+}

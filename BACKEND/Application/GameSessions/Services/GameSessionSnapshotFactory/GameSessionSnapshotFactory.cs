@@ -7,11 +7,6 @@ namespace Application.GameSessions.Services.GameSessionSnapshotFactory
     {
         public GameSessionSnapshotResponse Create(GameSession session, Guid? localPlayerId = null, bool? isRejoin = false)
         {
-            if (isRejoin != null && isRejoin != false)
-            {
-                session.IncrementVersion();                
-            }
-
             return new GameSessionSnapshotResponse
             {
                 Version = session.Version,

@@ -1,0 +1,66 @@
+<section *ngIf="board() as board">
+  <h2>Game Board</h2>
+
+  <p>
+    Current player:
+    <strong>{{ board.currentPlayer }}</strong>
+    <span *ngIf="ui.isMyTurn()"> (Your turn)</span>
+  </p>
+  <p *ngIf="ui.isWaiting()">Waiting for opponent...</p>
+
+  <app-dice [dice]="dice()" />
+
+  <div class="board-wrapper">
+    <!-- Doubling cube bal oldalon -->
+    <app-doubling-cube
+      [value]="doublingCubeValue()"
+      [owner]="doublingCubeOwner()"
+      [enabled]="doublingCubeEnabled()"
+    >
+    </app-doubling-cube>
+
+    <!-- Board -->
+    <app-board
+      [board]="board"
+      [clickablePoints]="clickablePoints()"
+      [targetPoints]="targetPoints()"
+      [selectedPoint]="selectedPoint()"
+      [enabled]="ui.canInteract()"
+      (pointClick)="onPointClick($event)"
+      (barClick)="onBarClick($event)"
+    ></app-board>
+  </div>
+
+  <div *ngIf="ui.error()" class="error">
+    {{ ui.error() }}
+  </div>
+
+  <app-turn-action-modal
+    *ngIf="ui.showActionModal()"
+    [canRoll]="ui.canRoll()"
+    [canDouble]="ui.canOfferDouble()"
+    [canRespond]="ui.canRespondToDouble()"
+    (roll)="rollDice()"
+    (offerDouble)="offerDouble()"
+    (accept)="acceptDouble()"
+    (decline)="declineDouble()"
+  >
+  </app-turn-action-modal>
+
+  <app-game-finished-modal
+    *ngIf="ui.isGameFinished()"
+    [winnerPlayerId]="store.snapshot()?.winnerPlayerId ?? null"
+    [localPlayerId]="store.localPlayerId() ?? null"
+    [resultType]="store.snapshot()?.resultType ?? null"
+    [finishReason]="store.snapshot()?.finishReason ?? null"
+    [awardedPoints]="store.snapshot()?.awardedPoints ?? null"
+  >
+  </app-game-finished-modal>
+
+  <div class="actions">
+    <button (click)="undoMove()" [disabled]="!ui.canUndo()">Undo</button>
+    <button (click)="onTurnFinished()" [disabled]="!ui.canSubmitTurn()">
+      Submit Turn
+    </button>
+  </div>
+</section>

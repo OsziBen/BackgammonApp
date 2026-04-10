@@ -10,7 +10,7 @@ namespace Application.GameSessions.Commands.PlayerForfeit.Validators
                 .NotEmpty()
                 .WithMessage("SessionId must not be empty.");
 
-            RuleFor(x => x.PlayerId)
+            RuleFor(x => x.UserId)
                 .NotEmpty()
                 .WithMessage("PlayerId must not be empty.");
         }

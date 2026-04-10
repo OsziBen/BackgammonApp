@@ -155,7 +155,7 @@ namespace Domain.GameSession
             EnsurePhase(GamePhase.CubeOffered);
             EnsurePlayerIsInSession(playerId);
 
-            if (playerId == CurrentPlayerId)
+            if (playerId != CurrentPlayerId)
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidPlayer,
@@ -168,7 +168,7 @@ namespace Domain.GameSession
             EnsurePhase(GamePhase.CubeOffered);
             EnsurePlayerIsInSession(playerId);
 
-            if (playerId == CurrentPlayerId)
+            if (playerId != CurrentPlayerId)
             {
                 throw new BusinessRuleException(
                     FunctionCode.InvalidPlayer,
@@ -208,10 +208,16 @@ namespace Domain.GameSession
         private void EnsureCanRollDice(Guid playerId)
         {
             EnsureNotFinished();
-            EnsurePhase(GamePhase.RollDice);
             EnsureNoActiveDice();
             EnsureCurrentPlayerIsSet();
             EnsureCurrentPlayer(playerId);
+
+            if (!CanRollDice(playerId))
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.CannotRollDice,
+                    "Player does not have the right to roll the dice");
+            }
         }
     }
 }

@@ -1,0 +1,105 @@
+<div class="board">
+  <!-- Bal oldal -->
+  <div class="board-half left">
+    <div class="quarter top">
+      <div class="points">
+        <app-point
+          *ngFor="let point of topLeft()"
+          [point]="point"
+          [top]="true"
+          [clickable]="isClickable(point.index)"
+          [target]="isTarget(point.index)"
+          [selected]="isSelected(point.index)"
+          (pointClick)="pointClick.emit($event)"
+        ></app-point>
+      </div>
+    </div>
+
+    <div class="quarter bottom">
+      <div class="points">
+        <app-point
+          *ngFor="let point of bottomLeft()"
+          [point]="point"
+          [top]="false"
+          [clickable]="isClickable(point.index)"
+          [target]="isTarget(point.index)"
+          [selected]="isSelected(point.index)"
+          (pointClick)="pointClick.emit($event)"
+        ></app-point>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle bar -->
+  <div class="middle-bar">
+    <app-bar
+      [barWhite]="board.bar[PlayerColor.White]"
+      [barBlack]="board.bar[PlayerColor.Black]"
+      [clickablePoints]="clickablePoints"
+      [targetPoints]="targetPoints"
+      [selectedPoint]="selectedPoint"
+      [enabled]="enabled"
+      (pointClick)="pointClick.emit($event)"
+    ></app-bar>
+  </div>
+
+  <!-- Jobb oldal -->
+  <div class="board-half right">
+    <div class="quarter top">
+      <div class="points">
+        <app-point
+          *ngFor="let point of topRight()"
+          [point]="point"
+          [top]="true"
+          [clickable]="isClickable(point.index)"
+          [target]="isTarget(point.index)"
+          [selected]="isSelected(point.index)"
+          (pointClick)="pointClick.emit($event)"
+        ></app-point>
+      </div>
+    </div>
+
+    <div class="quarter bottom">
+      <div class="points">
+        <app-point
+          *ngFor="let point of bottomRight()"
+          [point]="point"
+          [top]="false"
+          [clickable]="isClickable(point.index)"
+          [target]="isTarget(point.index)"
+          [selected]="isSelected(point.index)"
+          (pointClick)="pointClick.emit($event)"
+        ></app-point>
+      </div>
+    </div>
+  </div>
+
+  <!-- Off point a board jobb szélén -->
+  <div
+    class="off-point"
+    [class.clickable]="enabled && hasSelection()"
+    (click)="pointClick.emit(OFF)"
+  >
+    <!-- Fekete off -->
+    <div class="off-section top">
+      <ng-container *ngFor="let checker of getOffCheckers(PlayerColor.Black)">
+        <div class="checker black off-checker">
+          <span *ngIf="checker.count" class="count-text">{{
+            checker.count
+          }}</span>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Fehér off -->
+    <div class="off-section bottom">
+      <ng-container *ngFor="let checker of getOffCheckers(PlayerColor.White)">
+        <div class="checker white off-checker">
+          <span *ngIf="checker.count" class="count-text">{{
+            checker.count
+          }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

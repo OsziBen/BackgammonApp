@@ -1,6 +1,4 @@
-﻿using Application.GameSessions.Realtime;
-using Application.GameSessions.Responses;
-using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
 using Application.Interfaces.Repository;
 using Application.Interfaces.Repository.GamePlayer;
 using Application.Shared;
@@ -17,22 +15,19 @@ namespace Application.GameSessions.Commands.PlayerTimeoutExpired
     {
         private readonly IUnitOfWork _uow;
         private readonly IGamePlayerReadRepository _playerReadRepo;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public PlayerTimeoutExpiredCommandHandler(
             IUnitOfWork uow,
             IGamePlayerReadRepository playerReadRepo,
-            IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
             _playerReadRepo = playerReadRepo;
-            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(
@@ -79,17 +74,16 @@ namespace Application.GameSessions.Commands.PlayerTimeoutExpired
                 session.Abandon(now);
             }
 
+            session.MarkUpdated(now);
+            session.IncrementVersion();
+
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                session.Id,
-                new SessionUpdatedMessage
-                {
-                    EventType = session.CurrentPhase == GamePhase.GameFinished
+            var eventType = session.CurrentPhase == GamePhase.GameFinished
                         ? SessionEventType.SessionFinished
-                        : SessionEventType.SessionAbandoned,
-                    Snapshot = _gameSessionSnapshotFactory.Create(session)
-                });
+                        : SessionEventType.SessionAbandoned;
+
+            await _gameSessionBroadcaster.BroadcastAsync(session, eventType);
 
             return Unit.Value;
         }

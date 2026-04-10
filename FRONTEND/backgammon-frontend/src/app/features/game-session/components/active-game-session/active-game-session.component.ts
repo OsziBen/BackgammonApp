@@ -15,7 +15,14 @@ export class ActiveGameSessionComponent {
   @Output()
   deleteSession = new EventEmitter<string>();
 
+  @Output() joinSession = new EventEmitter<string>();
+
+  join() {
+    this.joinSession.emit(this.session.sessionCode);
+  }
+
   onDelete(): void {
+    console.log('JOIN CLICKED:', this.session.sessionCode);
     this.deleteSession.emit(this.session.sessionId);
   }
 }

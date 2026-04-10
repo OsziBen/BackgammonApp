@@ -1,6 +1,4 @@
-﻿using Application.GameSessions.Realtime;
-using Application.GameSessions.Responses;
-using Application.GameSessions.Services.GameSessionSnapshotFactory;
+﻿using Application.GameSessions.Services.GameSessionBroadcaster;
 using Application.Interfaces.Repository;
 using Application.Shared;
 using Application.Shared.Time;
@@ -13,20 +11,17 @@ namespace Application.GameSessions.Commands.AcceptDoublingCube
     public class AcceptDoublingCubeCommandHandler : IRequestHandler<AcceptDoublingCubeCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public AcceptDoublingCubeCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
-            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(AcceptDoublingCubeCommand request, CancellationToken cancellationToken)
@@ -35,21 +30,22 @@ namespace Application.GameSessions.Commands.AcceptDoublingCube
                 .GetByIdAsync(request.SessionId, cancellationToken)
                 .GetOrThrowAsync(nameof(GameSession), request.SessionId);
 
+            var playerId = session.Players
+               .FirstOrDefault(p => p.UserId == request.UserId)?.Id
+               ?? throw new InvalidOperationException("User is not part of this session");
+
             var now = _timeProvider.UtcNow;
 
             var result = session.AcceptDoublingCube(
-                request.PlayerId,
+                playerId,
                 now);
+
+            session.MarkUpdated(now);
+            session.IncrementVersion();
 
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                session.Id,
-                new SessionUpdatedMessage
-                {
-                    EventType = SessionEventType.DoubleAccepted,
-                    Snapshot = _gameSessionSnapshotFactory.Create(session)
-                });
+            await _gameSessionBroadcaster.BroadcastAsync(session, SessionEventType.DoubleAccepted);
 
             return Unit.Value;
         }

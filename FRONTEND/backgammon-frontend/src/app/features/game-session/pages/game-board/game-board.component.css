@@ -1,0 +1,10 @@
+.board-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+/* Doubling cube magasság igazítása a board magasságához */
+app-doubling-cube {
+  height: 100%;
+}

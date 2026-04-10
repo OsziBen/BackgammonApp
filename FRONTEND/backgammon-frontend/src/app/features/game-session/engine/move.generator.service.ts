@@ -29,13 +29,64 @@ export class MoveGeneratorService {
   ];
 
   generateAllMoves(board: UiBoardState, dice: number[]): MoveSequence[] {
-    const sequences: MoveSequence[] = [];
+    const allSequences: MoveSequence[] = [];
 
-    const sortedDice = [...dice].sort((a, b) => b - a);
+    const permutations = this.getPermutations(dice);
 
-    this.search(board, sortedDice, [], sequences);
+    for (const perm of permutations) {
+      this.search(board, perm, [], allSequences);
+    }
 
-    return this.applyRules(sequences, dice);
+    const unique = this.deduplicate(allSequences);
+    const finalSequences = this.applyRules(unique, dice);
+
+    // DEBUG LOG
+    console.log('==== MoveGenerator DEBUG ====');
+    console.log('Current player:', board.currentPlayer);
+    console.log('Dice:', dice);
+    console.log('Generated sequences:');
+    finalSequences.forEach((seq, idx) => {
+      console.log(
+        `Sequence ${idx + 1}:`,
+        seq.moves.map((m) => `${m.from}->${m.to}(${m.die})`).join(', '),
+      );
+    });
+    console.log('============================');
+
+    return finalSequences;
+  }
+
+  private getPermutations(arr: number[]): number[][] {
+    if (arr.length <= 1) {
+      return [arr];
+    }
+
+    const result: number[][] = [];
+
+    arr.forEach((num, i) => {
+      const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+      const perms = this.getPermutations(rest);
+
+      perms.forEach((p) => {
+        result.push([num, ...p]);
+      });
+    });
+
+    return result;
+  }
+
+  private deduplicate(sequences: MoveSequence[]): MoveSequence[] {
+    const map = new Map<string, MoveSequence>();
+
+    for (const seq of sequences) {
+      const key = seq.moves.map((m) => `${m.from}-${m.to}-${m.die}`).join('|');
+
+      if (!map.has(key)) {
+        map.set(key, seq);
+      }
+    }
+
+    return Array.from(map.values());
   }
 
   private applyRules(

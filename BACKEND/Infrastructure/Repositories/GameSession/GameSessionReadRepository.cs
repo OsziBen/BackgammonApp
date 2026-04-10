@@ -30,10 +30,17 @@ namespace Infrastructure.Repositories.GameSession
                 .Include(gs => gs.Players)
                 .FirstOrDefaultAsync(gs => gs.Id == id);
 
-        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken)
-            => Query()
-                .Include(gs => gs.Players)
-                .FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);
+        public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken, bool includePlayers = false)
+        {
+            IQueryable<Domain.GameSession.GameSession> query = Query();
+
+            if (includePlayers)
+            {
+                query = query.Include(gs => gs.Players);
+            }
+
+            return query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);
+        }
 
         public Task<bool> HasActiveSession(Guid playerId, CancellationToken cancellationToken)
             => Query()

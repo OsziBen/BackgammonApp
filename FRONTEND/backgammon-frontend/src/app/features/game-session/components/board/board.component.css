@@ -1,0 +1,112 @@
+/* ======================
+   Backgammon Board
+   ====================== */
+.board {
+  width: 1000px;
+  height: 500px;
+  margin: auto;
+  position: relative;
+  display: flex;
+  background-color: #335533;
+  border: 4px solid black;
+}
+
+/* Bal és jobb fél */
+.board-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Negyedek */
+.quarter {
+  flex: 1;
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid #000;
+}
+
+.middle-bar {
+  flex: 0 0 50px;
+  background-color: #222;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.middle-bar .bar-section {
+  width: 100%;
+  height: 50%;
+  box-sizing: border-box;
+  border-bottom: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow: visible;
+}
+
+.middle-bar .bar-section.bottom {
+  justify-content: flex-end;
+}
+
+/* Pontok konténer minden negyedben */
+.points {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  justify-content: space-around; /* háromszögek szétosztása */
+  align-items: flex-start;
+}
+
+/* Igazítás az alsó negyedekhez */
+.quarter.bottom .points {
+  align-items: flex-end; /* lefelé mutató háromszögek alján */
+}
+
+/* Off point container */
+.off-point {
+  flex: 0 0 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #554422; /* barna, dobozszerű */
+  padding: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.off-point.clickable:hover {
+  filter: drop-shadow(0 0 6px lightgreen);
+}
+
+/* Off sections (felső/fekete és alsó/fehér) */
+.off-point .off-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #2c2c2c; /* opcionális elválasztó vonal */
+  justify-content: flex-start;
+  height: 50%;
+}
+
+/* Felső fekete off */
+.off-point .off-section.top {
+  justify-content: flex-start;
+}
+
+/* Alsó fehér off */
+.off-point .off-section.bottom {
+  justify-content: flex-end;
+}
+
+/* Halványabb korongok */
+.off-checker {
+  opacity: 0.5;
+  pointer-events: none; /* ne lehessen onnan elmozdítani */
+}

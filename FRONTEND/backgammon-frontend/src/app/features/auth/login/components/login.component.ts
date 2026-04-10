@@ -23,6 +23,8 @@ import { AuthResponse } from '../../../../shared/models/auth-response.models';
 export class LoginComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
+  @Output() switchToRegister = new EventEmitter<void>();
+
   form: FormGroup;
   isSubmitted: boolean = false;
 
@@ -36,6 +38,10 @@ export class LoginComponent implements OnInit {
       emailAddress: ['', Validators.required],
       password: ['', Validators.required],
     });
+  }
+
+  onSwitchToRegister(): void {
+    this.switchToRegister.emit();
   }
 
   ngOnInit(): void {

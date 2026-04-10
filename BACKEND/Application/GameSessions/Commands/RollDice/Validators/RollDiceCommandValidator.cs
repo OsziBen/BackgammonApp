@@ -9,7 +9,7 @@ namespace Application.GameSessions.Commands.RollDice.Validators
             RuleFor(x => x.SessionId)
                 .NotEmpty();
 
-            RuleFor(x => x.PlayerId)
+            RuleFor(x => x.UserId)
                 .NotEmpty();
         }
     }

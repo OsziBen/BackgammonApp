@@ -1,0 +1,23 @@
+<div class="bar">
+  <!-- Fekete -->
+  <app-point
+    class="top-point"
+    [point]="blackPoint"
+    [top]="true"
+    [clickable]="isClickable()"
+    [target]="isTarget()"
+    [selected]="isSelected()"
+    (pointClick)="onPointClick($event)"
+  ></app-point>
+
+  <!-- Fehér -->
+  <app-point
+    class="bottom-point"
+    [point]="whitePoint"
+    [top]="false"
+    [clickable]="isClickable()"
+    [target]="isTarget()"
+    [selected]="isSelected()"
+    (pointClick)="onPointClick($event)"
+  ></app-point>
+</div>

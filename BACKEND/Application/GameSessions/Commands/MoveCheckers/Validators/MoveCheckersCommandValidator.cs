@@ -11,15 +11,13 @@ namespace Application.GameSessions.Commands.MoveCheckers.Validators
                 .NotEmpty()
                 .WithMessage("SessionId must not be empty.");
 
-            RuleFor(x => x.PlayerId)
+            RuleFor(x => x.UserId)
                 .NotEmpty()
                 .WithMessage("PlayerId must not be empty.");
 
             RuleFor(x => x.Moves)
                 .NotNull()
-                .NotEmpty()
-                .WithErrorCode(FunctionCode.InvalidMove.ToString())
-                .WithMessage("Moves list must not be empty.");
+                .WithMessage("Moves list must not be null.");
 
             RuleForEach(x => x.Moves)
                 .SetValidator(new MoveDtoValidator());

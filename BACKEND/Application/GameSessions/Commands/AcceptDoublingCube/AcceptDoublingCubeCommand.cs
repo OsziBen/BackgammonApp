@@ -2,5 +2,5 @@
 
 namespace Application.GameSessions.Commands.AcceptDoublingCube
 {
-    public record AcceptDoublingCubeCommand(Guid SessionId, Guid PlayerId) : IRequest<Unit>;
+    public record AcceptDoublingCubeCommand(Guid SessionId, Guid UserId) : IRequest<Unit>;
 }

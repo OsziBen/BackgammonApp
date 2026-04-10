@@ -125,12 +125,22 @@ namespace Domain.GameSession
         }
 
         public bool CanStartGame()
-            => Players.Count == 2 &&
-                CurrentPhase == GamePhase.WaitingForPlayers;
+        {
+            if (CurrentPhase != GamePhase.WaitingForPlayers)
+                return false;
+
+            if (Players.Count != 2)
+                return false;
+
+            if (Players.Any(p => !p.IsConnected))
+                return false;
+
+            return true;
+        }
 
         public bool CanUseDoublingCube(Guid playerId)
         {
-            if (CrawfordRuleApplies || DoublingCubeOwnerPlayerId != playerId)
+            if (CrawfordRuleApplies || (DoublingCubeOwnerPlayerId != null && DoublingCubeOwnerPlayerId != playerId))
             {
                 return false;
             }

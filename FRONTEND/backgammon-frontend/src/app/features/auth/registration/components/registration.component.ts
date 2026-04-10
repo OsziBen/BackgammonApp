@@ -23,6 +23,8 @@ import { RegisterRequest } from '../models/register-request.model';
 export class RegistrationComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
+  @Output() switchToLogin = new EventEmitter<void>();
+
   form: FormGroup;
   isSubmitted = false;
 
@@ -51,6 +53,10 @@ export class RegistrationComponent implements OnInit {
       },
       { validators: this.passwordMatchValidator },
     );
+  }
+
+  onSwitchToLogin(): void {
+    this.switchToLogin.emit();
   }
 
   ngOnInit(): void {

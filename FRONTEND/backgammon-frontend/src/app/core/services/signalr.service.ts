@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -11,15 +11,11 @@ import { HUB_EVENTS } from '../../shared/utils/constants/hub.constants';
 export class SignalRService {
   private hubConnection: signalR.HubConnection | null = null;
 
-  private connectionStateSubject =
-    new BehaviorSubject<signalR.HubConnectionState>(
-      signalR.HubConnectionState.Disconnected,
-    );
+  readonly connectionState = signal<signalR.HubConnectionState>(
+    signalR.HubConnectionState.Disconnected,
+  );
 
-  public connectionStates$: Observable<signalR.HubConnectionState> =
-    this.connectionStateSubject.asObservable();
-
-  constructor() {}
+  private registeredEvents = new Map<string, (...args: any[]) => void>();
 
   // Kapcsolat indítása + JWT token
   public async startConnection(token: string): Promise<void> {
@@ -28,13 +24,14 @@ export class SignalRService {
         this.hubConnection.state === signalR.HubConnectionState.Disconnected
       ) {
         await this.hubConnection.start();
+        this.connectionState.set(this.hubConnection.state);
       }
 
       return;
     }
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${environment.apiBaseUrl}/hubs/game-session`, {
+      .withUrl(environment.hubUrl, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect({
@@ -51,16 +48,12 @@ export class SignalRService {
       })
       .build();
 
-    this.registerConnectionLifecycleEvents();
+    this.registerLifecycleEvents();
 
-    try {
-      await this.hubConnection.start();
-      this.connectionStateSubject.next(this.hubConnection.state);
-      console.log('SignalR connected');
-    } catch (error) {
-      console.error('SignalR connection error:', error);
-      throw error;
-    }
+    await this.hubConnection.start();
+    this.connectionState.set(this.hubConnection.state);
+
+    console.log('SignalR connected');
   }
 
   //  Kapcsolat leállítása
@@ -70,8 +63,9 @@ export class SignalRService {
     }
 
     await this.hubConnection.stop();
-    this.connectionStateSubject.next(signalR.HubConnectionState.Disconnected);
+    this.connectionState.set(signalR.HubConnectionState.Disconnected);
     this.hubConnection = null;
+    this.registeredEvents.clear();
   }
 
   //  Hub method invoke wrapper (FE -> BE)
@@ -95,38 +89,44 @@ export class SignalRService {
       throw new Error('Hub connection not initialized');
     }
 
+    this.registeredEvents.set(eventName, callback);
+
     this.hubConnection.off(eventName);
     this.hubConnection.on(eventName, callback);
   }
 
-  //  Event listener eltávolítása
-  public offEvent(eventName: string): void {
+  private reRegisterEvents(): void {
     if (!this.hubConnection) {
       return;
     }
 
-    this.hubConnection.off(eventName);
+    this.registeredEvents.forEach((callback, eventName) => {
+      this.hubConnection!.off(eventName);
+      this.hubConnection!.on(eventName, callback);
+    });
   }
 
   //  Kapcsolati lifecycle események kezelése
-  private registerConnectionLifecycleEvents(): void {
+  private registerLifecycleEvents(): void {
     if (!this.hubConnection) {
       return;
     }
 
     this.hubConnection.onreconnecting((error) => {
       console.warn('SignalR reconnecting...', error);
-      this.connectionStateSubject.next(signalR.HubConnectionState.Reconnecting);
+      this.connectionState.set(signalR.HubConnectionState.Reconnecting);
     });
 
     this.hubConnection.onreconnected(() => {
       console.log('SignalR reconnected');
-      this.connectionStateSubject.next(signalR.HubConnectionState.Connected);
+      this.connectionState.set(signalR.HubConnectionState.Connected);
+
+      this.reRegisterEvents();
     });
 
     this.hubConnection.onclose((error) => {
       console.warn('SignalR closed', error);
-      this.connectionStateSubject.next(signalR.HubConnectionState.Disconnected);
+      this.connectionState.set(signalR.HubConnectionState.Disconnected);
     });
   }
 

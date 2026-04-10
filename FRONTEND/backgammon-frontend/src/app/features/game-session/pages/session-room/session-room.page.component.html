@@ -1,0 +1,5 @@
+<div *ngIf="!store.hasSnapshot()">Connecting / joining session...</div>
+
+<app-session-waiting-room *ngIf="store.hasSnapshot()"
+  >Waiting for another player...</app-session-waiting-room
+>

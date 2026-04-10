@@ -1,4 +1,5 @@
 ﻿using Application.GameSessions.Requests;
+using Domain.GameLogic.Constants;
 using FluentValidation;
 
 namespace Application.GameSessions.Commands.MoveCheckers.Validators
@@ -8,13 +9,13 @@ namespace Application.GameSessions.Commands.MoveCheckers.Validators
         public MoveDtoValidator()
         {
             RuleFor(x => x.From)
-                .InclusiveBetween(0, 24)
-                .WithMessage("From point must be between 0 (Bar) and 24");
+                .InclusiveBetween(BoardConstants.BarPosition, BoardConstants.BoardPoints)
+                .WithMessage($"From point must be between {BoardConstants.BarPosition} (Bar) and {BoardConstants.BoardPoints}");
 
             RuleFor(x => x.To)
-                .InclusiveBetween(-1, 24)
+                .InclusiveBetween(BoardConstants.OffBoardPosition, BoardConstants.BoardPoints)
                 .Must(to => to != 0)
-                .WithMessage("To point cannot be 0; use -1 for Off or 1-24 for board points");
+                .WithMessage($"To point cannot be {BoardConstants.BarPosition}; use {BoardConstants.OffBoardPosition} for Off or 1-{BoardConstants.BoardPoints} for board points");
 
             RuleFor(x => x.Die)
                 .InclusiveBetween(1, 6)

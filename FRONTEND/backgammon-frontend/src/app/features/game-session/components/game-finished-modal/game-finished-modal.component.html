@@ -1,0 +1,25 @@
+<div class="modal-overlay">
+  <div class="modal-card">
+    <h2 class="modal-title">{{ title() }}</h2>
+
+    <div class="modal-content">
+      <p *ngIf="resultType !== null">
+        <strong>Result:</strong> {{ resultTypeLabel() }}
+      </p>
+
+      <p *ngIf="finishReason !== null">
+        <strong>Reason:</strong> {{ finishReasonLabel() }}
+      </p>
+
+      <p *ngIf="awardedPoints !== null">
+        <strong>Points:</strong> {{ awardedPoints }}
+      </p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn primary" (click)="goToSessions()">
+        Back to sessions
+      </button>
+    </div>
+  </div>
+</div>

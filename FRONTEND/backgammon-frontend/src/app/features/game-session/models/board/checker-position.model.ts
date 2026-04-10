@@ -1,6 +1,6 @@
 import { PlayerColor } from '../enums/player-color.enum';
 
 export interface CheckerPosition {
-  color: PlayerColor;
+  owner: PlayerColor | null;
   count: number;
 }

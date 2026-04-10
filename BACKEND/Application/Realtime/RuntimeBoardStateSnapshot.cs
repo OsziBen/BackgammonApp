@@ -6,7 +6,7 @@ namespace Application.Realtime
 {
     public class RuntimeBoardStateSnapshot
     {
-        public Dictionary<int, CheckerPosition> Points { get; init; } = [];
+        public Dictionary<string, CheckerPosition> Points { get; init; } = [];
         public int BarWhite { get; init; }
         public int BarBlack { get; init; }
         public int OffWhite { get; init; }

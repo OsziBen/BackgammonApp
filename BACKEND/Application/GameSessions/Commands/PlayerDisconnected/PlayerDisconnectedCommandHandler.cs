@@ -1,5 +1,6 @@
 ﻿using Application.GameSessions.Realtime;
 using Application.GameSessions.Responses;
+using Application.GameSessions.Services.GameSessionBroadcaster;
 using Application.GameSessions.Services.GameSessionSnapshotFactory;
 using Application.Interfaces.Repository;
 using Application.Shared;
@@ -13,20 +14,17 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
     public class PlayerDisconnectedCommandHandler : IRequestHandler<PlayerDisconnectedCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
-        private readonly IGameSessionNotifier _gameSessionNotifier;
         private readonly IDateTimeProvider _timeProvider;
-        private readonly IGameSessionSnapshotFactory _gameSessionSnapshotFactory;
+        private readonly IGameSessionBroadcaster _gameSessionBroadcaster;
 
         public PlayerDisconnectedCommandHandler(
             IUnitOfWork uow,
-            IGameSessionNotifier gameSessionNotifier,
             IDateTimeProvider timeProvider,
-            IGameSessionSnapshotFactory gameSessionSnapshotFactory)
+            IGameSessionBroadcaster gameSessionBroadcaster)
         {
             _uow = uow;
-            _gameSessionNotifier = gameSessionNotifier;
             _timeProvider = timeProvider;
-            _gameSessionSnapshotFactory = gameSessionSnapshotFactory;
+            _gameSessionBroadcaster = gameSessionBroadcaster;
         }
 
         public async Task<Unit> Handle(
@@ -45,16 +43,12 @@ namespace Application.GameSessions.Commands.PlayerDisconnected
             var now = _timeProvider.UtcNow;
 
             player.Disconnect(now);
+            player.GameSession.MarkUpdated(now);
+            player.GameSession.IncrementVersion();
 
             await _uow.CommitAsync(cancellationToken);
 
-            await _gameSessionNotifier.SessionUpdated(
-                player.GameSessionId,
-                new SessionUpdatedMessage
-                {
-                    EventType = SessionEventType.PlayerDisconnected,
-                    Snapshot = _gameSessionSnapshotFactory.Create(player.GameSession)
-                });
+            await _gameSessionBroadcaster.BroadcastAsync(player.GameSession, SessionEventType.PlayerDisconnected);
 
             return Unit.Value;
         }
