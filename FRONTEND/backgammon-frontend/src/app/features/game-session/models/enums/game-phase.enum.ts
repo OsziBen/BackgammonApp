@@ -1,6 +1,5 @@
 export enum GamePhase {
   WaitingForPlayers = 0,
-  DeterminingStartingPlayer = 1,
 
   TurnStart = 9,
   RollDice = 10,

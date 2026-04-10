@@ -7,5 +7,5 @@ export interface BoardStateDto {
   barBlack: number;
   offWhite: number;
   offBlack: number;
-  currentPlayer: PlayerColor;
+  currentPlayer: number;
 }
