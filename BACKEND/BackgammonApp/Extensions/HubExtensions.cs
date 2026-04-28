@@ -6,7 +6,7 @@ namespace WebAPI.Extensions
 {
     public static class HubExtensions
     {
-        public static Guid GetCurrentPlayerId(
+        public static Guid GetCurrentUserId(
             this Hub hub,
             IConnectionMapping connections)
         {
@@ -14,20 +14,20 @@ namespace WebAPI.Extensions
                 .FindFirst(ClaimTypes.NameIdentifier)?
                 .Value;
 
-            if (Guid.TryParse(claimValue, out var playerId))
+            if (Guid.TryParse(claimValue, out var userId))
             {
-                return playerId;
+                return userId;
             }
 
             if (connections.TryGet(
                 hub.Context.ConnectionId,
-                out var mappedPlayerId))
+                out var mappedUserId))
             {
-                return mappedPlayerId;
+                return mappedUserId;
             }
 
             throw new HubException(
-                "Caller is not associated with a player");
+                "Caller is not associated with a user");
         }
     }
 }
