@@ -19,7 +19,7 @@ namespace BackgammonTest.Generators
                 .WithChecker(player == PlayerColor.White ? 1 : 24, player)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 4, 4 });
+            var dice = new DiceRoll(4, 4);
             var generator = new MoveSequenceGenerator();
 
             // Act
@@ -43,7 +43,7 @@ namespace BackgammonTest.Generators
                 .WithEnemyChecker(player == PlayerColor.White ? 2 : 23, player, 2)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 4, 4 });
+            var dice = new DiceRoll(4, 4);
             var generator = new MoveSequenceGenerator();
 
             // Act
@@ -66,7 +66,7 @@ namespace BackgammonTest.Generators
                 .WithChecker(player == PlayerColor.White ? 2 : 23, player)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 3, 3 });
+            var dice = new DiceRoll(3, 3);
             var generator = new MoveSequenceGenerator();
 
             // Act
@@ -94,7 +94,7 @@ namespace BackgammonTest.Generators
                 .WithChecker(player == PlayerColor.White ? 24 : 1, player)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 2, 2 });
+            var dice = new DiceRoll(2, 2);
             var generator = new MoveSequenceGenerator();
 
             // Act
@@ -120,7 +120,7 @@ namespace BackgammonTest.Generators
                 .WithChecker(player == PlayerColor.White ? 2 : 23, player)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 1, 2 });
+            var dice = new DiceRoll(1, 2);
             var generator = new MoveSequenceGenerator();
 
             // Act

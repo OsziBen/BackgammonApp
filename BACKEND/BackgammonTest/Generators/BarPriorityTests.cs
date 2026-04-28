@@ -20,7 +20,7 @@ namespace BackgammonTest.Generators
                 .WithChecker(6, player)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 1, 2 });
+            var dice = new DiceRoll(1, 2);
             var generator = new MoveSequenceGenerator();
 
             // Act

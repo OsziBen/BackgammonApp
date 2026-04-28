@@ -21,7 +21,7 @@ namespace BackgammonTest.Generators
                 .WithEnemyChecker(player == PlayerColor.White ? 16 : 8, player, 2)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 3, 5 });
+            var dice = new DiceRoll(3, 5);
             var generator = new MoveSequenceGenerator();
 
             // Act
