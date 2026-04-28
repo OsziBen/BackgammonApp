@@ -6,7 +6,8 @@ namespace Domain.TournamentParticipant
     public class TournamentParticipant : BaseEntity
     {
         public Guid TournamentId { get; set; }
-        public Guid? UserId { get; set; }
+        public Guid UserId { get; set; }
+
         public TournamentParticipantStatus Status { get; set; }
 
         public required string DisplayName { get; set; }

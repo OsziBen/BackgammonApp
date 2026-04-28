@@ -1,0 +1,11 @@
+﻿namespace Application.Tournament.Requests
+{
+    public class CreateTournamentRequest
+    {
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        public required string Type { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public Guid RulesTemplateId { get; set; }
+    }
+}

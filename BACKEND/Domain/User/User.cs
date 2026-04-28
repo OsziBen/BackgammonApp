@@ -25,6 +25,7 @@ namespace Domain.User
         public AppRole.AppRole AppRole { get; set; } = null!;
         public ICollection<GroupMembership.GroupMembership> GroupMemberships { get; set; } = [];
         public ICollection<Group.Group> CreatedGroups { get; set; } = [];
+        public ICollection<GroupJoinRequest.GroupJoinRequest> GroupJoinRequests { get; set; } = [];
         public ICollection<GroupMembershipRole.GroupMembershipRole> GrantedRoles { get; set; } = [];
         public ICollection<Post.Post> Posts { get; set; } = [];
         public ICollection<Comment.Comment> Comments { get; set; } = [];

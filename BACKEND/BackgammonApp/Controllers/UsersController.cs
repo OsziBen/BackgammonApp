@@ -1,4 +1,8 @@
-﻿using Application.Users.Commands.RegisterUser;
+﻿using Application.Groups.Commands.RejectJoinRequest;
+using Application.Interfaces.Common;
+using Application.Users.Commands.ListGroupJoinRequestsByUserId;
+using Application.Users.Commands.ListUserGroups;
+using Application.Users.Commands.RegisterUser;
 using Application.Users.Responses;
 using Asp.Versioning;
 using MediatR;
@@ -14,10 +18,14 @@ namespace WebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ICurrentUser _currentUser;
 
-        public UsersController(IMediator mediator)
+        public UsersController(
+            IMediator mediator,
+            ICurrentUser currentUser)
         {
             _mediator = mediator;
+            _currentUser = currentUser;
         }
 
         [HttpPost(UserConstants.Register)]
@@ -33,6 +41,42 @@ namespace WebAPI.Controllers
                 EmailAddress: request.EmailAddress,
                 Password: request.Password,
                 DateOfBirth: request.DateOfBirth);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet(UserConstants.Groups)]
+        public async Task<ActionResult> GetAllGroupsAsync(
+            CancellationToken cancellationToken)
+        {
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new ListUserGroupsCommand(userId);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet(UserConstants.GroupJoinRequests)]
+        public async Task<ActionResult> GetAllGroupJoinRequestsAsync(
+            CancellationToken cancellationToken)
+        {
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new ListGroupJoinRequestsByUserIdCommand(userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 

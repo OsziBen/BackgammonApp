@@ -525,13 +525,13 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("GroupType")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
+
+                    b.Property<int>("JoinPolicy")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -541,16 +541,68 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(50);
 
+                    b.Property<int>("MaxModerators")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("SizePreset")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("CreatorId", "Name")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Domain.GroupJoinRequest.GroupJoinRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ReviewedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "GroupId")
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 0");
+
+                    b.ToTable("GroupJoinRequests");
                 });
 
             modelBuilder.Entity("Domain.GroupMembership.GroupMembership", b =>
@@ -559,8 +611,16 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("DisabledAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTimeOffset>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
@@ -573,7 +633,8 @@ namespace Infrastructure.Migrations
                     b.HasIndex("GroupId");
 
                     b.HasIndex("UserId", "GroupId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsActive\" = true");
 
                     b.ToTable("GroupMemberships");
                 });
@@ -642,6 +703,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("SystemName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GroupId", "Name")
@@ -657,7 +723,8 @@ namespace Infrastructure.Migrations
                             Description = "Group creator and top-level admin",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Owner"
+                            Name = "Owner",
+                            SystemName = "OWNER"
                         },
                         new
                         {
@@ -666,7 +733,8 @@ namespace Infrastructure.Migrations
                             Description = "Can manage content and members",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Moderator"
+                            Name = "Moderator",
+                            SystemName = "MODERATOR"
                         },
                         new
                         {
@@ -675,7 +743,8 @@ namespace Infrastructure.Migrations
                             Description = "Standard group participant",
                             IsDeleted = false,
                             LastUpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Member"
+                            Name = "Member",
+                            SystemName = "MEMBER"
                         });
                 });
 
@@ -989,6 +1058,32 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("RulesTemplates");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CrawfordRuleEnabled = true,
+                            CreatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsDeleted = false,
+                            IsPublic = true,
+                            LastUpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Standard 5 points",
+                            TargetScore = 5,
+                            UseClock = false
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CrawfordRuleEnabled = true,
+                            CreatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsDeleted = false,
+                            IsPublic = true,
+                            LastUpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Standard 7 points",
+                            TargetScore = 7,
+                            UseClock = false
+                        });
                 });
 
             modelBuilder.Entity("Domain.Tournament.Tournament", b =>
@@ -1133,14 +1228,16 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("TournamentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TournamentId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("TournamentId", "UserId")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("TournamentParticipants");
                 });
@@ -1180,14 +1277,11 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TournamentId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ParticipantId");
-
-                    b.HasIndex("TournamentId");
+                    b.HasIndex("ParticipantId")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("TournamentRegistrations");
                 });
@@ -1362,6 +1456,9 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AppRoleId");
 
                     b.HasIndex("EmailAddress")
+                        .IsUnique();
+
+                    b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("Users");
@@ -1658,6 +1755,32 @@ namespace Infrastructure.Migrations
                     b.Navigation("Creator");
                 });
 
+            modelBuilder.Entity("Domain.GroupJoinRequest.GroupJoinRequest", b =>
+                {
+                    b.HasOne("Domain.Group.Group", "Group")
+                        .WithMany("JoinRequests")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.User.User", "User")
+                        .WithMany("GroupJoinRequests")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("ReviewedByUser");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.GroupMembership.GroupMembership", b =>
                 {
                     b.HasOne("Domain.Group.Group", "Group")
@@ -1871,7 +1994,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.User.User", "User")
                         .WithMany("TournamentParticipations")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Tournament");
 
@@ -1886,15 +2010,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Tournament.Tournament", "Tournament")
-                        .WithMany()
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Participant");
-
-                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("Domain.TournamentRound.TournamentRound", b =>
@@ -1965,6 +2081,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("GroupMemberships");
 
                     b.Navigation("GroupRoles");
+
+                    b.Navigation("JoinRequests");
 
                     b.Navigation("Posts");
                 });
@@ -2037,6 +2155,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("GameSessions");
 
                     b.Navigation("GrantedRoles");
+
+                    b.Navigation("GroupJoinRequests");
 
                     b.Navigation("GroupMemberships");
 

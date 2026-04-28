@@ -8,8 +8,14 @@ namespace Domain.Group
         public Guid CreatorId { get; set; }
         public required string Name { get; set; }
         public required string Description { get; set; }
-        public GroupType GroupType { get; set; }
+
+        public GroupVisibility Visibility { get; set; }
+        public GroupJoinPolicy JoinPolicy { get; set; }
+        public GroupSizePreset SizePreset { get; set; }
+
         public int MaxMembers { get; set; }
+        public int MaxModerators { get; set; }
+
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
@@ -19,5 +25,6 @@ namespace Domain.Group
         public ICollection<GroupMembership.GroupMembership> GroupMemberships { get; set; } = [];
         public ICollection<GroupRole.GroupRole> GroupRoles { get; set; } = [];
         public ICollection<Post.Post> Posts { get; set; } = [];
+        public ICollection<GroupJoinRequest.GroupJoinRequest> JoinRequests { get; set; } = [];
     }
 }

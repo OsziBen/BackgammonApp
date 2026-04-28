@@ -22,5 +22,14 @@ namespace Infrastructure.Repositories.User
             => await Query()
                 .Include(u => u.AppRole)
                 .FirstOrDefaultAsync(u => u.EmailAddress == email, cancellationToken);
+
+        public async Task<Domain.User.User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+            => await Query()
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+        public async Task<Domain.User.User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
+            => await Query()
+                .Include(u => u.AppRole)
+                .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
     }
 }

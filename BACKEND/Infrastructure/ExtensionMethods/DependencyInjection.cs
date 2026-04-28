@@ -6,7 +6,12 @@ using Application.Interfaces.Repository;
 using Application.Interfaces.Repository.AppRole;
 using Application.Interfaces.Repository.GamePlayer;
 using Application.Interfaces.Repository.GameSession;
+using Application.Interfaces.Repository.Group;
+using Application.Interfaces.Repository.GroupJoinRequest;
+using Application.Interfaces.Repository.GroupMembership;
 using Application.Interfaces.Repository.GroupMembershipRole;
+using Application.Interfaces.Repository.GroupRole;
+using Application.Interfaces.Repository.Tournament;
 using Application.Interfaces.Repository.User;
 using Application.Shared.Time;
 using Domain.GameLogic;
@@ -17,7 +22,12 @@ using Infrastructure.Repositories;
 using Infrastructure.Repositories.AppRole;
 using Infrastructure.Repositories.GamePlayer;
 using Infrastructure.Repositories.GameSession;
+using Infrastructure.Repositories.Group;
+using Infrastructure.Repositories.GroupJoinRequest;
+using Infrastructure.Repositories.GroupMembership;
 using Infrastructure.Repositories.GroupMembershipRole;
+using Infrastructure.Repositories.GroupRole;
+using Infrastructure.Repositories.Tournament;
 using Infrastructure.Repositories.User;
 using Infrastructure.Services;
 using Infrastructure.Shared.Time;
@@ -48,9 +58,28 @@ namespace Infrastructure.ExtensionMethods
             // AppRole
             services.AddScoped<IAppRoleReadRepository, AppRoleReadRepository>();
 
+            // Group
+            services.AddScoped<IGroupReadRepository, GroupReadRepository>();
+            services.AddScoped<IGroupWriteRepository, GroupWriteRepository>();
+
+            // GroupJoinRequest
+            services.AddScoped<IGroupJoinRequestReadRepository, GroupJoinRequestReadRepository>();
+            services.AddScoped<IGroupJoinRequestWriteRepository, GroupJoinRequestWriteRepository>();
+
+            // GroupRole
+            services.AddScoped<IGroupRoleReadRepository, GroupRoleReadRepository>();
+
+            // GroupMembership
+            services.AddScoped<IGroupMembershipReadRepository, GroupMembershipReadRepository>();
+            services.AddScoped<IGroupMembershipWriteRepository, GroupMembershipWriteRepository>();
+
             // GroupMembershipRole
             services.AddScoped<IGroupMembershipRoleReadRepository, GroupMembershipRoleReadRepository>();
             services.AddScoped<IGroupMembershipRoleWriteRepository, GroupMembershipRoleWriteRepository>();
+
+            // Tournament
+            services.AddScoped<ITournamentReadRepository, TournamentReadRepository>();
+            services.AddScoped<ITournamentWriteRepository, TournamentWriteRepository>();
 
             return services;
         }
@@ -58,10 +87,10 @@ namespace Infrastructure.ExtensionMethods
         public static IServiceCollection AddSystemServices(
             this IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+
             services.AddSingleton<IDiceService, DiceService>();
             services.AddSingleton<IDateTimeProvider, SystemdateTimeProvider>();
-
-            services.AddHttpContextAccessor();
 
             services.AddScoped<IBoardStateFactory, BoardStateFactory>();
             services.AddScoped<IGameSessionSnapshotFactory, GameSessionSnapshotFactory>();

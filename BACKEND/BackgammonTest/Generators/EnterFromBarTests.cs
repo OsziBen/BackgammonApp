@@ -21,7 +21,7 @@ namespace BackgammonTest.Generators
                 .WithEnemyChecker(player == PlayerColor.White ? 2 : 23, player, 2)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 1, 2 });
+            var dice = new DiceRoll(1, 2);
             var generator = new MoveSequenceGenerator();
             var expectedPosition = player == PlayerColor.White ? 1 : 24;
 
@@ -46,7 +46,7 @@ namespace BackgammonTest.Generators
                 .WithEnemyChecker(player == PlayerColor.White ? 2 : 23, player, 2)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 1, 2 });
+            var dice = new DiceRoll(1, 2);
             var generator = new MoveSequenceGenerator();
 
             // Act

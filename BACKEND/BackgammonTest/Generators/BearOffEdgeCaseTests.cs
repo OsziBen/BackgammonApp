@@ -22,7 +22,7 @@ namespace BackgammonTest.Generators
                 .WithOff(player, 13)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 6, 3 });
+            var dice = new DiceRoll(6, 3);
             var generator = new MoveSequenceGenerator();
 
             // Act
@@ -51,7 +51,7 @@ namespace BackgammonTest.Generators
                 .WithOff(player, 12)
                 .Build();
 
-            var dice = new DiceRoll(new[] { 6, 3 });
+            var dice = new DiceRoll(6, 3);
             var generator = new MoveSequenceGenerator();
 
             // Act

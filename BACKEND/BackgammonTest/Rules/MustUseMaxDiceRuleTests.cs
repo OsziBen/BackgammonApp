@@ -24,7 +24,7 @@ namespace BackgammonTest.Rules
             };
 
             var rule = new MustUseMaxDiceRule();
-            var roll = new DiceRoll(new[] { 3, 5 });
+            var roll = new DiceRoll(3, 5);
 
             // Act
             var result = rule.Apply(seqences, roll).ToList();

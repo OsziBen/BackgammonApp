@@ -1,8 +1,11 @@
-﻿using Infrastructure.Options;
+﻿using Domain.GroupRole;
+using Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebAPI.Authorization;
+using WebAPI.Constants;
 
 namespace WebAPI.Extensions
 {
@@ -16,7 +19,7 @@ namespace WebAPI.Extensions
                 config.GetSection(nameof(JwtOptions)));
 
             var jwtOptions = config
-                .GetSection("JwtOptions")
+                .GetSection(nameof(JwtOptions))
                 .Get<JwtOptions>()
                 ?? throw new InvalidOperationException("JwtOptions not configured properly.");
 
@@ -48,7 +51,7 @@ namespace WebAPI.Extensions
                             var path = context.HttpContext.Request.Path;
 
                             if (!string.IsNullOrEmpty(accessToken)
-                                && path.StartsWithSegments("/hubs/game-session"))
+                                && path.StartsWithSegments(HubRoutes.GameSession))
                             {
                                 context.Token = accessToken;
                             }
@@ -61,11 +64,36 @@ namespace WebAPI.Extensions
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy(Policies.GroupOwner,
+                    policy => policy.Requirements.Add(
+                        new GroupRoleRequirement(GroupRoleConstants.Owner)));
+
+                options.AddPolicy(Policies.GroupModerator,
+                    policy => policy.Requirements.Add(
+                        new GroupRoleRequirement(
+                            GroupRoleConstants.Owner,
+                            GroupRoleConstants.Moderator)));
+
+                options.AddPolicy(Policies.GroupMember,
+                    policy => policy.Requirements.Add(
+                        new GroupRoleRequirement(
+                            GroupRoleConstants.Owner,
+                            GroupRoleConstants.Moderator,
+                            GroupRoleConstants.Member)));
+
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                     .Build();
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthorizationServices(
+            this IServiceCollection services)
+        {
+            services.AddScoped<IAuthorizationHandler, GroupRoleHandler>();
 
             return services;
         }

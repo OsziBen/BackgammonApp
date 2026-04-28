@@ -75,7 +75,7 @@ namespace WebAPI.Hubs
 
         public async Task RollDice(Guid sessionId)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new RollDiceCommand(sessionId, userId));
@@ -83,7 +83,7 @@ namespace WebAPI.Hubs
 
         public async Task OfferDoublingCube(Guid sessionId)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new OfferDoublingCubeCommand(sessionId, userId));
@@ -91,7 +91,7 @@ namespace WebAPI.Hubs
 
         public async Task AcceptDoublingCube(Guid sessionId)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new AcceptDoublingCubeCommand(sessionId, userId));
@@ -99,7 +99,7 @@ namespace WebAPI.Hubs
 
         public async Task DeclineDoublingCube(Guid sessionId)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new DeclineDoublingCubeCommand(sessionId, userId));
@@ -109,7 +109,7 @@ namespace WebAPI.Hubs
             Guid sessionId,
             IReadOnlyList<MoveDto> moves)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new MoveCheckersCommand(sessionId, userId, moves));
@@ -117,7 +117,7 @@ namespace WebAPI.Hubs
 
         public async Task Forfeit(Guid sessionId)
         {
-            var userId = this.GetCurrentPlayerId(_connections);
+            var userId = this.GetCurrentUserId(_connections);
 
             await _mediator.Send(
                 new PlayerForfeitCommand(sessionId, userId));
