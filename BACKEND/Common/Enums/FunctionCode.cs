@@ -16,6 +16,7 @@
         // Üzleti szabály hibák (409 Conflict / 422 Unprocessable Entity)
         BusinessRuleViolation = 4000,
         ArchivedItemModification = 4001,
+        // GAME SESSION
         SessionFull = 4002,
         InvalidGamePhase = 4003,
         InvalidGameState = 4004,
@@ -32,10 +33,26 @@
         DoublingCubeDisabled = 4015,
         InvalidPlayer = 4016,
         SessionAlreadyStarted = 4017,
+        // USERS
         UserAlreadyInActiveSession = 4018,
         UserWithEmailAlreadyExists = 4019,
         UserWithUserNameAlreadyExists = 4020,
         CannotRollDice = 4021,
+        // GROUPS
+        GroupWithGroupNameAlreadyExists = 4022,
+        CannotDowngradeGroupSize = 4023,
+        CannotAddUserDIrectlyInPublicGroup = 4024,
+        UserAlreadyActiveMember = 4025,
+        GroupReachedMaxMembersLimit = 4026,
+        CannotRemoveGroupOwner = 4027,
+        InvalidJoinRequestStatus = 4028,
+        GroupMismatch = 4029,
+        CannotDemoteGroupOwner = 4030,
+        UserIsNotModerator = 4031,
+        ModeratorLimitReached = 4032,
+        UserIsAlreadyModerator = 4033,
+        CannotJoinPrivateGroup = 4034,
+        JoinAlreadyRequested = 4035,
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,
