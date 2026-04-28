@@ -9,6 +9,7 @@ using Domain.Game;
 using Domain.GamePlayer;
 using Domain.GameSession;
 using Domain.Group;
+using Domain.GroupJoinRequest;
 using Domain.GroupMembership;
 using Domain.GroupMembershipRole;
 using Domain.GroupRole;
@@ -38,6 +39,7 @@ namespace Infrastructure.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<AppRole> AppRoles { get; set; } = null!;
         public DbSet<Group> Groups { get; set; } = null!;
+        public DbSet<GroupJoinRequest> GroupJoinRequests { get; set; } = null!;
         public DbSet<GroupRole> GroupRoles { get; set; } = null!;
         public DbSet<GroupMembership> GroupMemberships { get; set; } = null!;
         public DbSet<GroupMembershipRole> GroupMembershipRoles { get; set; } = null!;
@@ -67,6 +69,9 @@ namespace Infrastructure.Data
                 user.HasKey(u => u.Id);
 
                 user.HasIndex(u => u.EmailAddress)
+                    .IsUnique();
+
+                user.HasIndex(u => u.UserName)
                     .IsUnique();
 
                 user.HasOne(u => u.AppRole)
@@ -229,15 +234,71 @@ namespace Infrastructure.Data
                      .HasMaxLength(200)
                      .IsRequired();
 
-                group.Property(g => g.GroupType)
+                group.Property(g => g.Visibility)
+                     .HasConversion<int>()
+                     .IsRequired();
+
+                group.Property(g => g.JoinPolicy)
+                     .HasConversion<int>()
+                     .IsRequired();
+
+                group.Property(g => g.SizePreset)
                      .HasConversion<int>()
                      .IsRequired();
 
                 group.Property(g => g.MaxMembers)
                      .HasDefaultValue(50);
 
+                group.Property(g => g.MaxModerators)
+                     .HasDefaultValue(2);
+
                 group.Property(g => g.IsDeleted)
                      .HasDefaultValue(false);
+
+                group.Property(g => g.CreatedAt)
+                     .IsRequired();
+
+                group.Property(g => g.LastUpdatedAt)
+                     .IsRequired();
+
+                group.HasIndex(g => new { g.CreatorId, g.Name })
+                     .IsUnique()
+                     .HasFilter("\"IsDeleted\" = false");
+            });
+
+            modelBuilder.Entity<GroupJoinRequest>(groupJoinRequest =>
+            {
+                groupJoinRequest.HasKey(gjr => gjr.Id);
+
+                groupJoinRequest.HasOne(gjr => gjr.User)
+                                .WithMany(u => u.GroupJoinRequests)
+                                .HasForeignKey(gjr => gjr.UserId)
+                                .OnDelete(DeleteBehavior.Cascade);
+
+                groupJoinRequest.HasOne(gjr => gjr.Group)
+                                .WithMany(g => g.JoinRequests)
+                                .HasForeignKey(gjr => gjr.GroupId)
+                                .OnDelete(DeleteBehavior.Cascade);
+
+                groupJoinRequest.HasOne(x => x.ReviewedByUser)
+                                .WithMany()
+                                .HasForeignKey(x => x.ReviewedByUserId)
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                groupJoinRequest.Property(gjr => gjr.Status)
+                                .HasConversion<int>()
+                                .IsRequired();
+
+                groupJoinRequest.Property(gjr => gjr.CreatedAt)
+                                .IsRequired();
+
+                groupJoinRequest.HasIndex(x => x.GroupId);
+
+                groupJoinRequest.HasIndex(x => x.UserId);
+
+                groupJoinRequest.HasIndex(gjr => new { gjr.UserId, gjr.GroupId })
+                                .IsUnique()
+                                .HasFilter("\"Status\" = 0");
             });
 
             modelBuilder.Entity<GroupRole>(groupRole =>
@@ -257,6 +318,10 @@ namespace Infrastructure.Data
                          .HasMaxLength(20)
                          .IsRequired();
 
+                groupRole.Property(gr => gr.SystemName)
+                         .HasMaxLength(20)
+                         .IsRequired();
+
                 groupRole.Property(gr => gr.Description)
                          .HasMaxLength(200)
                          .IsRequired();
@@ -269,6 +334,7 @@ namespace Infrastructure.Data
                     {
                         Id = DefaultGroupRoles.Owner,
                         Name = "Owner",
+                        SystemName = GroupRoleConstants.Owner,
                         Description = "Group creator and top-level admin",
                         GroupId = null,
                         CreatedAt = SeedTimestamp,
@@ -278,6 +344,7 @@ namespace Infrastructure.Data
                     {
                         Id = DefaultGroupRoles.Moderator,
                         Name = "Moderator",
+                        SystemName = GroupRoleConstants.Moderator,
                         Description = "Can manage content and members",
                         GroupId = null,
                         CreatedAt = SeedTimestamp,
@@ -287,6 +354,7 @@ namespace Infrastructure.Data
                     {
                         Id = DefaultGroupRoles.Member,
                         Name = "Member",
+                        SystemName = GroupRoleConstants.Member,
                         Description = "Standard group participant",
                         GroupId = null,
                         CreatedAt = SeedTimestamp,
@@ -299,7 +367,8 @@ namespace Infrastructure.Data
                 groupMembership.HasKey(gm => gm.Id);
 
                 groupMembership.HasIndex(gm => new { gm.UserId, gm.GroupId })
-                               .IsUnique();
+                               .IsUnique()
+                               .HasFilter("\"IsActive\" = true");
 
                 groupMembership.HasOne(gm => gm.User)
                                .WithMany(u => u.GroupMemberships)
@@ -312,6 +381,10 @@ namespace Infrastructure.Data
                                .HasForeignKey(gm => gm.GroupId)
                                .IsRequired()
                                .OnDelete(DeleteBehavior.Cascade);
+
+                groupMembership.Property(gm => gm.IsActive)
+                               .IsRequired()
+                               .HasDefaultValue(true);
             });
 
             modelBuilder.Entity<GroupMembershipRole>(groupMembershipRole =>
@@ -434,7 +507,7 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<RulesTemplate>(rulesTemplate =>
             {
-                rulesTemplate.HasKey(r => r.Id);
+                rulesTemplate.HasKey(rt => rt.Id);
 
                 rulesTemplate.HasOne(rt => rt.Author)
                              .WithMany(u => u.RulesTemplates)
@@ -461,6 +534,33 @@ namespace Infrastructure.Data
 
                 rulesTemplate.Property(rt => rt.IsDeleted)
                              .HasDefaultValue(false);
+
+                rulesTemplate.HasData(
+                    new RulesTemplate
+                    {
+                        Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                        Name = "Standard 5 points",
+                        TargetScore = 5,
+                        UseClock = false,
+                        CrawfordRuleEnabled = true,
+                        IsPublic = true,
+                        CreatedAt = SeedTimestamp,
+                        LastUpdatedAt = SeedTimestamp,
+                        IsDeleted = false
+                    },
+                    new RulesTemplate
+                    {
+                        Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                        Name = "Standard 7 points",
+                        TargetScore = 7,
+                        UseClock = false,
+                        CrawfordRuleEnabled = true,
+                        IsPublic = true,
+                        CreatedAt = SeedTimestamp,
+                        LastUpdatedAt = SeedTimestamp,
+                        IsDeleted = false
+                    }
+                );
             });
 
             modelBuilder.Entity<Match>(match =>
@@ -753,7 +853,7 @@ namespace Infrastructure.Data
                 tournamentParticipant.HasOne(tp => tp.User)
                                      .WithMany(u => u.TournamentParticipations)
                                      .HasForeignKey(tp => tp.UserId)
-                                     .IsRequired(false)
+                                     .IsRequired()
                                      .OnDelete(DeleteBehavior.Restrict);
 
                 tournamentParticipant.Property(tp => tp.Status)
@@ -774,17 +874,15 @@ namespace Infrastructure.Data
 
                 tournamentParticipant.Property(tp => tp.IsDeleted)
                                      .HasDefaultValue(false);
+
+                tournamentParticipant.HasIndex(x => new { x.TournamentId, x.UserId })
+                                     .IsUnique()
+                                     .HasFilter("\"IsDeleted\" = false");
             });
 
             modelBuilder.Entity<TournamentRegistration>(tournamentRegistration =>
             {
                 tournamentRegistration.HasKey(tr => tr.Id);
-
-                tournamentRegistration.HasOne(tr => tr.Tournament)
-                                      .WithMany()
-                                      .HasForeignKey(tr => tr.TournamentId)
-                                      .IsRequired()
-                                      .OnDelete(DeleteBehavior.Restrict);
 
                 tournamentRegistration.HasOne(tr => tr.Participant)
                                       .WithMany(tp => tp.Registrations)
@@ -798,6 +896,10 @@ namespace Infrastructure.Data
 
                 tournamentRegistration.Property(tr => tr.IsDeleted)
                                       .HasDefaultValue(false);
+
+                tournamentRegistration.HasIndex(x => x.ParticipantId)
+                                      .IsUnique()
+                                      .HasFilter("\"IsDeleted\" = false");
             });
 
             modelBuilder.Entity<TournamentRound>(tournamentRound =>

@@ -5,7 +5,6 @@ namespace Domain.TournamentRegistration
 {
     public class TournamentRegistration : BaseEntity
     {
-        public Guid TournamentId { get; set; }
         public Guid ParticipantId { get; set; }
 
         public TournamentRegistrationStatus Status { get; set; }
@@ -21,7 +20,6 @@ namespace Domain.TournamentRegistration
         public DateTimeOffset? DeletedAt { get; set; }
 
 
-        public Tournament.Tournament Tournament { get; set; } = null!;
         public TournamentParticipant.TournamentParticipant Participant { get; set; } = null!;
     }
 }

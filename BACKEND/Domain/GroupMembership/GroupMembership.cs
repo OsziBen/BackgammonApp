@@ -8,6 +8,9 @@ namespace Domain.GroupMembership
         public Guid GroupId { get; set; }
         public DateTimeOffset JoinedAt { get; set; }
 
+        public bool IsActive { get; set; } = true;
+        public DateTimeOffset? DisabledAt { get; set; }
+
         public User.User User { get; set; } = null!;
         public Group.Group Group { get; set; } = null!;
         public ICollection<GroupMembershipRole.GroupMembershipRole> GroupRoles { get; set; } = [];

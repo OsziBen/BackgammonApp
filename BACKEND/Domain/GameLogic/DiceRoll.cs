@@ -34,7 +34,7 @@ namespace Domain.GameLogic
                     FunctionCode.InvalidDiceRoll,
                     "Dice roll must contain exactly 2 or 4 values.");
             }            
-
+            
             Values = IsDouble
                 ? new[] { dice[0], dice[0], dice[0], dice[0] }
                 : dice;

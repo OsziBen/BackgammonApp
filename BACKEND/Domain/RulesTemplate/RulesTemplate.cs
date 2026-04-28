@@ -14,8 +14,8 @@ namespace Domain.RulesTemplate
         public int? StartOfTurnDelayPerPlayerInSeconds { get; set; }
         public bool CrawfordRuleEnabled { get; set; }
         public bool IsPublic { get; set; }
-        public bool IsDeleted { get; set; }
 
+        public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }

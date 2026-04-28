@@ -6,6 +6,7 @@ namespace Domain.GroupRole
     {
         public required string Name { get; set; }
         public required string Description { get; set; }
+        public required string SystemName { get; set; } // "OWNER", "MODERATOR", "MEMBER"
         public Guid? GroupId { get; set; }
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
