@@ -19,6 +19,7 @@ using Domain.Post;
 using Domain.Reaction;
 using Domain.RulesTemplate;
 using Domain.Tournament;
+using Domain.TournamentJoinRequest;
 using Domain.TournamentPairing;
 using Domain.TournamentParticipant;
 using Domain.TournamentRegistration;
@@ -55,6 +56,7 @@ namespace Infrastructure.Data
         public DbSet<PlayerTurn> PlayerTurns { get; set; } = null!;
         public DbSet<RulesTemplate> RulesTemplates { get; set; } = null!;
         public DbSet<Tournament> Tournaments { get; set; } = null!;
+        public DbSet<TournamentJoinRequest> TournamentJoinRequests { get; set; } = null!;
         public DbSet<TournamentPairing> TournamentPairings { get; set; } = null!;
         public DbSet<TournamentParticipant> TournamentParticipants { get; set; } = null!;
         public DbSet<TournamentRegistration> TournamentRegistrations { get; set; } = null!;
@@ -798,12 +800,59 @@ namespace Infrastructure.Data
                           .HasConversion<int>()
                           .IsRequired();
 
+                tournament.Property(g => g.Visibility)
+                          .HasConversion<int>()
+                          .IsRequired();
+
                 tournament.Property(t => t.Status)
                           .HasConversion<int>()
                           .IsRequired();
 
+                tournament.Property(t => t.MaxParticipants)
+                          .HasDefaultValue(30);
+
                 tournament.Property(t => t.IsDeleted)
                           .HasDefaultValue(false);
+
+
+                tournament.HasIndex(g => new { g.OrganizerUserId, g.Name })
+                          .IsUnique()
+                          .HasFilter("\"IsDeleted\" = false");
+            });
+
+            modelBuilder.Entity<TournamentJoinRequest>(tournamentJoinRequest =>
+            {
+                tournamentJoinRequest.HasKey(tjr => tjr.Id);
+
+                tournamentJoinRequest.HasOne(tjr => tjr.User)
+                                .WithMany(u => u.TournamentJoinRequests)
+                                .HasForeignKey(tjr => tjr.UserId)
+                                .OnDelete(DeleteBehavior.Cascade);
+
+                tournamentJoinRequest.HasOne(tjr => tjr.Tournament)
+                                .WithMany(g => g.JoinRequests)
+                                .HasForeignKey(tjr => tjr.TournamentId)
+                                .OnDelete(DeleteBehavior.Cascade);
+
+                tournamentJoinRequest.HasOne(x => x.ReviewedByUser)
+                                .WithMany()
+                                .HasForeignKey(x => x.ReviewedByUserId)
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                tournamentJoinRequest.Property(tjr => tjr.Status)
+                                .HasConversion<int>()
+                                .IsRequired();
+
+                tournamentJoinRequest.Property(tjr => tjr.CreatedAt)
+                                .IsRequired();
+
+                tournamentJoinRequest.HasIndex(x => x.TournamentId);
+
+                tournamentJoinRequest.HasIndex(x => x.UserId);
+
+                tournamentJoinRequest.HasIndex(tjr => new { tjr.UserId, tjr.TournamentId })
+                                .IsUnique()
+                                .HasFilter("\"Status\" = 0");
             });
 
             modelBuilder.Entity<TournamentPairing>(tournamentPairing =>

@@ -1,12 +1,12 @@
 ﻿using Common.Enums.Group;
 using Common.Models;
 
-namespace Domain.GroupJoinRequest
+namespace Domain.TournamentJoinRequest
 {
-    public class GroupJoinRequest : BaseEntity
+    public class TournamentJoinRequest : BaseEntity
     {
         public Guid UserId { get; set; }
-        public Guid GroupId { get; set; }
+        public Guid TournamentId { get; set; }
 
         public JoinRequestStatus Status { get; set; }
 
@@ -15,7 +15,7 @@ namespace Domain.GroupJoinRequest
         public Guid? ReviewedByUserId { get; set; }
 
         public User.User User { get; set; } = null!;
-        public Group.Group Group { get; set; } = null!;
+        public Tournament.Tournament Tournament { get; set; } = null!;
         public User.User? ReviewedByUser { get; set; }
     }
 }
