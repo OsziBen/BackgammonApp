@@ -1,10 +1,164 @@
+/* ======================
+   CONTAINER
+   ====================== */
+.game-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ======================
+   HEADER BAR (FIX HEIGHT)
+   ====================== */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+  padding: 10px 14px;
+
+  background: #f5f5f5;
+  border-radius: 10px;
+
+  height: 72px;
+}
+
+/* ======================
+   PLAYER INFO
+   ====================== */
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: #444;
+}
+
+/* Badge */
+.badge {
+  background: #335533;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Waiting text */
+.waiting-text {
+  color: #777;
+  font-style: italic;
+}
+
+/* ======================
+   DICE CONTAINER (FIX WIDTH)
+   ====================== */
+.dice-container {
+  min-width: 120px;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ======================
+   HEADER / STATUS
+   ====================== */
+.game-title {
+  color: #335533;
+  margin-bottom: 12px;
+}
+
+.game-status {
+  margin-bottom: 12px;
+  color: #444;
+}
+
+.waiting-text {
+  color: #777;
+  font-style: italic;
+}
+
+/* ======================
+   BOARD LAYOUT
+   ====================== */
 .board-wrapper {
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 16px;
+
+  margin-top: 16px;
 }
 
-/* Doubling cube magasság igazítása a board magasságához */
+/* ======================
+   DOUBLING CUBE PANEL
+   ====================== */
+.cube-wrapper {
+  width: 70px;
+
+  background: #f5f5f5;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px;
+}
+
+/* Angular host fix */
 app-doubling-cube {
-  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ======================
+   ERROR
+   ====================== */
+.error-box {
+  margin-top: 16px;
+  color: #e53935;
+  background: #ffecec;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* ======================
+   ACTIONS
+   ====================== */
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.actions button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+
+  background: #ddd;
+  cursor: pointer;
+
+  transition: 0.15s ease;
+}
+
+.actions button:hover:not(:disabled) {
+  background: #ccc;
+}
+
+.actions button.primary {
+  background: #335533;
+  color: white;
+}
+
+.actions button.primary:hover:not(:disabled) {
+  background: #2a442a;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

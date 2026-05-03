@@ -1,25 +1,37 @@
-<section *ngIf="board() as board">
-  <h2>Game Board</h2>
+<section *ngIf="board() as board" class="game-container">
+  <!-- FIX HEADER BAR -->
+  <div class="game-header">
+    <div class="player-info">
+      <span>
+        Current player:
+        <strong>{{ board.currentPlayer }}</strong>
+      </span>
 
-  <p>
-    Current player:
-    <strong>{{ board.currentPlayer }}</strong>
-    <span *ngIf="ui.isMyTurn()"> (Your turn)</span>
-  </p>
-  <p *ngIf="ui.isWaiting()">Waiting for opponent...</p>
+      <span *ngIf="ui.isMyTurn()" class="badge"> Your turn </span>
 
-  <app-dice [dice]="dice()" />
+      <span *ngIf="ui.isWaiting()" class="waiting-text">
+        Waiting for opponent...
+      </span>
+    </div>
 
+    <!-- DICE ALWAYS PRESENT -->
+    <div class="dice-container">
+      <app-dice [dice]="dice()" />
+    </div>
+  </div>
+
+  <!-- BOARD + CUBE LAYOUT -->
   <div class="board-wrapper">
-    <!-- Doubling cube bal oldalon -->
-    <app-doubling-cube
-      [value]="doublingCubeValue()"
-      [owner]="doublingCubeOwner()"
-      [enabled]="doublingCubeEnabled()"
-    >
-    </app-doubling-cube>
+    <!-- LEFT PANEL (Doubling Cube) -->
+    <div class="cube-wrapper">
+      <app-doubling-cube
+        [value]="doublingCubeValue()"
+        [owner]="doublingCubeOwner()"
+        [enabled]="doublingCubeEnabled()"
+      ></app-doubling-cube>
+    </div>
 
-    <!-- Board -->
+    <!-- BOARD -->
     <app-board
       [board]="board"
       [clickablePoints]="clickablePoints()"
@@ -28,13 +40,16 @@
       [enabled]="ui.canInteract()"
       (pointClick)="onPointClick($event)"
       (barClick)="onBarClick($event)"
-    ></app-board>
+    >
+    </app-board>
   </div>
 
-  <div *ngIf="ui.error()" class="error">
+  <!-- ERROR -->
+  <div *ngIf="ui.error()" class="error-box">
     {{ ui.error() }}
   </div>
 
+  <!-- MODALS -->
   <app-turn-action-modal
     *ngIf="ui.showActionModal()"
     [canRoll]="ui.canRoll()"
@@ -57,9 +72,15 @@
   >
   </app-game-finished-modal>
 
+  <!-- ACTIONS -->
   <div class="actions">
     <button (click)="undoMove()" [disabled]="!ui.canUndo()">Undo</button>
-    <button (click)="onTurnFinished()" [disabled]="!ui.canSubmitTurn()">
+
+    <button
+      class="primary"
+      (click)="onTurnFinished()"
+      [disabled]="!ui.canSubmitTurn()"
+    >
       Submit Turn
     </button>
   </div>

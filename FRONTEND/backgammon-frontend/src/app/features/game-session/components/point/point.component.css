@@ -33,11 +33,14 @@
 }
 
 /* SZÍNEZÉS */
-.point.top:nth-child(even)::after {
-  border-top-color: #ddccaa;
+.point.top::after,
+.point:not(.top)::after {
+  border-top-color: #aa7744;
+  border-bottom-color: #aa7744;
 }
 
-.point:not(.top):nth-child(even)::after {
+.point.even::after {
+  border-top-color: #ddccaa;
   border-bottom-color: #ddccaa;
 }
 

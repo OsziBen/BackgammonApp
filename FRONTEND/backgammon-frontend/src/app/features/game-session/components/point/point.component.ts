@@ -15,6 +15,7 @@ export class PointComponent {
   @Input() clickable = false;
   @Input() target = false;
   @Input() selected = false;
+  @Input() index!: number;
 
   @Output() pointClick = new EventEmitter<number>();
 
@@ -38,6 +39,10 @@ export class PointComponent {
     }
 
     return arr;
+  }
+
+  get isEven(): boolean {
+    return this.point.index % 2 === 0;
   }
 
   get checkers() {

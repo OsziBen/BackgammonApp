@@ -1,23 +1,27 @@
 <div class="bar">
-  <!-- Fekete -->
-  <app-point
-    class="top-point"
-    [point]="blackPoint"
-    [top]="true"
-    [clickable]="isClickable()"
-    [target]="isTarget()"
-    [selected]="isSelected()"
-    (pointClick)="onPointClick($event)"
-  ></app-point>
+  <!-- TOP (BLACK) -->
+  <div class="bar-section top">
+    <app-point
+      class="bar-point"
+      [point]="blackPoint"
+      [top]="true"
+      [clickable]="isClickable()"
+      [target]="isTarget()"
+      [selected]="isSelected()"
+      (pointClick)="onPointClick($event)"
+    ></app-point>
+  </div>
 
-  <!-- Fehér -->
-  <app-point
-    class="bottom-point"
-    [point]="whitePoint"
-    [top]="false"
-    [clickable]="isClickable()"
-    [target]="isTarget()"
-    [selected]="isSelected()"
-    (pointClick)="onPointClick($event)"
-  ></app-point>
+  <!-- BOTTOM (WHITE) -->
+  <div class="bar-section bottom">
+    <app-point
+      class="bar-point"
+      [point]="whitePoint"
+      [top]="false"
+      [clickable]="isClickable()"
+      [target]="isTarget()"
+      [selected]="isSelected()"
+      (pointClick)="onPointClick($event)"
+    ></app-point>
+  </div>
 </div>

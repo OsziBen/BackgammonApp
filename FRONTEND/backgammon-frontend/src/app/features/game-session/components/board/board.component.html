@@ -4,7 +4,7 @@
     <div class="quarter top">
       <div class="points">
         <app-point
-          *ngFor="let point of topLeft()"
+          *ngFor="let point of topLeft(); let i = index"
           [point]="point"
           [top]="true"
           [clickable]="isClickable(point.index)"
@@ -18,7 +18,7 @@
     <div class="quarter bottom">
       <div class="points">
         <app-point
-          *ngFor="let point of bottomLeft()"
+          *ngFor="let point of bottomLeft(); let i = index"
           [point]="point"
           [top]="false"
           [clickable]="isClickable(point.index)"
@@ -48,7 +48,7 @@
     <div class="quarter top">
       <div class="points">
         <app-point
-          *ngFor="let point of topRight()"
+          *ngFor="let point of topRight(); let i = index"
           [point]="point"
           [top]="true"
           [clickable]="isClickable(point.index)"
@@ -62,7 +62,7 @@
     <div class="quarter bottom">
       <div class="points">
         <app-point
-          *ngFor="let point of bottomRight()"
+          *ngFor="let point of bottomRight(); let i = index"
           [point]="point"
           [top]="false"
           [clickable]="isClickable(point.index)"
