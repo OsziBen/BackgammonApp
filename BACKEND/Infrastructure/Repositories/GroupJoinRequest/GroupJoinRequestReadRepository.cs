@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces.Repository.GroupJoinRequest;
-using Common.Enums;
+using Common.Enums.Group;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +21,13 @@ namespace Infrastructure.Repositories.GroupJoinRequest
         public async Task<List<Domain.GroupJoinRequest.GroupJoinRequest>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
             => await Query()
                 .Where(gjr => gjr.UserId == userId)
+                .Include(gjr => gjr.Group)
+                .ToListAsync(cancellationToken);
+
+        public async Task<List<Domain.GroupJoinRequest.GroupJoinRequest>> GetAllPendingByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => await Query()
+                .Where(gjr => gjr.UserId == userId
+                           && gjr.Status == JoinRequestStatus.Pending)
                 .Include(gjr => gjr.Group)
                 .ToListAsync(cancellationToken);
 
