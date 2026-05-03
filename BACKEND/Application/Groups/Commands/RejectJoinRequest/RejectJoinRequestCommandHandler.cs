@@ -2,6 +2,7 @@
 using Application.Shared;
 using Application.Shared.Time;
 using Common.Enums;
+using Common.Enums.Group;
 using Common.Exceptions;
 using Domain.GroupJoinRequest;
 using MediatR;

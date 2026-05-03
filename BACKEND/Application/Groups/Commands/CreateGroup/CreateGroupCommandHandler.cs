@@ -8,7 +8,6 @@ using Application.Shared.Time;
 using Common.Enums;
 using Common.Enums.Group;
 using Common.Exceptions;
-using Domain.GameSession;
 using Domain.Group;
 using Domain.GroupMembership;
 using Domain.GroupMembershipRole;
@@ -109,7 +108,7 @@ namespace Application.Groups.Commands.CreateGroup
             group.GroupMemberships.Add(membership);
 
             await _uow.GroupsWrite.AddAsync(group, cancellationToken);
-            
+
             await _uow.CommitAsync(cancellationToken);
 
             return new BaseGroupResponse
@@ -123,6 +122,7 @@ namespace Application.Groups.Commands.CreateGroup
                 SizePreset = group.SizePreset.ToString(),
                 MaxMembers = group.MaxMembers,
                 MaxModerators = group.MaxModerators,
+                CanJoin = false,
                 CreatedAt = group.CreatedAt,
             };
         }

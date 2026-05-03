@@ -78,7 +78,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new GetAllPublicGroupsCommand();
+            var command = new GetAllPublicGroupsCommand(userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -97,7 +97,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new GetGroupByIdCommand(groupId);
+            var command = new GetGroupByIdCommand(groupId, userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
