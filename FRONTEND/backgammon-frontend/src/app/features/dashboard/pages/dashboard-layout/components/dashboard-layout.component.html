@@ -1,49 +1,89 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-  <a class="navbar-brand" routerLink="/">Backgammon</a>
+<nav class="app-navbar">
+  <!-- BRAND -->
+  <div class="nav-left">
+    <a class="brand" routerLink="/">Backgammon</a>
 
-  <ul class="navbar-nav ms-auto">
+    <div class="nav-links">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Home
+      </a>
+
+      <a
+        [routerLink]="['/', AppRoutes.backgammonRules]"
+        routerLinkActive="active"
+      >
+        Rules
+      </a>
+
+      <a
+        [routerLink]="['/', AppRoutes.backgammonHistory]"
+        routerLinkActive="active"
+      >
+        History
+      </a>
+
+      <ng-container *ngIf="isLoggedIn">
+        <a [routerLink]="['/', AppRoutes.sessions]" routerLinkActive="active">
+          Sessions
+        </a>
+
+        <a [routerLink]="['/', AppRoutes.groups]" routerLinkActive="active">
+          Groups
+        </a>
+
+        <a
+          [routerLink]="['/', AppRoutes.tournaments]"
+          routerLinkActive="active"
+        >
+          Tournaments
+        </a>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="nav-right">
     <ng-container *ngIf="!isLoggedIn">
-      <li class="nav-item">
-        <button class="btn btn-link nav-link" (click)="openLogin()">
-          Login
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="btn btn-link nav-link" (click)="openRegister()">
-          Register
-        </button>
-      </li>
+      <button class="btn ghost" (click)="openLogin()">Login</button>
+      <button class="btn primary" (click)="openRegister()">Register</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn">
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/', AppRoutes.sessions]"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          >Game Sessions</a
-        >
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/', AppRoutes.profile]"
-          routerLinkActive="active"
-          >Profile</a
-        >
-      </li>
-      <li class="nav-item">
-        <button class="btn btn-sm btn-outline-light ms-2" (click)="logout()">
-          Logout
-        </button>
-      </li>
+      <a
+        class="profile-link"
+        [routerLink]="['/', AppRoutes.profile]"
+        routerLinkActive="active"
+      >
+        Profile
+      </a>
+
+      <button class="btn outline" (click)="logout()">Logout</button>
     </ng-container>
-  </ul>
+  </div>
 </nav>
 
-<!-- Main content -->
-<router-outlet></router-outlet>
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="app-footer">
+  <div class="footer-content">
+    <span>© {{ currentYear }} Backgammon App</span>
+
+    <div class="footer-links">
+      <a routerLink="/rules">Rules</a>
+      <a routerLink="/history">History</a>
+      <a routerLink="/groups">Groups</a>
+      <a routerLink="/tournaments">Tournaments</a>
+    </div>
+
+    <span class="muted">Built with Angular</span>
+  </div>
+</footer>
 
 <!-- Modal overlay -->
 <div
@@ -52,17 +92,24 @@
   (click)="closeModal()"
 >
   <div class="modal-card" (click)="$event.stopPropagation()">
-    <button class="close-btn" (click)="closeModal()">✕</button>
+    <!-- HEADER -->
+    <div class="modal-header">
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
 
-    <app-login
-      *ngIf="showLogin"
-      (close)="closeModal()"
-      (switchToRegister)="openRegister()"
-    ></app-login>
-    <app-registration
-      *ngIf="showRegister"
-      (close)="closeModal()"
-      (switchToLogin)="openLogin()"
-    ></app-registration>
+    <!-- CONTENT -->
+    <div class="modal-body">
+      <app-login
+        *ngIf="showLogin"
+        (close)="closeModal()"
+        (switchToRegister)="openRegister()"
+      ></app-login>
+
+      <app-registration
+        *ngIf="showRegister"
+        (close)="closeModal()"
+        (switchToLogin)="openLogin()"
+      ></app-registration>
+    </div>
   </div>
 </div>

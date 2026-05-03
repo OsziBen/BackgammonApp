@@ -1,8 +1,26 @@
-<h2>Dashboard</h2>
+<div class="home-hero">
+  <h1>Backgammon Platform</h1>
 
-<p>{{ status }}</p>
+  <p>Play games, join tournaments, manage groups and track your progress.</p>
 
-<p>
-  Welcome to the Backgammon platform. You can play games, view leaderboards and
-  manage your profile.
-</p>
+  <div class="home-actions">
+    <a
+      [routerLink]="['/', AppRoutes.sessions]"
+      routerLinkActive="active"
+      class="btn-primary"
+      >Start Game</a
+    >
+    <a
+      [routerLink]="['/', AppRoutes.groups]"
+      routerLinkActive="active"
+      class="btn-secondary"
+      >Groups</a
+    >
+    <a
+      [routerLink]="['/', AppRoutes.tournaments]"
+      routerLinkActive="active"
+      class="btn-secondary"
+      >Tournaments</a
+    >
+  </div>
+</div>
