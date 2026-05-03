@@ -1,0 +1,72 @@
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #335533;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-grid input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.form-grid input:focus {
+  outline: none;
+  border-color: #335533;
+  background: white;
+}
+
+.form-grid button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+
+  background: #335533;
+  color: white;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: 0.15s ease;
+}
+
+.form-grid button:hover {
+  background: #2a442a;
+}
+
+.form-grid button:disabled {
+  background: #b5b5b5;
+  color: #eee;
+
+  cursor: not-allowed;
+  opacity: 0.7;
+
+  transform: none;
+  box-shadow: none;
+}
+
+.form-grid button:disabled:hover {
+  background: #b5b5b5;
+}
+
+.error-box {
+  color: #e53935;
+  font-size: 12px;
+  background: #ffecec;
+  padding: 8px;
+  border-radius: 8px;
+}

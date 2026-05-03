@@ -1,0 +1,75 @@
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #335533;
+}
+
+/* INFO BLOCK */
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  font-size: 14px;
+  color: #333;
+}
+
+/* SUB TITLE */
+.sub-title {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+/* SETTINGS GRID */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  font-size: 14px;
+  color: #444;
+}
+
+.settings-grid span {
+  font-weight: 600;
+}
+
+/* ACTIONS */
+.session-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.session-actions button {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  font-weight: 600;
+}
+
+/* PRIMARY */
+.btn-secondary {
+  background: #aa7744;
+  color: white;
+}
+
+/* DANGER */
+.btn-danger {
+  background: #e53935;
+  color: white;
+}
+
+.session-actions button:hover {
+  opacity: 0.9;
+}

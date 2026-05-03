@@ -1,36 +1,47 @@
 <section class="waiting-room">
   <!-- ERROR -->
-  <div *ngIf="store.error()" class="error">
+  <div *ngIf="store.error()" class="error-box">
     {{ store.error() }}
   </div>
 
   <!-- CONNECTING -->
-  <div *ngIf="store.connectionState() === ConnectionState.Connecting">
-    <h2>Connecting to session...</h2>
+  <div
+    *ngIf="store.connectionState() === ConnectionState.Connecting"
+    class="card"
+  >
+    <h2>Connecting...</h2>
+    <p>Please wait while we join the session.</p>
   </div>
 
-  <!-- CONNECTED -->
+  <!-- WAITING ROOM -->
   <div
     *ngIf="
       store.connectionState() === ConnectionState.Connected &&
       store.isWaitingRoom()
     "
+    class="card"
   >
-    <h2>Waiting Room</h2>
-    <p>
-      Session Code: <strong>{{ store.snapshot()?.sessionCode }}</strong>
-    </p>
-    <p *ngIf="isHost()">You are the host.</p>
+    <div class="header">
+      <h2>Waiting Room</h2>
+      <span class="session-code">
+        {{ store.snapshot()?.sessionCode }}
+      </span>
+    </div>
 
-    <h3>Players</h3>
-    <ul>
-      <li *ngFor="let player of players()">
-        {{ player.playerId }}
-        <span *ngIf="player.playerId === localPlayerId()"> (You) </span>
-      </li>
-    </ul>
+    <p class="role" *ngIf="isHost()">You are the host</p>
 
-    <button (click)="leave()">Leave session</button>
+    <div class="players">
+      <h3>Players</h3>
+
+      <ul>
+        <li *ngFor="let player of players()">
+          {{ player.playerId }}
+          <span *ngIf="player.playerId === localPlayerId()"> (You) </span>
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn-leave" (click)="leave()">Leave session</button>
   </div>
 
   <!-- DISCONNECTED -->
@@ -39,6 +50,7 @@
       store.connectionState() === ConnectionState.Disconnected &&
       store.hasSnapshot()
     "
+    class="card"
   >
     <h2>Disconnected</h2>
     <p>Connection closed.</p>

@@ -1,29 +1,31 @@
-<h1>Game Session</h1>
+<div class="session-page">
+  <h1 class="page-title">Game Sessions</h1>
 
-<div *ngIf="loading()">Loading...</div>
+  <div *ngIf="loading()" class="info-text">Loading...</div>
 
-<div *ngIf="error()" style="color: red">
-  {{ error() }}
+  <div *ngIf="error()" class="error-box">
+    {{ error() }}
+  </div>
+
+  <!-- JOIN (always visible) -->
+  <div class="card">
+    <app-join-game-session (joinSession)="onJoinSession($event)">
+    </app-join-game-session>
+  </div>
+
+  <!-- ACTIVE SESSION -->
+  <div class="card" *ngIf="activeSession()">
+    <app-active-game-session
+      [session]="activeSession()!"
+      (deleteSession)="onDeleteSession($event)"
+      (joinSession)="onJoinSession($event)"
+    >
+    </app-active-game-session>
+  </div>
+
+  <!-- CREATE SESSION -->
+  <div class="card" *ngIf="!activeSession() && !loading()">
+    <app-create-game-session (sessionCreated)="onSessionCreated($event)">
+    </app-create-game-session>
+  </div>
 </div>
-
-<!-- JOIN mindig elérhető -->
-<app-join-game-session
-  (joinSession)="onJoinSession($event)"
-></app-join-game-session>
-
-<hr />
-
-<!-- nincs aktív session -->
-<app-create-game-session
-  *ngIf="!activeSession() && !loading()"
-  (sessionCreated)="onSessionCreated($event)"
-></app-create-game-session>
-
-<!-- VAN aktív session -->
-<app-active-game-session
-  *ngIf="activeSession()"
-  [session]="activeSession()!"
-  (deleteSession)="onDeleteSession($event)"
-  (joinSession)="onJoinSession($event)"
->
-</app-active-game-session>

@@ -11,6 +11,7 @@ import { AppRoutes } from '../../../../app.routes';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './session-waiting-room.component.html',
+  styleUrls: ['./session-waiting-room.component.css'],
 })
 export class SessionWaitingRoomComponent {
   readonly ConnectionState = ConnectionState;

@@ -1,19 +1,22 @@
-<section class="join-panel">
-  <h2>Join Session</h2>
+<div class="card-section">
+  <div class="section-title">Join Session</div>
 
-  <div *ngIf="store.error()" class="error">
+  <div *ngIf="store.error()" class="error-box">
     {{ store.error() }}
   </div>
 
-  <form [formGroup]="form" (ngSubmit)="onJoin()">
+  <form [formGroup]="form" (ngSubmit)="onJoin()" class="form-grid">
     <input
       type="text"
       placeholder="Session code"
       formControlName="sessionCode"
     />
 
-    <button type="submit" [disabled]="form.invalid || isLoading()">
-      {{ isLoading() ? 'Joining...' : 'Join' }}
+    <button
+      type="submit"
+      [disabled]="form.get('sessionCode')?.invalid || isLoading()"
+    >
+      {{ isLoading() ? 'Joining...' : 'Join session' }}
     </button>
   </form>
-</section>
+</div>

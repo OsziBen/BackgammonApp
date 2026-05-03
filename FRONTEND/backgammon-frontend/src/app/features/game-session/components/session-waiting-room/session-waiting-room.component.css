@@ -1,0 +1,97 @@
+.waiting-room {
+  max-width: 700px;
+  margin: auto;
+  padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ERROR */
+.error-box {
+  color: #e53935;
+  background: #ffecec;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  color: #335533;
+}
+
+.session-code {
+  background: #335533;
+  color: white;
+
+  padding: 4px 10px;
+  border-radius: 8px;
+
+  font-size: 13px;
+}
+
+/* ROLE */
+.role {
+  margin-top: 6px;
+  color: #aa7744;
+  font-weight: 600;
+}
+
+/* PLAYERS */
+.players {
+  margin-top: 12px;
+}
+
+.players ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.players li {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+/* BUTTON */
+.btn-leave {
+  margin-top: 16px;
+  padding: 10px;
+
+  background: #e53935;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-weight: 600;
+
+  transition: 0.15s ease;
+}
+
+.btn-leave:hover {
+  opacity: 0.9;
+}

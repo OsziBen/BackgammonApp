@@ -7,6 +7,7 @@ import { GetActiveSessionResponse } from '../../models/api/responses/get-active-
   standalone: true,
   imports: [CommonModule],
   templateUrl: './active-game-session.component.html',
+  styleUrls: ['./active-game-session.component.css'],
 })
 export class ActiveGameSessionComponent {
   @Input({ required: true })

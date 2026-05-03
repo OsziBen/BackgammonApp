@@ -1,0 +1,39 @@
+.form-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #335533;
+  margin-bottom: 12px;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-grid input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.checkbox {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-grid button {
+  margin-top: 10px;
+  padding: 10px;
+
+  background: #335533;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
