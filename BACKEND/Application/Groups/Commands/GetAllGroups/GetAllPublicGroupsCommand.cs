@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Application.Groups.Commands.GetAllGroups
 {
-    public record GetAllPublicGroupsCommand() : IRequest<List<BaseGroupResponse>>;
+    public record GetAllPublicGroupsCommand(Guid UserId) : IRequest<List<BaseGroupResponse>>;
 }

@@ -9,10 +9,13 @@ namespace Domain.Tournament
         public string? Description { get; set; }
 
         public TournamentType Type { get; set; }
+        public TournamentVisibility Visibility { get; set; }
         public TournamentStatus Status { get; set; }
+        public int MaxParticipants { get; set; }
 
         public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset? EndDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+        public DateTimeOffset Deadline { get; set; }
 
         public Guid OrganizerUserId { get; set; }
         public Guid RulesTemplateId { get; set; }
@@ -20,11 +23,13 @@ namespace Domain.Tournament
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
+        public DateTimeOffset? FinishedAt { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }
 
 
         public User.User OrganizerUser { get; set; } = null!;
         public RulesTemplate.RulesTemplate RulesTemplate { get; set; } = null!;
+        public ICollection<TournamentJoinRequest.TournamentJoinRequest> JoinRequests { get; set; } = [];
         public ICollection<TournamentParticipant.TournamentParticipant> Participants { get; set; } = [];
         public ICollection<TournamentRound.TournamentRound> Rounds { get; set; } = [];
         public ICollection<TournamentStanding.TournamentStanding> Standings { get; set; } = [];

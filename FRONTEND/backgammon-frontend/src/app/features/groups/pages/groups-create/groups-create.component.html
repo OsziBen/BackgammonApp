@@ -1,0 +1,6 @@
+<h2 class="section-title">Create Group</h2>
+
+<app-group-form (submitted)="onSubmit($event)"></app-group-form>
+
+<div *ngIf="loading()" class="info-text">Creating group...</div>
+<div *ngIf="error()" class="error-box">{{ error() }}</div>

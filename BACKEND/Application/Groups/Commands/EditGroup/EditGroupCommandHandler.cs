@@ -64,6 +64,7 @@ namespace Application.Groups.Commands.EditGroup
                 SizePreset = group.SizePreset.ToString(),
                 MaxMembers = group.MaxMembers,
                 MaxModerators = group.MaxModerators,
+                CanJoin = false,
                 CreatedAt = group.CreatedAt,
             };
         }

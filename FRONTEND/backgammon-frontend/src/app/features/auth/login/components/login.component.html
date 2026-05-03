@@ -1,47 +1,51 @@
-<div class="mb-4">
-  <h2 class="text-success">Sing in</h2>
-  <div>
-    Don't have an account?
-    <a (click)="onSwitchToRegister()" class="auth-link">Sign up</a>
+<div class="auth-card">
+  <div class="auth-header">
+    <h2>Sign in</h2>
+    <p>
+      Don't have an account?
+      <a class="auth-link" (click)="onSwitchToRegister()">Sign up</a>
+    </p>
   </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+    <div class="mb-3">
+      <input
+        type="email"
+        class="form-control bg-body-secondary"
+        placeholder="Email"
+        formControlName="emailAddress"
+      />
+      <div
+        class="error-feedback"
+        *ngIf="
+          hasDisplayableError('email') &&
+          form.get('email')?.hasError('required')
+        "
+      >
+        Please enter your email address.
+      </div>
+    </div>
+    <div class="mb-3">
+      <input
+        type="password"
+        class="form-control bg-body-secondary"
+        placeholder="Password"
+        formControlName="password"
+      />
+      <div
+        class="error-feedback"
+        *ngIf="
+          hasDisplayableError('password') &&
+          form.get('password')?.hasError('required')
+        "
+      >
+        Please enter your password.
+      </div>
+    </div>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success w-100 rounded-3">
+        Sign in
+      </button>
+    </div>
+  </form>
 </div>
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="mb-3">
-    <input
-      type="email"
-      class="form-control bg-body-secondary"
-      placeholder="Email"
-      formControlName="emailAddress"
-    />
-    <div
-      class="error-feedback"
-      *ngIf="
-        hasDisplayableError('email') && form.get('email')?.hasError('required')
-      "
-    >
-      Please enter your email address.
-    </div>
-  </div>
-  <div class="mb-3">
-    <input
-      type="password"
-      class="form-control bg-body-secondary"
-      placeholder="Password"
-      formControlName="password"
-    />
-    <div
-      class="error-feedback"
-      *ngIf="
-        hasDisplayableError('password') &&
-        form.get('password')?.hasError('required')
-      "
-    >
-      Please enter your password.
-    </div>
-  </div>
-  <div class="mt-4">
-    <button type="submit" class="btn btn-success w-100 rounded-3">
-      Sign in
-    </button>
-  </div>
-</form>

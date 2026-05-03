@@ -24,6 +24,8 @@ export class DashboardLayoutComponent {
   showLogin = false;
   showRegister = false;
 
+  readonly currentYear = new Date().getUTCFullYear();
+
   constructor(
     public authService: AuthService,
     private router: Router,

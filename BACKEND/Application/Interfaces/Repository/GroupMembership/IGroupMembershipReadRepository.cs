@@ -5,6 +5,7 @@
         Task<string?> GetUserRoleAsync(Guid userId, Guid groupId, CancellationToken cancellationToken);
         Task<bool> ExistsAsync(Guid userId, Guid groupId, CancellationToken cancellationToken);
         Task<List<Domain.GroupMembership.GroupMembership>> GetUsersByGroupIdAsync(Guid groupId, CancellationToken cancellationToken);
+        Task<List<Domain.GroupMembership.GroupMembership>> GetMembershipsByUserIdAsync(Guid userId, CancellationToken cancellationToken);
         Task<Domain.GroupMembership.GroupMembership?> GetAsync(Guid userId, Guid groupId, CancellationToken cancellationToken);
     }
 }

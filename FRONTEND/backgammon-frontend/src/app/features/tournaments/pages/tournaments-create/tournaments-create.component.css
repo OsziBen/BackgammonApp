@@ -1,0 +1,18 @@
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #335533;
+}
+
+.info-text {
+  color: #777;
+  margin-top: 10px;
+}
+
+.error-box {
+  color: #e53935;
+  background: #ffecec;
+  padding: 10px;
+  border-radius: 8px;
+}

@@ -14,6 +14,7 @@ import { ConnectionState } from '../../models/enums/connection-state.enum';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './join-game-session.component.html',
+  styleUrls: ['./join-game-session.component.css'],
 })
 export class JoinSessionComponent {
   form: FormGroup;
@@ -23,7 +24,15 @@ export class JoinSessionComponent {
     public readonly store: GameSessionStore,
   ) {
     this.form = this.fb.group({
-      sessionCode: ['', [Validators.required, Validators.minLength(6)]],
+      sessionCode: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(6),
+          Validators.pattern(/^[a-zA-Z0-9]{6}$/),
+        ],
+      ],
     });
   }
 

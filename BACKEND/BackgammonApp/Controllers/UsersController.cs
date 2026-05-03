@@ -1,4 +1,5 @@
 ﻿using Application.Groups.Commands.RejectJoinRequest;
+using Application.Groups.Responses;
 using Application.Interfaces.Common;
 using Application.Users.Commands.ListGroupJoinRequestsByUserId;
 using Application.Users.Commands.ListUserGroups;
@@ -48,7 +49,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(UserConstants.Groups)]
-        public async Task<ActionResult> GetAllGroupsAsync(
+        public async Task<ActionResult<List<BaseGroupResponse>>> GetAllGroupsAsync(
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;
@@ -66,7 +67,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(UserConstants.GroupJoinRequests)]
-        public async Task<ActionResult> GetAllGroupJoinRequestsAsync(
+        public async Task<ActionResult<List<UserGroupJoinRequestResponse>>> GetAllGroupJoinRequestsAsync(
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;

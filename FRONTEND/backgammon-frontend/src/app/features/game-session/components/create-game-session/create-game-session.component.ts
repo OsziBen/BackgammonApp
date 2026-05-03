@@ -8,6 +8,7 @@ import { GameSessionSettings } from '../../models/game-session-settings.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-game-session.component.html',
+  styleUrls: ['./create-game-session.component.css'],
 })
 export class CreateGameSessionComponent implements OnInit {
   @Output()

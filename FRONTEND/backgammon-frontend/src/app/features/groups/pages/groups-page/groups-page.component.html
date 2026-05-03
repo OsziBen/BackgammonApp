@@ -1,0 +1,18 @@
+<div class="page-container groups-page">
+  <h1 class="page-title">Groups</h1>
+
+  <nav class="tab-nav">
+    <a [routerLink]="[routes.groupsAll]" routerLinkActive="active">All</a>
+    <a [routerLink]="[routes.groupsMy]" routerLinkActive="active">My</a>
+    <a [routerLink]="[routes.groupsJoinRequests]" routerLinkActive="active">
+      Join requests
+    </a>
+    <a [routerLink]="[routes.groupsCreate]" routerLinkActive="active">
+      Create
+    </a>
+  </nav>
+
+  <div class="page-content card">
+    <router-outlet></router-outlet>
+  </div>
+</div>

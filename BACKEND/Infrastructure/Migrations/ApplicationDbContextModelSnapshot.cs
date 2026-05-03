@@ -1095,6 +1095,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset>("Deadline")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1102,7 +1105,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<DateTimeOffset?>("EndDate")
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("FinishedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
@@ -1112,6 +1118,11 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MaxParticipants")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1133,13 +1144,57 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.Property<int>("Visibility")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("OrganizerUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RulesTemplateId");
 
+                    b.HasIndex("OrganizerUserId", "Name")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
                     b.ToTable("Tournaments");
+                });
+
+            modelBuilder.Entity("Domain.TournamentJoinRequest.TournamentJoinRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ReviewedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "TournamentId")
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 0");
+
+                    b.ToTable("TournamentJoinRequests");
                 });
 
             modelBuilder.Entity("Domain.TournamentPairing.TournamentPairing", b =>
@@ -1956,6 +2011,32 @@ namespace Infrastructure.Migrations
                     b.Navigation("RulesTemplate");
                 });
 
+            modelBuilder.Entity("Domain.TournamentJoinRequest.TournamentJoinRequest", b =>
+                {
+                    b.HasOne("Domain.User.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Tournament.Tournament", "Tournament")
+                        .WithMany("JoinRequests")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User.User", "User")
+                        .WithMany("TournamentJoinRequests")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedByUser");
+
+                    b.Navigation("Tournament");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.TournamentPairing.TournamentPairing", b =>
                 {
                     b.HasOne("Domain.TournamentParticipant.TournamentParticipant", "BlackParticipant")
@@ -2125,6 +2206,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Tournament.Tournament", b =>
                 {
+                    b.Navigation("JoinRequests");
+
                     b.Navigation("Participants");
 
                     b.Navigation("Rounds");
@@ -2171,6 +2254,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("Reactions");
 
                     b.Navigation("RulesTemplates");
+
+                    b.Navigation("TournamentJoinRequests");
 
                     b.Navigation("TournamentParticipations");
                 });

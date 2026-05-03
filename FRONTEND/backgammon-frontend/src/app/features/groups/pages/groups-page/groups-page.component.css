@@ -1,0 +1,47 @@
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #335533;
+  margin-bottom: 16px;
+}
+
+/* ===== TAB NAV ===== */
+.tab-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tab-nav a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: #335533;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.15s;
+}
+
+.tab-nav a:hover {
+  background: #e8efe8;
+}
+
+.tab-nav a.active {
+  background: #335533;
+  color: white;
+}
+
+/* ===== CONTENT WRAPPER ===== */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}

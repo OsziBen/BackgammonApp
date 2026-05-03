@@ -1,43 +1,45 @@
-<h2>Active Game Session</h2>
+<div class="card-section">
+  <div class="section-title">Active Session</div>
 
-<p><strong>Session code:</strong> {{ session.sessionCode }}</p>
-<p><strong>Session ID:</strong> {{ session.sessionId }}</p>
-<p>
-  <strong>Created at:</strong>
-  {{ session.createdAt | date: 'medium' }}
-</p>
+  <div class="session-info">
+    <div><strong>Session code:</strong> {{ session.sessionCode }}</div>
+    <div><strong>Session ID:</strong> {{ session.sessionId }}</div>
+    <div>
+      <strong>Created at:</strong>
+      {{ session.createdAt | date: 'MMM d, yyyy • HH:mm' }}
+    </div>
+  </div>
 
-<h3>Settings</h3>
+  <div class="sub-title">Settings</div>
 
-<ul>
-  <li>
-    <strong>Target points:</strong>
-    {{ session.settings.targetPoints }}
-  </li>
+  <div class="settings-grid">
+    <div><span>Target points:</span> {{ session.settings.targetPoints }}</div>
 
-  <li>
-    <strong>Doubling cube:</strong>
-    {{ session.settings.doublingCubeEnabled ? 'Enabled' : 'Disabled' }}
-  </li>
+    <div>
+      <span>Doubling cube:</span>
+      {{ session.settings.doublingCubeEnabled ? 'Enabled' : 'Disabled' }}
+    </div>
 
-  <li>
-    <strong>Crawford rule:</strong>
-    {{ session.settings.crawfordRuleEnabled ? 'Enabled' : 'Disabled' }}
-  </li>
+    <div>
+      <span>Crawford rule:</span>
+      {{ session.settings.crawfordRuleEnabled ? 'Enabled' : 'Disabled' }}
+    </div>
 
-  <li>
-    <strong>Clock:</strong>
-    {{ session.settings.clockEnabled ? 'Enabled' : 'Disabled' }}
-  </li>
+    <div>
+      <span>Clock:</span>
+      {{ session.settings.clockEnabled ? 'Enabled' : 'Disabled' }}
+    </div>
 
-  <li *ngIf="session.settings.clockEnabled">
-    <strong>Clock settings:</strong>
-    {{ session.settings.matchTimePerPlayerInSeconds }}s +
-    {{ session.settings.startOfTurnDelayPerPlayerInSeconds }}s / move
-  </li>
-</ul>
+    <div *ngIf="session.settings.clockEnabled">
+      <span>Clock settings:</span>
+      {{ session.settings.matchTimePerPlayerInSeconds }}s +
+      {{ session.settings.startOfTurnDelayPerPlayerInSeconds }}s / move
+    </div>
+  </div>
 
-<hr />
+  <div class="session-actions">
+    <button class="btn-secondary" (click)="join()">Join session</button>
 
-<button (click)="join()">Join session</button>
-<button (click)="onDelete()">Delete session</button>
+    <button class="btn-danger" (click)="onDelete()">Delete session</button>
+  </div>
+</div>

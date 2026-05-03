@@ -1,0 +1,17 @@
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.card-item {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: white;
+}
+
+.muted {
+  color: #777;
+  font-size: 12px;
+}

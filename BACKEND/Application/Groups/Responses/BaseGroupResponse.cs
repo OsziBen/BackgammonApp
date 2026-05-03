@@ -14,6 +14,8 @@
         public int MaxMembers { get; set; }
         public int MaxModerators { get; set; }
 
+        public bool CanJoin { get; set; }
+
         public DateTimeOffset CreatedAt { get; set; }
     }
 }

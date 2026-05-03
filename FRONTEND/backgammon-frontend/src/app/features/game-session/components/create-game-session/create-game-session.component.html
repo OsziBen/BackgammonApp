@@ -1,51 +1,38 @@
-<h2>Create Game Session</h2>
+<div class="form-title">Create Game Session</div>
 
-<form [formGroup]="form">
-  <div>
-    <label>
-      Target points:
-      <input type="number" formControlName="targetPoints" />
-    </label>
-  </div>
+<form [formGroup]="form" class="form-grid">
+  <input
+    type="number"
+    placeholder="Target points"
+    formControlName="targetPoints"
+  />
 
-  <div>
-    <label>
-      <input type="checkbox" formControlName="doublingCubeEnabled" />
-      Doubling cube enabled
-    </label>
-  </div>
+  <label class="checkbox">
+    <input type="checkbox" formControlName="doublingCubeEnabled" />
+    Doubling cube enabled
+  </label>
 
-  <fieldset style="margin-top: 1rem">
-    <legend>Clock</legend>
+  <label class="checkbox">
+    <input type="checkbox" formControlName="clockEnabled" />
+    Clock enabled
+  </label>
 
-    <label>
-      <input type="checkbox" formControlName="clockEnabled" />
-      Enable clock
-    </label>
+  <input
+    type="number"
+    placeholder="Match time (seconds)"
+    formControlName="matchTimePerPlayerInSeconds"
+  />
 
-    <div>
-      <input
-        type="number"
-        placeholder="Match time (seconds)"
-        formControlName="matchTimePerPlayerInSeconds"
-      />
-    </div>
+  <input
+    type="number"
+    placeholder="Turn delay (seconds)"
+    formControlName="startOfTurnDelayPerPlayerInSeconds"
+  />
 
-    <div>
-      <input
-        type="number"
-        placeholder="Turn delay (seconds)"
-        formControlName="startOfTurnDelayPerPlayerInSeconds"
-      />
-    </div>
-  </fieldset>
+  <label class="checkbox">
+    <input type="checkbox" formControlName="crawfordRuleEnabled" />
+    Crawford rule enabled
+  </label>
 
-  <div>
-    <label>
-      <input type="checkbox" formControlName="crawfordRuleEnabled" />
-      Crawford rule enabled
-    </label>
-  </div>
-
-  <button type="button" (click)="create()">Create</button>
+  <button type="button" (click)="create()">Create session</button>
 </form>

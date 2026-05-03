@@ -1,0 +1,41 @@
+.home-hero {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.home-hero h1 {
+  font-size: 36px;
+  color: #335533;
+  margin-bottom: 10px;
+}
+
+.home-hero p {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.home-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #335533;
+  color: white;
+}
+
+.btn-secondary {
+  background: #aa7744;
+  color: white;
+}

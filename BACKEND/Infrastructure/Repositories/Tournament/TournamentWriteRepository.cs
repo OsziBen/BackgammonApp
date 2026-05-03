@@ -11,5 +11,8 @@ namespace Infrastructure.Repositories.Tournament
         {
             _context = context;
         }
+
+        public async Task AddAsync(Domain.Tournament.Tournament tournament, CancellationToken cancellationToken)
+            => await _context.Tournaments.AddAsync(tournament, cancellationToken);
     }
 }

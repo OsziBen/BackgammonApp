@@ -218,10 +218,10 @@ export class GameSessionFacade {
       return;
     }
 
-    if (!moves || moves.length === 0) {
-      console.warn('No moves provided');
-      return;
-    }
+    // if (!moves || moves.length === 0) {
+    //   console.warn('No moves provided');
+    //   return;
+    // }
 
     try {
       await this.signalRService.invoke(

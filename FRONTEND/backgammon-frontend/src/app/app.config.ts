@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideToastr({
-      positionClass: 'toast-top-center',
+      positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
   ],

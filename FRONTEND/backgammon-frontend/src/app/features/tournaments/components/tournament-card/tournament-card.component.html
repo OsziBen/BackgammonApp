@@ -1,0 +1,66 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="title">{{ tournament.name }}</h3>
+    <span class="status">{{ tournament.status }}</span>
+  </div>
+
+  <p class="description">{{ tournament.description }}</p>
+
+  <div class="meta-grid">
+    <div class="meta-item">
+      <span class="label">Organizer:</span>
+      <span class="value">{{ tournament.organizerUserName }}</span>
+    </div>
+
+    <div class="meta-item">
+      <span class="label">Type:</span>
+      <span class="value">{{ tournament.type }}</span>
+    </div>
+
+    <div class="meta-item">
+      <span class="label">Visibility:</span>
+      <span class="value">{{ tournament.visibility }}</span>
+    </div>
+
+    <div class="meta-item">
+      <span class="label">Max participants:</span>
+      <span class="value">{{ tournament.maxParticipants }}</span>
+    </div>
+  </div>
+
+  <div class="date-grid">
+    <div class="meta-item">
+      <span class="label">Start:</span>
+      <span class="value">{{
+        tournament.startDate | date: 'yyyy. MMM d. HH:mm'
+      }}</span>
+    </div>
+
+    <div class="meta-item">
+      <span class="label">End:</span>
+      <span class="value">{{
+        tournament.endDate | date: 'yyyy. MMM d. HH:mm'
+      }}</span>
+    </div>
+
+    <div class="meta-item full">
+      <span class="label">Deadline:</span>
+      <span class="value">{{
+        tournament.deadline | date: 'yyyy. MMM d. HH:mm'
+      }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    @if (canJoin()) {
+      <button class="primary" (click)="onJoin()">Join</button>
+    } @else {
+      <button (click)="onView()">View</button>
+    }
+    @if (!canJoin()) {
+      <button class="primary" (click)="onJoin()">Join</button>
+    } @else {
+      <button (click)="onView()">View</button>
+    }
+  </div>
+</div>

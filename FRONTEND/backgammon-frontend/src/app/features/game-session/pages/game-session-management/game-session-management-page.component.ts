@@ -22,6 +22,7 @@ import { AuthService } from '../../../../shared/services/auth.service';
     JoinSessionComponent,
   ],
   templateUrl: './game-session-management-page.component.html',
+  styleUrls: ['./game-session-management-page.component.css'],
 })
 export class GameSessionManagementPageComponent implements OnInit {
   // STATE

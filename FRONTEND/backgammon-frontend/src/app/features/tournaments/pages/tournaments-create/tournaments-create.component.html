@@ -1,0 +1,6 @@
+<h2 class="section-title">Create Tournament</h2>
+
+<app-tournament-form (submitted)="onSubmit($event)"></app-tournament-form>
+
+<div *ngIf="loading()" class="info-text">Creating tournament...</div>
+<div *ngIf="error()" class="error-box">{{ error() }}</div>

@@ -1,0 +1,13 @@
+<h2 class="section-title">All Groups</h2>
+
+<div *ngIf="loading()" class="info-text">Loading groups...</div>
+
+<div *ngIf="error()" class="error-box">{{ error() }}</div>
+
+<div *ngIf="!loading() && !error()" class="card-grid">
+  <app-group-card
+    *ngFor="let group of groups(); trackBy: trackById"
+    [group]="group"
+    (join)="onJoin($event)"
+  />
+</div>

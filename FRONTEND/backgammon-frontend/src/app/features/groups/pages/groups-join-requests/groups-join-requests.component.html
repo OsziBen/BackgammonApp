@@ -1,0 +1,17 @@
+<h2 class="section-title">Join Requests</h2>
+
+<div *ngIf="loading()" class="info-text">Loading requests...</div>
+<div *ngIf="error()" class="error-box">{{ error() }}</div>
+
+<div *ngIf="!loading() && !error()" class="card-grid">
+  <div class="card-item" *ngFor="let req of requests()">
+    <h3>{{ req.groupName }}</h3>
+
+    <p>
+      Status:
+      <strong>{{ req.status }}</strong>
+    </p>
+
+    <p class="muted">Requested at: {{ req.createdAt | date: 'medium' }}</p>
+  </div>
+</div>

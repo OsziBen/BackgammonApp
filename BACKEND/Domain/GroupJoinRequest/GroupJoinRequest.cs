@@ -1,4 +1,4 @@
-﻿using Common.Enums;
+﻿using Common.Enums.Group;
 using Common.Models;
 
 namespace Domain.GroupJoinRequest
