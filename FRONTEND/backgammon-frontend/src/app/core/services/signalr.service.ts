@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SessionUpdatedMessage } from '../../features/game-session/models/api/session-updated-message.model';
 import { HUB_EVENTS } from '../../shared/utils/constants/hub.constants';
