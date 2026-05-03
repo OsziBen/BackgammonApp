@@ -1,0 +1,33 @@
+<form class="form-card" (ngSubmit)="submit()">
+  <div class="form-title">Create Group</div>
+
+  <label class="form-field">
+    <span>Name</span>
+    <input [(ngModel)]="model.name" name="name" required />
+  </label>
+
+  <label class="form-field">
+    <span>Description</span>
+    <textarea [(ngModel)]="model.description" name="description"></textarea>
+  </label>
+
+  <label class="form-field">
+    <span>Visibility</span>
+    <select [(ngModel)]="model.visibility" name="visibility">
+      @for (v of visibilityOptions; track v) {
+        <option [value]="v">{{ v }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="form-field">
+    <span>Size</span>
+    <select [(ngModel)]="model.sizePreset" name="sizePreset">
+      @for (s of sizeOptions; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </label>
+
+  <button class="btn primary full" type="submit">Create</button>
+</form>

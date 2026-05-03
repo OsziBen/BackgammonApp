@@ -1,0 +1,53 @@
+.form-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #335533;
+  margin-bottom: 4px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field span {
+  font-size: 13px;
+  color: #555;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+
+  font-size: 14px;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #335533;
+  background: white;
+}
+
+.btn.full {
+  width: 100%;
+  margin-top: 8px;
+}

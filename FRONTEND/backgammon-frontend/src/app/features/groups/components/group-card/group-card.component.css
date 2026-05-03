@@ -1,0 +1,68 @@
+.group-card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #335533;
+  margin: 0;
+}
+
+.group-description {
+  font-size: 14px;
+  color: #444;
+  margin: 0;
+}
+
+.group-meta {
+  font-size: 13px;
+  color: #666;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.group-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+/* BUTTON SYSTEM */
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  font-weight: 500;
+  transition: 0.15s;
+}
+
+.btn.primary {
+  background: #335533;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #2a442a;
+}
+
+.btn.secondary {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn.secondary:hover {
+  background: #e0e0e0;
+}

@@ -1,0 +1,19 @@
+<h3 class="section-title">Members</h3>
+
+<div class="card-grid">
+  @for (m of [1, 2, 3, 4, 5]; track m) {
+    <div class="card-item">
+      <p>
+        <strong>Player {{ m }}</strong>
+      </p>
+      <p class="muted">Role: Member</p>
+    </div>
+  }
+</div>
+
+<div *ngIf="role === 'Owner'" class="actions">
+  <button>Add Member</button>
+  <button>Promote</button>
+  <button>Demote</button>
+  <button class="danger">Remove</button>
+</div>

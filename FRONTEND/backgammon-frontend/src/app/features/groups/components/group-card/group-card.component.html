@@ -1,0 +1,24 @@
+<div class="group-card">
+  <h3 class="group-title">{{ group.name }}</h3>
+
+  <p class="group-description">{{ group.description }}</p>
+
+  <div class="group-meta">
+    <p><strong>Creator:</strong> {{ group.creatorName }}</p>
+    <p><strong>Visibility:</strong> {{ group.visibility }}</p>
+    <p><strong>Members:</strong> {{ group.maxMembers }}</p>
+  </div>
+
+  <div class="group-actions">
+    @if (group.canJoin) {
+      <button class="btn primary" (click)="onJoin()">Join</button>
+    } @else {
+      <button class="btn secondary" (click)="onView()">View</button>
+    }
+    @if (!group.canJoin) {
+      <button class="btn primary" (click)="onJoin()">Join</button>
+    } @else {
+      <button class="btn secondary" (click)="onView()">View</button>
+    }
+  </div>
+</div>
