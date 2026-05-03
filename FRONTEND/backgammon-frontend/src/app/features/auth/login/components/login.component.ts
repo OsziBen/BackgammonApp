@@ -18,7 +18,7 @@ import { AuthResponse } from '../../../../shared/models/auth-response.models';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styles: ``,
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
   @Output() close = new EventEmitter<void>();

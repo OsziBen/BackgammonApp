@@ -19,6 +19,7 @@ import { RegisterRequest } from '../models/register-request.model';
   selector: 'app-registration',
   imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css'],
 })
 export class RegistrationComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
