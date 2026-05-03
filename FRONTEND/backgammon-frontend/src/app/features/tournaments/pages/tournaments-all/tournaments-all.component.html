@@ -1,0 +1,10 @@
+<h2 class="section-title">All Tournaments</h2>
+
+<div *ngIf="loading()" class="info-text">Loading tournaments...</div>
+<div *ngIf="error()" class="error-box">{{ error() }}</div>
+
+<div *ngIf="!loading() && !error()" class="card-grid">
+  @for (tournament of tournaments(); track tournament.id) {
+    <app-tournament-card [tournament]="tournament" (join)="onJoin($event)" />
+  }
+</div>

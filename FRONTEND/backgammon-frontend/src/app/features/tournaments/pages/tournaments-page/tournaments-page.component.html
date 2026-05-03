@@ -1,0 +1,21 @@
+<div class="tournaments-container">
+  <h1 class="page-title">Tournaments</h1>
+
+  <nav class="tabs">
+    <a [routerLink]="[routes.tournamentsAll]" routerLinkActive="active">All</a>
+    <a [routerLink]="[routes.tournamentsMy]" routerLinkActive="active">My</a>
+    <a
+      [routerLink]="[routes.tournamentsJoinRequests]"
+      routerLinkActive="active"
+    >
+      My join requests
+    </a>
+    <a [routerLink]="[routes.tournamentsCreate]" routerLinkActive="active">
+      Create
+    </a>
+  </nav>
+
+  <div class="tab-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

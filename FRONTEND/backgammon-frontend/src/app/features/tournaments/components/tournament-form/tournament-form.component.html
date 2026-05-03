@@ -1,0 +1,81 @@
+<form (ngSubmit)="submit()" class="form">
+  <div class="form-section">
+    <h3>Basic Info</h3>
+
+    <label>
+      Name
+      <input [(ngModel)]="model.name" name="name" required />
+    </label>
+
+    <label>
+      Description
+      <textarea [(ngModel)]="model.description" name="description"></textarea>
+    </label>
+  </div>
+
+  <div class="form-section">
+    <h3>Settings</h3>
+
+    <label>
+      Type
+      <select [(ngModel)]="model.type" name="type">
+        @for (t of typeOptions; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Visibility
+      <select [(ngModel)]="model.visibility" name="visibility">
+        @for (v of visibilityOptions; track v) {
+          <option [value]="v">{{ v }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Max Participants
+      <input
+        type="number"
+        [(ngModel)]="model.maxParticipants"
+        name="maxParticipants"
+        min="2"
+      />
+    </label>
+
+    <label>
+      Rules Template Id
+      <input [(ngModel)]="model.rulesTemplateId" name="rulesTemplateId" />
+    </label>
+  </div>
+
+  <div class="form-section">
+    <h3>Schedule</h3>
+
+    <label>
+      Registration Deadline
+      <input
+        type="datetime-local"
+        [(ngModel)]="model.deadline"
+        name="deadline"
+      />
+    </label>
+
+    <label>
+      Start Date
+      <input
+        type="datetime-local"
+        [(ngModel)]="model.startDate"
+        name="startDate"
+      />
+    </label>
+
+    <label>
+      End Date
+      <input type="datetime-local" [(ngModel)]="model.endDate" name="endDate" />
+    </label>
+  </div>
+
+  <button type="submit" class="primary">Create Tournament</button>
+</form>

@@ -1,0 +1,7 @@
+.placeholder-card {
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px dashed #ccc;
+  color: #777;
+  text-align: center;
+}
