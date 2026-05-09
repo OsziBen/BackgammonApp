@@ -8,7 +8,6 @@ namespace Application.Groups.Commands.ListGroupJoinRequests
     {
         private readonly IGroupJoinRequestReadRepository _groupJoinRequestReadRepository;
 
-
         public ListGroupJoinRequestsCommandHandler(IGroupJoinRequestReadRepository groupJoinRequestReadRepository)
         {
             _groupJoinRequestReadRepository = groupJoinRequestReadRepository;

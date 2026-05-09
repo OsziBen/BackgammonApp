@@ -30,7 +30,6 @@ namespace Application.Groups.Commands.RemoveGroupMember
         {
             var now = _dateTimeProvider.UtcNow;
 
-
             var membership = await _uow.GroupMembershipsWrite
                 .GetAsync(request.UserId, request.GroupId, cancellationToken)
                 .GetOrThrowAsync(nameof(GroupMembership), request.GroupId);

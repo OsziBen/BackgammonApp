@@ -2,7 +2,7 @@
 {
     public interface IGroupJoinRequestWriteRepository
     {
-        Task AddAsync(Domain.GroupJoinRequest.GroupJoinRequest groupJoinRequest, CancellationToken cancellation);
+        Task AddAsync(Domain.GroupJoinRequest.GroupJoinRequest groupJoinRequest, CancellationToken cancellationToken);
         Task<Domain.GroupJoinRequest.GroupJoinRequest?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }

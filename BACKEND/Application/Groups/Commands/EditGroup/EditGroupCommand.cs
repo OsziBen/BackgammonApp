@@ -9,5 +9,5 @@ namespace Application.Groups.Commands.EditGroup
         string Name,
         string Description,
         GroupVisibility Visibility,
-        GroupSizePreset SizePreset) : IRequest<BaseGroupResponse>;
+        GroupSizePreset SizePreset) : IRequest<GroupBaseResponse>;
 }

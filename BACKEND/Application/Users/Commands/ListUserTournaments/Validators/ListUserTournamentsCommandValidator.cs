@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
 
 namespace Application.Users.Commands.ListUserTournaments.Validators
 {
-    internal class ListUserTournamentsCommandValidator
+    public class ListUserTournamentsCommandValidator : AbstractValidator<ListUserTournamentsCommand>
     {
+        public ListUserTournamentsCommandValidator()
+        {
+            RuleFor(x => x.UserId)
+               .NotEmpty()
+               .WithMessage("User ID is required.");
+        }
     }
 }

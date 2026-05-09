@@ -4,7 +4,9 @@ using Application.Interfaces.Repository.User;
 using Application.Shared;
 using Application.Shared.Time;
 using Application.Tournament.Responses;
+using Common.Enums;
 using Common.Enums.Tournament;
+using Common.Exceptions;
 using Domain.User;
 using MediatR;
 
@@ -42,7 +44,9 @@ namespace Application.Tournament.Commands.CreateTournament
 
             if (hasTournamentWithSameName)
             {
-                throw new Exception();  // TODO: custom
+                throw new BusinessRuleException(
+                    FunctionCode.TournamentWithTournamentNameAlreadyExists,
+                    $"Tournament with name {normalizedName} already exists.");
             }
 
             Domain.Tournament.Tournament tournament = new()

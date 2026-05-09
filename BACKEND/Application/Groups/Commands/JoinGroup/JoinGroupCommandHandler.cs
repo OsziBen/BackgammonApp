@@ -8,6 +8,7 @@ using Common.Enums;
 using Common.Enums.Group;
 using Common.Exceptions;
 using Domain.Group;
+using Domain.GroupJoinRequest;
 using MediatR;
 
 namespace Application.Groups.Commands.JoinGroup
@@ -70,7 +71,7 @@ namespace Application.Groups.Commands.JoinGroup
                     "Group reached max members limit.");
             }
 
-            await _uow.GroupJoinRequestsWrite.AddAsync(new Domain.GroupJoinRequest.GroupJoinRequest
+            await _uow.GroupJoinRequestsWrite.AddAsync(new GroupJoinRequest
             {
                 UserId = request.UserId,
                 GroupId = request.GroupId,

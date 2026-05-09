@@ -41,7 +41,7 @@
         // GROUPS
         GroupWithGroupNameAlreadyExists = 4022,
         CannotDowngradeGroupSize = 4023,
-        CannotAddUserDIrectlyInPublicGroup = 4024,
+        CannotAddUserDirectlyInPublicGroup = 4024,
         UserAlreadyActiveMember = 4025,
         GroupReachedMaxMembersLimit = 4026,
         CannotRemoveGroupOwner = 4027,
@@ -53,6 +53,17 @@
         UserIsAlreadyModerator = 4033,
         CannotJoinPrivateGroup = 4034,
         JoinAlreadyRequested = 4035,
+        // TOURNAMENTS
+        CannotAddParticipantDirectlyInPublicTournament = 4036,
+        UserAlreadyActiveParticipant = 4037,
+        TournamentReachedMaxParticipantsLimit = 4038,
+        JoinDeadlinePassed = 4039,
+        TournamentMismatch = 4040,
+        TournamentWithTournamentNameAlreadyExists = 4041,
+        MaxParicipantsCannotBeLessThanCurrentNumberOfParticipants = 4042,
+        CannotRemoveTournamentOrganizer = 4043,
+        CannotJoinPrivateTournament = 4044,
+
 
         // Jogosultsági/Hozzáférés hibák (403 Forbidden)
         AccessDenied = 5000,

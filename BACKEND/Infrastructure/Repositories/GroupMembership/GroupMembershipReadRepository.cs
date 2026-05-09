@@ -27,21 +27,21 @@ namespace Infrastructure.Repositories.GroupMembership
                 x.IsActive,
                 cancellationToken);
 
-        public async Task<List<Domain.GroupMembership.GroupMembership>> GetMembershipsByUserIdAsync(Guid userId, CancellationToken cancellationToken)
-            => await Query()
+        public Task<List<Domain.GroupMembership.GroupMembership>> GetMembershipsByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => Query()
                 .Where(x => x.UserId == userId && x.IsActive)
                 .ToListAsync(cancellationToken);
 
-        public async Task<string?> GetUserRoleAsync(Guid userId, Guid groupId, CancellationToken cancellationToken)
-            => await Query()
+        public Task<string?> GetUserRoleAsync(Guid userId, Guid groupId, CancellationToken cancellationToken)
+            => Query()
                 .Where(gm => gm.UserId == userId && gm.GroupId == groupId)
                 .SelectMany(gm => gm.GroupRoles)
                 .Where(gmr => gmr.IsActive)
                 .Select(gmr => gmr.GroupRole.SystemName)
                 .FirstOrDefaultAsync(cancellationToken);
 
-        public async Task<List<Domain.GroupMembership.GroupMembership>> GetUsersByGroupIdAsync(Guid groupId, CancellationToken cancellationToken)
-            => await Query()
+        public Task<List<Domain.GroupMembership.GroupMembership>> GetUsersByGroupIdAsync(Guid groupId, CancellationToken cancellationToken)
+            => Query()
                 .Where(x => x.GroupId == groupId && x.IsActive)
                 .Include(x => x.User)
                 .Include(x => x.GroupRoles)

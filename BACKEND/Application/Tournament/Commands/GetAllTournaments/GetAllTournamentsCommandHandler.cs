@@ -30,7 +30,7 @@ namespace Application.Tournament.Commands.GetAllTournaments
                 StartDate = t.StartDate,
                 EndDate = t.EndDate,
                 Deadline = t.Deadline,
-                OrganizerUserName = t.OrganizerUser.UserName    // TODO: NEM adja még vissza
+                OrganizerUserName = t.OrganizerUser.UserName
             }).ToList();
         }
     }

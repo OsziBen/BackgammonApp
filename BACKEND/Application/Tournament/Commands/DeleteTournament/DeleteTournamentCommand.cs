@@ -2,5 +2,5 @@
 
 namespace Application.Tournament.Commands.DeleteTournament
 {
-    public record DeleteTournamentCommand() : IRequest<Unit>;
+    public record DeleteTournamentCommand(Guid TournamentId, Guid UserId) : IRequest<Unit>;
 }

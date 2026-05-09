@@ -1,8 +1,9 @@
-﻿using Common.Models;
+﻿using Common.Interfaces;
+using Common.Models;
 
 namespace Domain.RulesTemplate
 {
-    public class RulesTemplate : BaseEntity
+    public class RulesTemplate : BaseEntity, ISoftDeletable
     {
         public required string Name { get; set; }
         public string? Description { get; set; }

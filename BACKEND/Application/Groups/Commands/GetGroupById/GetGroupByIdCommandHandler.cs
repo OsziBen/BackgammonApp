@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Application.Groups.Commands.GetGroupById
 {
-    public class GetGroupByIdCommandHandler : IRequestHandler<GetGroupByIdCommand, BaseGroupResponse>
+    public class GetGroupByIdCommandHandler : IRequestHandler<GetGroupByIdCommand, GroupBaseResponse>
     {
         private readonly IGroupReadRepository _groupReadRepository;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
@@ -24,7 +24,7 @@ namespace Application.Groups.Commands.GetGroupById
             _groupJoinRequestReadRepository = groupJoinRequestReadRepository;
         }
 
-        public async Task<BaseGroupResponse> Handle(GetGroupByIdCommand request, CancellationToken cancellationToken)
+        public async Task<GroupBaseResponse> Handle(GetGroupByIdCommand request, CancellationToken cancellationToken)
         {
             var group = await _groupReadRepository
                 .GetByIdAsync(request.GroupId, cancellationToken)
@@ -40,7 +40,7 @@ namespace Application.Groups.Commands.GetGroupById
                 .Select(jr => jr.GroupId)
                 .ToHashSet();
 
-            return new BaseGroupResponse
+            return new GroupBaseResponse
             {
                 Id = group.Id,
                 CreatorName = group.Creator.UserName,

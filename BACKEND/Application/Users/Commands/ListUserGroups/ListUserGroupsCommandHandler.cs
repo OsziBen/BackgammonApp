@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Users.Commands.ListUserGroups
 {
-    public class ListUserGroupsCommandHandler : IRequestHandler<ListUserGroupsCommand, List<BaseGroupResponse>>
+    public class ListUserGroupsCommandHandler : IRequestHandler<ListUserGroupsCommand, List<GroupBaseResponse>>
     {
         private readonly IGroupReadRepository _groupReadRepository;
 
@@ -13,11 +13,11 @@ namespace Application.Users.Commands.ListUserGroups
             _groupReadRepository = groupReadRepository;
         }
 
-        public async Task<List<BaseGroupResponse>> Handle(ListUserGroupsCommand request, CancellationToken cancellationToken)
+        public async Task<List<GroupBaseResponse>> Handle(ListUserGroupsCommand request, CancellationToken cancellationToken)
         {
             var groups = await _groupReadRepository.GetAllByUserIdAsync(request.UserId, cancellationToken);
 
-            return groups.Select(group => new BaseGroupResponse
+            return groups.Select(group => new GroupBaseResponse
             {
                 Id = group.Id,
                 CreatorName = group.Creator.UserName,

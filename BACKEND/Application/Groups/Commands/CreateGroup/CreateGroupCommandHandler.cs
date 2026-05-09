@@ -17,7 +17,7 @@ using MediatR;
 
 namespace Application.Groups.Commands.CreateGroup
 {
-    public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, BaseGroupResponse>
+    public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, GroupBaseResponse>
     {
         private readonly IUnitOfWork _uow;
         private readonly IGroupReadRepository _groupReadRepository;
@@ -39,7 +39,7 @@ namespace Application.Groups.Commands.CreateGroup
             _userReadRepository = userReadRepository;
         }
 
-        public async Task<BaseGroupResponse> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
+        public async Task<GroupBaseResponse> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
             var normalizedName = request.Name.Trim();
@@ -111,7 +111,7 @@ namespace Application.Groups.Commands.CreateGroup
 
             await _uow.CommitAsync(cancellationToken);
 
-            return new BaseGroupResponse
+            return new GroupBaseResponse
             {
                 Id = group.Id,
                 CreatorName = user.UserName,

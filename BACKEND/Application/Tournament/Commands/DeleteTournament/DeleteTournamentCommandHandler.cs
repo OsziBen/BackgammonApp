@@ -1,5 +1,9 @@
 ﻿using Application.Interfaces.Repository;
+using Application.Shared;
 using Application.Shared.Time;
+using Common.Enums;
+using Common.Exceptions;
+using Domain.Tournament;
 using MediatR;
 
 namespace Application.Tournament.Commands.DeleteTournament
@@ -17,9 +21,28 @@ namespace Application.Tournament.Commands.DeleteTournament
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public Task<Unit> Handle(DeleteTournamentCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteTournamentCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var now = _dateTimeProvider.UtcNow;
+
+            var tournament = await _uow.TournamentsWrite
+                .GetByIdAsync(request.TournamentId, cancellationToken)
+                .GetOrThrowAsync(nameof(Tournament), request.TournamentId);
+
+            if (tournament.OrganizerUserId != request.UserId)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.MissingPermission,
+                    $"Tournament can only be deleted by the organiser.");
+            }
+
+            tournament.IsDeleted = true;
+            tournament.DeletedAt = now;
+            tournament.LastUpdatedAt = now;
+
+            await _uow.CommitAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

@@ -6,6 +6,8 @@ using Application.Interfaces.Repository.GroupJoinRequest;
 using Application.Interfaces.Repository.GroupMembership;
 using Application.Interfaces.Repository.GroupMembershipRole;
 using Application.Interfaces.Repository.Tournament;
+using Application.Interfaces.Repository.TournamentJoinRequest;
+using Application.Interfaces.Repository.TournamentParticipant;
 using Application.Interfaces.Repository.User;
 using Infrastructure.Data;
 using Infrastructure.Repositories.GamePlayer;
@@ -15,6 +17,8 @@ using Infrastructure.Repositories.GroupJoinRequest;
 using Infrastructure.Repositories.GroupMembership;
 using Infrastructure.Repositories.GroupMembershipRole;
 using Infrastructure.Repositories.Tournament;
+using Infrastructure.Repositories.TournamentJoinRequest;
+using Infrastructure.Repositories.TournamentParticipant;
 using Infrastructure.Repositories.User;
 
 namespace Infrastructure.Repositories
@@ -31,6 +35,8 @@ namespace Infrastructure.Repositories
         public IGroupMembershipWriteRepository GroupMembershipsWrite { get; }
         public IGroupMembershipRoleWriteRepository GroupMembershipRolesWrite { get; }
         public ITournamentWriteRepository TournamentsWrite { get; }
+        public ITournamentJoinRequestWriteRepository TournamentJoinRequestsWrite { get; }
+        public ITournamentParticipantWriteRepository TournamentParticipantsWrite { get; }
 
         // repositories
 
@@ -46,6 +52,8 @@ namespace Infrastructure.Repositories
             GroupMembershipsWrite = new GroupMembershipWriteRepository(context);
             GroupMembershipRolesWrite = new GroupMembershipRoleWriteRepository(context);
             TournamentsWrite = new TournamentWriteRepository(context);
+            TournamentJoinRequestsWrite = new TournamentJoinRequestWriteRepository(context);
+            TournamentParticipantsWrite = new TournamentParticipantWriteRepository(context);
             // repositories
         }
 

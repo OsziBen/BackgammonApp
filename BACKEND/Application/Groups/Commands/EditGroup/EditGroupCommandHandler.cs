@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Application.Groups.Commands.EditGroup
 {
-    public class EditGroupCommandHandler : IRequestHandler<EditGroupCommand, BaseGroupResponse>
+    public class EditGroupCommandHandler : IRequestHandler<EditGroupCommand, GroupBaseResponse>
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -23,7 +23,7 @@ namespace Application.Groups.Commands.EditGroup
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<BaseGroupResponse> Handle(EditGroupCommand request, CancellationToken cancellationToken)
+        public async Task<GroupBaseResponse> Handle(EditGroupCommand request, CancellationToken cancellationToken)
         {
             var group = await _uow.GroupsWrite
                 .GetByIdAsync(request.GroupId, cancellationToken)
@@ -53,7 +53,7 @@ namespace Application.Groups.Commands.EditGroup
 
             await _uow.CommitAsync(cancellationToken);
 
-            return new BaseGroupResponse
+            return new GroupBaseResponse
             {
                 Id = group.Id,
                 CreatorName = group.Creator.UserName,
