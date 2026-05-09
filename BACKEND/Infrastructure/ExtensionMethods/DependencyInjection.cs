@@ -11,7 +11,10 @@ using Application.Interfaces.Repository.GroupJoinRequest;
 using Application.Interfaces.Repository.GroupMembership;
 using Application.Interfaces.Repository.GroupMembershipRole;
 using Application.Interfaces.Repository.GroupRole;
+using Application.Interfaces.Repository.RulesTemplate;
 using Application.Interfaces.Repository.Tournament;
+using Application.Interfaces.Repository.TournamentJoinRequest;
+using Application.Interfaces.Repository.TournamentParticipant;
 using Application.Interfaces.Repository.User;
 using Application.Shared.Time;
 using Domain.GameLogic;
@@ -27,7 +30,10 @@ using Infrastructure.Repositories.GroupJoinRequest;
 using Infrastructure.Repositories.GroupMembership;
 using Infrastructure.Repositories.GroupMembershipRole;
 using Infrastructure.Repositories.GroupRole;
+using Infrastructure.Repositories.RulesTemplate;
 using Infrastructure.Repositories.Tournament;
+using Infrastructure.Repositories.TournamentJoinRequest;
+using Infrastructure.Repositories.TournamentParticipant;
 using Infrastructure.Repositories.User;
 using Infrastructure.Services;
 using Infrastructure.Shared.Time;
@@ -80,6 +86,17 @@ namespace Infrastructure.ExtensionMethods
             // Tournament
             services.AddScoped<ITournamentReadRepository, TournamentReadRepository>();
             services.AddScoped<ITournamentWriteRepository, TournamentWriteRepository>();
+
+            // TournamentJoinRequests
+            services.AddScoped<ITournamentJoinRequestReadRepository, TournamentJoinRequestReadRepository>();
+            services.AddScoped<ITournamentJoinRequestWriteRepository, TournamentJoinRequestWriteRepository>();
+
+            // TournamentParticipants
+            services.AddScoped<ITournamentParticipantReadRepository, TournamentParticipantReadRepository>();
+            services.AddScoped<ITournamentParticipantWriteRepository, TournamentParticipantWriteRepository>();
+
+            // RulesTemplates
+            services.AddScoped<IRulesTemplateReadRepository, RulesTemplateReadRepository>();
 
             return services;
         }

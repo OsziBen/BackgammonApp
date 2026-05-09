@@ -13,9 +13,9 @@ namespace Infrastructure.Repositories.GroupJoinRequest
             _context = context;
         }
 
-        public async Task AddAsync(Domain.GroupJoinRequest.GroupJoinRequest groupJoinRequest, CancellationToken cancellation)
+        public async Task AddAsync(Domain.GroupJoinRequest.GroupJoinRequest groupJoinRequest, CancellationToken cancellationToken)
             => await _context.GroupJoinRequests
-                .AddAsync(groupJoinRequest, cancellation);
+                .AddAsync(groupJoinRequest, cancellationToken);
 
         public Task<Domain.GroupJoinRequest.GroupJoinRequest?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.GroupJoinRequests

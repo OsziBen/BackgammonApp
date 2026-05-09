@@ -30,6 +30,7 @@ namespace Infrastructure.Repositories.Group
         public Task<Domain.Group.Group?> GetByIdAsync(Guid groupId, CancellationToken cancellationToken)
             => Query()
                 .Include(g => g.Creator)
+                .Include(g => g.GroupMemberships)
                 .FirstOrDefaultAsync(g => g.Id == groupId, cancellationToken);
     }
 }

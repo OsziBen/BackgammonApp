@@ -15,10 +15,22 @@ namespace Infrastructure.Repositories.Tournament
             => Query()
                 .AnyAsync(t => t.Name == tournamentName, cancellationToken);
 
+        public Task<List<Domain.Tournament.Tournament>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => Query()
+                .Where(t => t.OrganizerUserId == userId)
+                .Include(t => t.OrganizerUser)
+                .ToListAsync(cancellationToken);
+
         public Task<List<Domain.Tournament.Tournament>> GetAllPublicAsync(CancellationToken cancellationToken)
             => Query()
                 .Where(t => t.Visibility == TournamentVisibility.Public)
                 .Include(t => t.OrganizerUser)
                 .ToListAsync(cancellationToken);
+
+        public Task<Domain.Tournament.Tournament?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+            => Query()
+                .Include(t => t.OrganizerUser)
+                .Include(t => t.Participants)
+                .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 }
