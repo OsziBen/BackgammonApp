@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Application.Tournament.Commands.DeleteTournament.Validators
+namespace Application.Tournament.Commands.GetTournamentById.Validators
 {
-    public class DeleteTournamentCommandValidator : AbstractValidator<DeleteTournamentCommand>
+    public class GetTournamentByIdCommandValidator : AbstractValidator<GetTournamentByIdCommand>
     {
-        public DeleteTournamentCommandValidator()
+        public GetTournamentByIdCommandValidator()
         {
             RuleFor(x => x.TournamentId)
                 .NotEmpty()
