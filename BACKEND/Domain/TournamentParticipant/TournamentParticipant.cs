@@ -12,7 +12,7 @@ namespace Domain.TournamentParticipant
 
         public required string DisplayName { get; set; }
         public string? Email { get; set; }
-        public string? Notes { get; set; }
+        public string? Notes { get; set; }  // for DQ reasoning (not MVP)
 
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }

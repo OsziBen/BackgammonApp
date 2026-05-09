@@ -1,9 +1,10 @@
 ﻿using Common.Enums.Group;
+using Common.Interfaces;
 using Common.Models;
 
 namespace Domain.Group
 {
-    public class Group : BaseEntity
+    public class Group : BaseEntity, ISoftDeletable
     {
         public Guid CreatorId { get; set; }
         public required string Name { get; set; }

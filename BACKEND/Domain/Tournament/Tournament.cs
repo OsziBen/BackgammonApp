@@ -1,9 +1,10 @@
 ﻿using Common.Enums.Tournament;
+using Common.Interfaces;
 using Common.Models;
 
 namespace Domain.Tournament
 {
-    public class Tournament : BaseEntity
+    public class Tournament : BaseEntity, ISoftDeletable
     {
         public required string Name { get; set; }
         public string? Description { get; set; }
