@@ -1,8 +1,11 @@
-﻿using Application.Groups.Commands.RejectJoinRequest;
-using Application.Groups.Responses;
+﻿using Application.Groups.Responses;
 using Application.Interfaces.Common;
+using Application.Tournament.Responses;
+using Application.Users.Commands.GetUserById;
 using Application.Users.Commands.ListGroupJoinRequestsByUserId;
+using Application.Users.Commands.ListTournamentJoinRequestsByUserId;
 using Application.Users.Commands.ListUserGroups;
+using Application.Users.Commands.ListUserTournaments;
 using Application.Users.Commands.RegisterUser;
 using Application.Users.Responses;
 using Asp.Versioning;
@@ -78,6 +81,60 @@ namespace WebAPI.Controllers
             }
 
             var command = new ListGroupJoinRequestsByUserIdCommand(userId);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet(UserConstants.Tournaments)]
+        public async Task<ActionResult<List<TournamentBaseResponse>>> GetAllTournamentsAsync(
+            CancellationToken cancellationToken)
+        {
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new ListUserTournamentsCommand(userId);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet(UserConstants.TournamentJoinRequests)]
+        public async Task<ActionResult<List<UserTournamentJoinRequestResponse>>> GetAllTournamentJoinRequestsAsync(
+            CancellationToken cancellationToken)
+        {
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new ListTournamentJoinRequestsByUserIdCommand(userId);
+
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet(UserConstants.Me)]
+        public async Task<ActionResult<UserProfileResponse>> GetByIdAsync(
+            CancellationToken cancellationToken)
+        {
+            var userId = _currentUser.UserId;
+
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var command = new GetUserByIdCommand(userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
