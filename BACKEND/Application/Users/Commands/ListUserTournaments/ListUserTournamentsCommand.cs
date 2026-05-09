@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Tournament.Responses;
+using MediatR;
 
 namespace Application.Users.Commands.ListUserTournaments
 {
-    internal class ListUserTournamentsCommand
-    {
-    }
+    public record ListUserTournamentsCommand(Guid UserId) : IRequest<List<TournamentBaseResponse>>;
 }
