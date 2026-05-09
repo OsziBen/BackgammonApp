@@ -2,5 +2,5 @@
 
 namespace Application.Groups.Commands.AddGroupMember
 {
-    public record AddGroupMemberCommand(Guid GroupId, string UserName, Guid CurrentUserId) : IRequest<Unit>;
+    public record AddGroupMemberCommand(Guid GroupId, string UserName, Guid UserId) : IRequest<Unit>;
 }

@@ -4,6 +4,5 @@ namespace Application.Groups.Commands.DemoteModerator
 {
     public record DemoteModeratorCommand(
         Guid GroupId,
-        Guid TargetUserId,
-        Guid CurrentUserId) : IRequest<Unit>;
+        Guid TargetUserId) : IRequest<Unit>;
 }

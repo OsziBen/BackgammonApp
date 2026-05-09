@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(UserConstants.Groups)]
-        public async Task<ActionResult<List<BaseGroupResponse>>> GetAllGroupsAsync(
+        public async Task<ActionResult<List<GroupBaseResponse>>> GetAllGroupsAsync(
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;

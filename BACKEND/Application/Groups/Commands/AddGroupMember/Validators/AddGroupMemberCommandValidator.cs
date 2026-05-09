@@ -13,6 +13,10 @@ namespace Application.Groups.Commands.AddGroupMember.Validators
             RuleFor(x => x.UserName)
                .NotEmpty()
                .WithMessage("User Name is required.");
+
+            RuleFor(x => x.UserId)
+               .NotEmpty()
+               .WithMessage("User Id is required.");
         }
     }
 }

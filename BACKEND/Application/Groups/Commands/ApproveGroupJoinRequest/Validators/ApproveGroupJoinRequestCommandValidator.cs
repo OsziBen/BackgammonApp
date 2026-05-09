@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Application.Groups.Commands.RejectJoinRequest.Validators
+namespace Application.Groups.Commands.ApproveGroupJoinRequest.Validators
 {
-    public class RejectJoinRequestCommandValidator : AbstractValidator<RejectJoinRequestCommand>
+    public class ApproveGroupJoinRequestCommandValidator : AbstractValidator<ApproveGroupJoinRequestCommand>
     {
-        public RejectJoinRequestCommandValidator()
+        public ApproveGroupJoinRequestCommandValidator()
         {
             RuleFor(x => x.GroupId)
                .NotEmpty()

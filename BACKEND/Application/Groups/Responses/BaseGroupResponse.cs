@@ -1,6 +1,6 @@
 ﻿namespace Application.Groups.Responses
 {
-    public class BaseGroupResponse
+    public class GroupBaseResponse
     {
         public Guid Id { get; set; }
         public required string CreatorName { get; set; }

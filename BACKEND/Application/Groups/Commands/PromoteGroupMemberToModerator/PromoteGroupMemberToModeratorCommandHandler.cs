@@ -10,16 +10,16 @@ using Domain.GroupMembershipRole;
 using Domain.GroupRole;
 using MediatR;
 
-namespace Application.Groups.Commands.PromoteToModerator
+namespace Application.Groups.Commands.PromoteGroupMemberToModerator
 {
-    public class PromoteToModeratorCommandHandler : IRequestHandler<PromoteToModeratorCommand, Unit>
+    public class PromoteGroupMemberToModeratorCommandHandler : IRequestHandler<PromoteGroupMemberToModeratorCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGroupMembershipReadRepository _membershipRead;
         private readonly IGroupRoleReadRepository _roleRead;
 
-        public PromoteToModeratorCommandHandler(
+        public PromoteGroupMemberToModeratorCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider dateTimeProvider,
             IGroupMembershipReadRepository membershipRead,
@@ -31,7 +31,7 @@ namespace Application.Groups.Commands.PromoteToModerator
             _roleRead = roleRead;
         }
 
-        public async Task<Unit> Handle(PromoteToModeratorCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(PromoteGroupMemberToModeratorCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
 

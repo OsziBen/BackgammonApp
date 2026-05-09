@@ -10,6 +10,6 @@ namespace Application.Groups.Commands.CreateGroup
         string Description,
         GroupVisibility Visibility,
         GroupSizePreset SizePreset)
-        : IRequest<BaseGroupResponse>;
+        : IRequest<GroupBaseResponse>;
 
 }

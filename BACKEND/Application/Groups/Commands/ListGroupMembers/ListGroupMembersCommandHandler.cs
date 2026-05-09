@@ -6,14 +6,14 @@ using Application.Users.Responses;
 using MediatR;
 using System.Text.RegularExpressions;
 
-namespace Application.Groups.Commands.ListMembers
+namespace Application.Groups.Commands.ListGroupMembers
 {
-    public class ListMembersCommandHandler : IRequestHandler<ListMembersCommand, GroupMembersResponse>
+    public class ListGroupMembersCommandHandler : IRequestHandler<ListGroupMembersCommand, GroupMembersResponse>
     {
         private readonly IGroupReadRepository _groupReadRepository;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
 
-        public ListMembersCommandHandler(
+        public ListGroupMembersCommandHandler(
             IGroupReadRepository groupReadRepository,
             IGroupMembershipReadRepository groupMembershipReadRepository)
         {
@@ -21,7 +21,7 @@ namespace Application.Groups.Commands.ListMembers
             _groupMembershipReadRepository = groupMembershipReadRepository;
         }
 
-        public async Task<GroupMembersResponse> Handle(ListMembersCommand request, CancellationToken cancellationToken)
+        public async Task<GroupMembersResponse> Handle(ListGroupMembersCommand request, CancellationToken cancellationToken)
         {
             var group = await _groupReadRepository
                 .GetByIdAsync(request.GroupId, cancellationToken)

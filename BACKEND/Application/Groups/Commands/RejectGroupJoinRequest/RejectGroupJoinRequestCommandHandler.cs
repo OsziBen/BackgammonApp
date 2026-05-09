@@ -7,14 +7,14 @@ using Common.Exceptions;
 using Domain.GroupJoinRequest;
 using MediatR;
 
-namespace Application.Groups.Commands.RejectJoinRequest
+namespace Application.Groups.Commands.RejectGroupJoinRequest
 {
-    public class RejectJoinRequestCommandHandler : IRequestHandler<RejectJoinRequestCommand, Unit>
+    public class RejectGroupJoinRequestCommandHandler : IRequestHandler<RejectGroupJoinRequestCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        public RejectJoinRequestCommandHandler(
+        public RejectGroupJoinRequestCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider dateTimeProvider)
         {
@@ -22,7 +22,7 @@ namespace Application.Groups.Commands.RejectJoinRequest
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<Unit> Handle(RejectJoinRequestCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RejectGroupJoinRequestCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
 

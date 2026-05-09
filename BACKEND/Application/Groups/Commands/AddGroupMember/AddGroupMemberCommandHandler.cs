@@ -53,7 +53,7 @@ namespace Application.Groups.Commands.AddGroupMember
             if (group.Visibility != GroupVisibility.Private)
             {
                 throw new BusinessRuleException(
-                    FunctionCode.CannotAddUserDIrectlyInPublicGroup,
+                    FunctionCode.CannotAddUserDirectlyInPublicGroup,
                     "Direct add is only allowed for private groups.");
             }
 
@@ -92,7 +92,7 @@ namespace Application.Groups.Commands.AddGroupMember
                 GroupRoleId = role.Id,
                 IsActive = true,
                 AssignedAt = now,
-                GrantedBy = request.CurrentUserId
+                GrantedBy = request.UserId
             }, cancellationToken);
 
             await _uow.CommitAsync(cancellationToken);

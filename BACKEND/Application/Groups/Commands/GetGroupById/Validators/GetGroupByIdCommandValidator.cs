@@ -8,6 +8,10 @@ namespace Application.Groups.Commands.GetGroupById.Validators
         {
             RuleFor(x => x.GroupId)
                 .NotEmpty()
+                .WithMessage("Group ID is required.");
+
+            RuleFor(x => x.UserId)
+                .NotEmpty()
                 .WithMessage("User ID is required.");
         }
     }

@@ -4,9 +4,9 @@ using Application.Interfaces.Repository.GroupJoinRequest;
 using Application.Interfaces.Repository.GroupMembership;
 using MediatR;
 
-namespace Application.Groups.Commands.GetAllGroups
+namespace Application.Groups.Commands.GetAllPublicGroups
 {
-    public class GetAllPublicGroupsCommandHandler : IRequestHandler<GetAllPublicGroupsCommand, List<BaseGroupResponse>>
+    public class GetAllPublicGroupsCommandHandler : IRequestHandler<GetAllPublicGroupsCommand, List<GroupBaseResponse>>
     {
         private readonly IGroupReadRepository _groupReadRepository;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
@@ -22,7 +22,7 @@ namespace Application.Groups.Commands.GetAllGroups
             _groupJoinRequestReadRepository = groupJoinRequestReadRepository;
         }
 
-        public async Task<List<BaseGroupResponse>> Handle(GetAllPublicGroupsCommand request, CancellationToken cancellationToken)
+        public async Task<List<GroupBaseResponse>> Handle(GetAllPublicGroupsCommand request, CancellationToken cancellationToken)
         {
             var groups = await _groupReadRepository.GetAllPublicAsync(cancellationToken);
 
@@ -36,7 +36,7 @@ namespace Application.Groups.Commands.GetAllGroups
                 .Select(jr => jr.GroupId)
                 .ToHashSet();
 
-            return groups.Select(g => new BaseGroupResponse
+            return groups.Select(g => new GroupBaseResponse
             {
                 Id = g.Id,
                 CreatorName = g.Creator.UserName,

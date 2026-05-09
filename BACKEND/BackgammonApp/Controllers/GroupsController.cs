@@ -1,17 +1,17 @@
 ﻿using Application.Groups.Commands.AddGroupMember;
-using Application.Groups.Commands.ApproveJoinRequest;
+using Application.Groups.Commands.ApproveGroupJoinRequest;
 using Application.Groups.Commands.CreateGroup;
 using Application.Groups.Commands.DeleteGroup;
 using Application.Groups.Commands.DemoteModerator;
 using Application.Groups.Commands.EditGroup;
-using Application.Groups.Commands.GetAllGroups;
+using Application.Groups.Commands.GetAllPublicGroups;
 using Application.Groups.Commands.GetGroupById;
 using Application.Groups.Commands.JoinGroup;
 using Application.Groups.Commands.LeaveGroup;
 using Application.Groups.Commands.ListGroupJoinRequests;
-using Application.Groups.Commands.ListMembers;
-using Application.Groups.Commands.PromoteToModerator;
-using Application.Groups.Commands.RejectJoinRequest;
+using Application.Groups.Commands.ListGroupMembers;
+using Application.Groups.Commands.PromoteGroupMemberToModerator;
+using Application.Groups.Commands.RejectGroupJoinRequest;
 using Application.Groups.Commands.RemoveGroupMember;
 using Application.Groups.Requests;
 using Application.Groups.Responses;
@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BaseGroupResponse>> CreateGroupAsync(
+        public async Task<ActionResult<GroupBaseResponse>> CreateGroupAsync(
             [FromBody] CreateGroupRequest request,
             CancellationToken cancellationToken)
         {
@@ -68,7 +68,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BaseGroupResponse>>> GetAllGroupsAsync(
+        public async Task<ActionResult<List<GroupBaseResponse>>> GetAllGroupsAsync(
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;
@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(GroupConstants.ById)]
-        public async Task<ActionResult<BaseGroupResponse>> GetGroupGyIdAsync(
+        public async Task<ActionResult<GroupBaseResponse>> GetGroupGyIdAsync(
             [FromRoute] Guid groupId,
             CancellationToken cancellationToken)
         {
@@ -106,7 +106,7 @@ namespace WebAPI.Controllers
 
         [HttpPatch(GroupConstants.ById)]
         [Authorize(Policy = Policies.GroupOwner)]
-        public async Task<ActionResult<BaseGroupResponse>> EditGroupAsync(
+        public async Task<ActionResult<GroupBaseResponse>> EditGroupAsync(
             [FromRoute] Guid groupId,
             [FromBody] EditGroupRequest request,
             CancellationToken cancellationToken)
@@ -224,7 +224,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new ApproveJoinRequestCommand(groupId, userId, requestId);
+            var command = new ApproveGroupJoinRequestCommand(groupId, userId, requestId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -245,7 +245,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new RejectJoinRequestCommand(groupId, userId, requestId);
+            var command = new RejectGroupJoinRequestCommand(groupId, userId, requestId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -265,7 +265,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new ListMembersCommand(groupId);
+            var command = new ListGroupMembersCommand(groupId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -324,7 +324,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new PromoteToModeratorCommand(groupId, userId, currentUserId);
+            var command = new PromoteGroupMemberToModeratorCommand(groupId, userId, currentUserId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -345,7 +345,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new DemoteModeratorCommand(groupId, userId, currentUserId);
+            var command = new DemoteModeratorCommand(groupId, userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 

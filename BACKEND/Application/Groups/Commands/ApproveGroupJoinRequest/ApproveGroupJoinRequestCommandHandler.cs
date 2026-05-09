@@ -12,16 +12,16 @@ using Domain.GroupMembershipRole;
 using Domain.GroupRole;
 using MediatR;
 
-namespace Application.Groups.Commands.ApproveJoinRequest
+namespace Application.Groups.Commands.ApproveGroupJoinRequest
 {
-    public class ApproveJoinRequestCommandHandler : IRequestHandler<ApproveJoinRequestCommand, Unit>
+    public class ApproveGroupJoinRequestCommandHandler : IRequestHandler<ApproveGroupJoinRequestCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
         private readonly IGroupRoleReadRepository _groupRoleReadRepository;
 
-        public ApproveJoinRequestCommandHandler(
+        public ApproveGroupJoinRequestCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider dateTimeProvider,
             IGroupMembershipReadRepository groupMembershipReadRepository,
@@ -33,7 +33,7 @@ namespace Application.Groups.Commands.ApproveJoinRequest
             _groupRoleReadRepository = groupRoleReadRepository;
         }
 
-        public async Task<Unit> Handle(ApproveJoinRequestCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ApproveGroupJoinRequestCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
 
