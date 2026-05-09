@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Repository.GroupMembership;
+﻿using Application.Interfaces.Common;
+using Application.Interfaces.Repository.GroupMembership;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Authorization
@@ -7,22 +8,25 @@ namespace WebAPI.Authorization
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
+        private readonly ICurrentUser _currentUser;
 
         public GroupRoleHandler(
             IHttpContextAccessor httpContextAccessor,
-            IGroupMembershipReadRepository groupMembershipReadRepository)
+            IGroupMembershipReadRepository groupMembershipReadRepository,
+            ICurrentUser currentUser)
         {
             _httpContextAccessor = httpContextAccessor;
             _groupMembershipReadRepository = groupMembershipReadRepository;
+            _currentUser = currentUser;
         }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             GroupRoleRequirement requirement)
         {
-            var userIdClaim = context.User.FindFirst("sub")?.Value;
+            var userId = _currentUser.UserId;
 
-            if (!Guid.TryParse(userIdClaim, out var userId))
+            if (userId == Guid.Empty)
             {
                 return;
             }
