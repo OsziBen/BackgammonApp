@@ -1,3 +1,5 @@
+import { TournamentUserState } from '../../enums/tournament-user-state.type';
+
 export interface TournamentBaseResponse {
   id: string; // Guid → string
   name: string;
@@ -10,4 +12,5 @@ export interface TournamentBaseResponse {
   endDate: string;
   deadline: string;
   organizerUserName: string;
+  tournamentUserState: TournamentUserState | null;
 }
