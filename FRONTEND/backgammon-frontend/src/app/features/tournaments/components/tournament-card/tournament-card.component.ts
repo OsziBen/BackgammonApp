@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TournamentBaseResponse } from '../../models/api/responses/tournament-base.response';
-import { AppRoutes } from '../../../../app.routes';
 import { CommonModule } from '@angular/common';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-tournament-card',

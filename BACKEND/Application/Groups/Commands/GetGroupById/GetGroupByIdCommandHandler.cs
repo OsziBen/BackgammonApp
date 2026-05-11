@@ -1,4 +1,5 @@
-﻿using Application.Groups.Responses;
+﻿using Application.Groups.Helpers;
+using Application.Groups.Responses;
 using Application.Interfaces.Repository.Group;
 using Application.Interfaces.Repository.GroupJoinRequest;
 using Application.Interfaces.Repository.GroupMembership;
@@ -30,30 +31,26 @@ namespace Application.Groups.Commands.GetGroupById
                 .GetByIdAsync(request.GroupId, cancellationToken)
                 .GetOrThrowAsync(nameof(Group), request.GroupId);
 
-            var memberships = await _groupMembershipReadRepository.GetMembershipsByUserIdAsync(request.UserId, cancellationToken);
-            var membershipGroupIds = memberships
-                .Select(m => m.GroupId)
-                .ToHashSet();
+            var memberships = await _groupMembershipReadRepository
+                .GetMembershipsWithRolesByUserIdAsync(
+                    request.UserId,
+                    cancellationToken);
 
-            var pendingJoinRequests = await _groupJoinRequestReadRepository.GetAllPendingByUserIdAsync(request.UserId, cancellationToken);
-            var pendingJoinRequestGroupIds = pendingJoinRequests
-                .Select(jr => jr.GroupId)
-                .ToHashSet();
+            var membership = memberships
+                .FirstOrDefault(m => m.GroupId == request.GroupId);
 
-            return new GroupBaseResponse
-            {
-                Id = group.Id,
-                CreatorName = group.Creator.UserName,
-                Name = group.Name,
-                Description = group.Description,
-                Visibility = group.Visibility.ToString(),
-                JoinPolicy = group.JoinPolicy.ToString(),
-                SizePreset = group.SizePreset.ToString(),
-                MaxMembers = group.MaxMembers,
-                MaxModerators = group.MaxModerators,
-                CanJoin = !membershipGroupIds.Contains(request.GroupId) && !pendingJoinRequestGroupIds.Contains(request.GroupId),
-                CreatedAt = group.CreatedAt,
-            };
+            var pendingJoinRequests = await _groupJoinRequestReadRepository
+                .GetAllPendingByUserIdAsync(
+                    request.UserId,
+                    cancellationToken);
+
+            var hasPendingRequest = pendingJoinRequests
+                .Any(jr => jr.GroupId == request.GroupId);
+
+            return GroupResponseMapper.ToBaseResponse(
+                group,
+                membership,
+                hasPendingRequest);
         }
     }
 }

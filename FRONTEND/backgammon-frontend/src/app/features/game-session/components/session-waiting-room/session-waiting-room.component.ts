@@ -4,7 +4,7 @@ import { ConnectionState } from '../../models/enums/connection-state.enum';
 import { GameSessionFacade } from '../../facade/game-session.facade';
 import { GameSessionStore } from '../../state/game-session.store';
 import { Router } from '@angular/router';
-import { AppRoutes } from '../../../../app.routes';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-session-waiting-room',

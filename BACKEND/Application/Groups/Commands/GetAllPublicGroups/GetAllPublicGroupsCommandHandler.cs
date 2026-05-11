@@ -1,4 +1,5 @@
-﻿using Application.Groups.Responses;
+﻿using Application.Groups.Helpers;
+using Application.Groups.Responses;
 using Application.Interfaces.Repository.Group;
 using Application.Interfaces.Repository.GroupJoinRequest;
 using Application.Interfaces.Repository.GroupMembership;
@@ -24,30 +25,37 @@ namespace Application.Groups.Commands.GetAllPublicGroups
 
         public async Task<List<GroupBaseResponse>> Handle(GetAllPublicGroupsCommand request, CancellationToken cancellationToken)
         {
-            var groups = await _groupReadRepository.GetAllPublicAsync(cancellationToken);
+            var groups = await _groupReadRepository
+                .GetAllPublicAsync(cancellationToken);
 
-            var memberships = await _groupMembershipReadRepository.GetMembershipsByUserIdAsync(request.UserId, cancellationToken);
-            var membershipGroupIds = memberships
-                .Select(m => m.GroupId)
+            var memberships = await _groupMembershipReadRepository
+                .GetMembershipsWithRolesByUserIdAsync(
+                    request.UserId,
+                    cancellationToken);
+
+            var membershipLookup = memberships.ToDictionary(
+                m => m.GroupId,
+                m => m);
+
+            var pendingJoinRequests = await _groupJoinRequestReadRepository
+                .GetAllPendingByUserIdAsync(
+                    request.UserId,
+                    cancellationToken);
+
+            var pendingGroupIds = pendingJoinRequests
+                .Select(x => x.GroupId)
                 .ToHashSet();
 
-            var pendingJoinRequests = await _groupJoinRequestReadRepository.GetAllPendingByUserIdAsync(request.UserId, cancellationToken);
-            var pendingJoinRequestGroupIds = pendingJoinRequests
-                .Select(jr => jr.GroupId)
-                .ToHashSet();
-
-            return groups.Select(g => new GroupBaseResponse
+            return groups.Select(group =>
             {
-                Id = g.Id,
-                CreatorName = g.Creator.UserName,
-                Name = g.Name,
-                Description = g.Description,
-                Visibility = g.Visibility.ToString(),
-                JoinPolicy = g.JoinPolicy.ToString(),
-                SizePreset = g.SizePreset.ToString(),
-                MaxMembers = g.MaxMembers,
-                CanJoin = !membershipGroupIds.Contains(g.Id) && !pendingJoinRequestGroupIds.Contains(g.Id),
-                CreatedAt = g.CreatedAt,
+                membershipLookup.TryGetValue(group.Id, out var membership);
+
+                var hasPendingRequest = pendingGroupIds.Contains(group.Id);
+
+                return GroupResponseMapper.ToBaseResponse(
+                    group,
+                    membership,
+                    hasPendingRequest);
             }).ToList();
         }
     }

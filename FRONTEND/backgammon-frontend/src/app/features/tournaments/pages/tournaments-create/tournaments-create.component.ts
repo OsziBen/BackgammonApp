@@ -2,16 +2,16 @@ import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
-
-import { AppRoutes } from '../../../../app.routes';
 import { TournamentFormComponent } from '../../components/tournament-form/tournament-form.component';
 import { CreateTournamentRequest } from '../../models/api/requests/create-tournament.request';
 import { TournamentsApiService } from '../../services/tournaments-api.service';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tournaments-create',
   standalone: true,
-  imports: [TournamentFormComponent],
+  imports: [CommonModule, TournamentFormComponent],
   templateUrl: './tournaments-create.component.html',
   styleUrls: ['./tournaments-create.component.css'],
 })

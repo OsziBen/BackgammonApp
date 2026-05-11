@@ -19,12 +19,14 @@ namespace Infrastructure.Repositories.Tournament
             => Query()
                 .Where(t => t.OrganizerUserId == userId)
                 .Include(t => t.OrganizerUser)
+                .Include(t => t.Participants)
                 .ToListAsync(cancellationToken);
 
         public Task<List<Domain.Tournament.Tournament>> GetAllPublicAsync(CancellationToken cancellationToken)
             => Query()
                 .Where(t => t.Visibility == TournamentVisibility.Public)
                 .Include(t => t.OrganizerUser)
+                .Include(t => t.Participants)
                 .ToListAsync(cancellationToken);
 
         public Task<Domain.Tournament.Tournament?> GetByIdAsync(Guid id, CancellationToken cancellationToken)

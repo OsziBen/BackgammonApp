@@ -1,0 +1,12 @@
+.profile-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #222;
+}

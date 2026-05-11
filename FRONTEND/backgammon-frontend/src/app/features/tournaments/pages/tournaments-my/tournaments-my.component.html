@@ -1,5 +1,11 @@
 <h2 class="section-title">My Tournaments</h2>
 
-<div class="placeholder-card">
-  <p>Your tournaments will appear here</p>
+<div *ngIf="loading()" class="info-text">Loading tournaments...</div>
+<div *ngIf="error()" class="error-box">{{ error() }}</div>
+
+<div *ngIf="!loading() && !error()" class="card-grid">
+  <app-tournament-card
+    *ngFor="let tournament of tournaments(); trackBy: trackById"
+    [tournament]="tournament"
+  />
 </div>

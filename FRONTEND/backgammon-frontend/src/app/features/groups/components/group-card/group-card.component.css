@@ -1,68 +1,149 @@
+/* ===================== */
+/* CARD                  */
+/* ===================== */
+
 .group-card {
-  background: white;
-  border-radius: 14px;
-  padding: 14px;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-
+  padding: 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+}
+
+.group-card.pending {
+  gap: 6px;
+}
+
+.group-card.pending .group-info {
+  margin-top: 6px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
 }
 
 .group-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #335533;
+  font-weight: 700;
   margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .group-description {
   font-size: 14px;
-  color: #444;
+  color: #555;
   margin: 0;
 }
 
+/* ===================== */
+/* META                  */
+/* ===================== */
+
 .group-meta {
   font-size: 13px;
-  color: #666;
-
+  color: #444;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
+
+/* ===================== */
+/* ACTIONS               */
+/* ===================== */
 
 .group-actions {
-  margin-top: 8px;
   display: flex;
   gap: 8px;
+  margin-top: 8px;
 }
 
-/* BUTTON SYSTEM */
-.btn {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+/* ===================== */
+/* BUTTONS               */
+/* ===================== */
 
-  font-weight: 500;
-  transition: 0.15s;
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
 }
 
 .btn.primary {
-  background: #335533;
+  background: #2f6f3e;
   color: white;
 }
 
 .btn.primary:hover {
-  background: #2a442a;
+  background: #255a32;
 }
 
 .btn.secondary {
-  background: #f0f0f0;
+  background: #e9ecef;
   color: #333;
 }
 
 .btn.secondary:hover {
-  background: #e0e0e0;
+  background: #dee2e6;
+}
+
+/* ===================== */
+/* BADGE                */
+/* ===================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* STATES */
+.badge.owner {
+  background: #1f3d2a;
+  color: #e9f7ef;
+}
+
+.badge.moderator {
+  background: #2f5d3a;
+  color: #eaf5ee;
+}
+
+.badge.member {
+  background: #e8f5e9;
+  color: #1b4332;
+}
+
+.badge.none {
+  background: #f3f3f3;
+  color: #666;
+}
+
+/* ===================== */
+/* PENDING INFO         */
+/* ===================== */
+
+.group-info {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff8e1;
+  color: #7a5c00;
+  border: 1px solid #f2d58a;
 }

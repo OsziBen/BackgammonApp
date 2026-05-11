@@ -3,41 +3,10 @@ import { authGuard } from './shared/utils/auth.guard';
 import { ForbiddenComponent } from './features/forbidden/components/forbidden.component';
 import { DashboardLayoutComponent } from './features/dashboard/pages/dashboard-layout/components/dashboard-layout.component';
 import { DashboardHomeComponent } from './features/dashboard/pages/dashboard-home/components/dashboard-home.component';
-import { UserComponent } from './features/user/components/user.component';
-
-// TODO: kiszervezni külön fájlba
-export const AppRoutes = {
-  home: '',
-  signup: 'signup',
-  signin: 'signin',
-  forbidden: 'forbidden',
-  profile: 'profile',
-  sessions: 'sessions',
-  sessionRoom: 'sessions/:code',
-  game: 'sessions/:code/game',
-  backgammonRules: 'backgammon-rules',
-  backgammonHistory: 'backgammon-history',
-
-  groups: 'groups',
-  groupsAll: 'all',
-  groupsMy: 'my',
-  groupsJoinRequests: 'join-requests',
-  groupsCreate: 'create',
-  groupsDetails: ':groupId',
-  groupsOverview: 'overview',
-  groupsMembers: 'members',
-  groupsRequests: 'requests',
-
-  tournaments: 'tournaments',
-  tournamentsAll: 'all',
-  tournamentsMy: 'my',
-  tournamentsJoinRequests: 'join-requests',
-  tournamentsCreate: 'create',
-  tournamentsDetails: ':tournamentId',
-  tournamentsOverview: 'overview',
-  tournamentsParticipants: 'participants',
-  tournamentsRequests: 'requests',
-} as const;
+import { AppRoutes } from './shared/constants/app-routes.constants';
+import { group } from '@angular/animations';
+import { groupResolver } from './features/groups/services/group.resolver';
+import { tournamentResolver } from './features/tournaments/services/tournament.resolver';
 
 export const routes: Routes = [
   // DASHBOARD LAYOUT
@@ -65,8 +34,11 @@ export const routes: Routes = [
       },
       {
         path: AppRoutes.profile,
-        component: UserComponent, // Profile Component
         canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/user/pages/user-profile-page/user-profile-page.component').then(
+            (m) => m.UserProfilePageComponent,
+          ),
       },
       {
         path: AppRoutes.groups,
@@ -115,6 +87,9 @@ export const routes: Routes = [
               import('./features/groups/pages/group-details/group-details.component').then(
                 (m) => m.GroupDetailsComponent,
               ),
+            resolve: {
+              group: groupResolver,
+            },
             children: [
               {
                 path: '',
@@ -193,6 +168,9 @@ export const routes: Routes = [
               import('./features/tournaments/pages/tournament-details/tournament-details.component').then(
                 (m) => m.TournamentDetailsComponent,
               ),
+            resolve: {
+              tournament: tournamentResolver,
+            },
             children: [
               {
                 path: '',

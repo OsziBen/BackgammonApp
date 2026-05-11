@@ -4,7 +4,12 @@
   <nav class="tabs">
     <a routerLink="overview" routerLinkActive="active">Overview</a>
     <a routerLink="participants" routerLinkActive="active">Participants</a>
-    <a routerLink="requests" routerLinkActive="active">Requests</a>
+
+    @if (isOrganizer()) {
+      <a [routerLink]="['requests']" routerLinkActive="active">
+        Join Requests
+      </a>
+    }
   </nav>
 
   <div class="tab-content">

@@ -12,8 +12,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AppRoutes } from '../../../../app.routes';
 import { RegisterRequest } from '../models/register-request.model';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-registration',

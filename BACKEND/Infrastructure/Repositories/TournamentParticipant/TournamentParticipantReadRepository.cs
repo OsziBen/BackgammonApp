@@ -18,6 +18,12 @@ namespace Infrastructure.Repositories.TournamentParticipant
                     x.TournamentId == tournamentId,
                 cancellationToken);
 
+        public Task<List<Guid>> GetParticipantTournamentIdsByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => Query()
+                .Where(p => p.UserId == userId && !p.IsDeleted)
+                .Select(p => p.TournamentId)
+                .ToListAsync(cancellationToken);
+
         public Task<List<Domain.TournamentParticipant.TournamentParticipant>> GetUsersByTournamentIdAsync(Guid tournamentId, CancellationToken cancellationToken)
             => Query()
                 .Where(x => x.TournamentId == tournamentId && x.Status == TournamentParticipantStatus.Active)

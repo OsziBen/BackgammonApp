@@ -1,13 +1,11 @@
-<h3 class="section-title">Overview</h3>
+<h2>Overview</h2>
 
-<div class="card">
-  <p><strong>Group name:</strong> Backgammon Masters</p>
-  <p><strong>Description:</strong> Competitive group for ranked players</p>
-  <p><strong>Visibility:</strong> Public</p>
-  <p><strong>Members:</strong> 8 / 12</p>
-</div>
+<p><strong>Name:</strong> {{ group.name }}</p>
+<p><strong>Description:</strong> {{ group.description }}</p>
+<p><strong>Owner:</strong> {{ group.creatorName }}</p>
+<p><strong>Visibility:</strong> {{ group.visibility }}</p>
 
-<div *ngIf="role === 'Owner'" class="actions">
-  <button>Edit Group</button>
-  <button class="danger">Delete Group</button>
-</div>
+@if (isOwner()) {
+  <button>Edit</button>
+  <button>Delete</button>
+}

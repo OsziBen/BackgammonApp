@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppRoutes } from '../../../../app.routes';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-groups-page',

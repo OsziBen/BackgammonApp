@@ -1,0 +1,7 @@
+@if (canAdd) {
+  <div class="add-user">
+    <input type="text" placeholder="Username" [(ngModel)]="username" />
+
+    <button (click)="onAdd()">Add</button>
+  </div>
+}

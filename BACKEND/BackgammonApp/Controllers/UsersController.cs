@@ -1,6 +1,6 @@
 ﻿using Application.Groups.Responses;
 using Application.Interfaces.Common;
-using Application.Tournament.Responses;
+using Application.Tournaments.Responses;
 using Application.Users.Commands.GetUserById;
 using Application.Users.Commands.ListGroupJoinRequestsByUserId;
 using Application.Users.Commands.ListTournamentJoinRequestsByUserId;

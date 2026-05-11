@@ -1,18 +1,44 @@
 <h3 class="section-title">Participants</h3>
 
+<!-- ADD PARTICIPANT -->
+<app-tournament-participants-add
+  [canAdd]="canAddParticipants()"
+  (add)="onAddParticipant($event)"
+>
+</app-tournament-participants-add>
+
+@if (loading()) {
+  <p>Loading participants...</p>
+}
+
 <div class="card-grid">
-  @for (p of [1, 2, 3, 4, 5, 6, 7, 8]; track p) {
+  @for (p of participants(); track trackById($index, p)) {
     <div class="card-item">
+      <!-- NAME -->
       <p>
-        <strong>Player {{ p }}</strong>
+        <strong>{{ p.displayName }}</strong>
       </p>
-      <p class="muted">Score: {{ 100 - p * 5 }}</p>
+
+      <!-- STATUS -->
+      <p class="muted">Status: {{ p.status }}</p>
+
+      <!-- EMAIL -->
+      @if (p.email) {
+        <p class="muted">Email: {{ p.email }}</p>
+      }
+
+      <!-- CREATED AT -->
+      <p class="muted">Joined: {{ p.createdAt | date: 'medium' }}</p>
+
+      <!-- NOTES -->
+      @if (p.notes) {
+        <p class="muted">Notes: {{ p.notes }}</p>
+      }
+
+      <!-- ACTIONS -->
+      @if (canManageParticipants()) {
+        <button class="danger" (click)="onRemove(p.userId)">Remove</button>
+      }
     </div>
   }
-</div>
-
-<div class="actions">
-  <button>Add Participant</button>
-  <button>Remove</button>
-  <button>Seed</button>
 </div>

@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="header">
+    <h3>
+      {{ request.groupName }}
+    </h3>
+
+    <span class="status" [ngClass]="request.status.toLowerCase()">
+      {{ request.status }}
+    </span>
+  </div>
+
+  <div class="body">
+    <p>
+      <span class="label"> Requested at: </span>
+
+      {{ request.createdAt | date: 'medium' }}
+    </p>
+  </div>
+</div>

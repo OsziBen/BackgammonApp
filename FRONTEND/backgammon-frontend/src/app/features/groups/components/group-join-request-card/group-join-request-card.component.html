@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="header">
+    <h3>
+      {{ request.userName }}
+    </h3>
+
+    <span class="status" [ngClass]="request.status.toLowerCase()">
+      {{ request.status }}
+    </span>
+  </div>
+
+  <div class="body">
+    <p>
+      <span class="label"> Requested at: </span>
+
+      {{ request.createdAt | date: 'yyyy.MM.dd HH:mm' }}
+    </p>
+  </div>
+
+  @if (canManage) {
+    <div class="actions">
+      <button (click)="onApprove()">Approve</button>
+
+      <button class="danger" (click)="onReject()">Reject</button>
+    </div>
+  }
+</div>

@@ -19,47 +19,8 @@
   margin-bottom: 12px;
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+.list {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-}
-
-.card-item {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-}
-
-.muted {
-  color: #777;
-  font-size: 13px;
-}
-
-:host {
-  display: block;
-}
-
-.section-title {
-  margin-bottom: 12px;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.card-item h3 {
-  margin: 0 0 6px 0;
-  color: #335533;
-}
-
-.card-item p {
-  margin: 4px 0;
-}
-
-.card-item strong {
-  color: #222;
 }

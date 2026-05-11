@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { AppApiService } from '../../../../../core/services/app-api.service';
+import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AppRoutes } from '../../../../../app.routes';
+import { AppRoutes } from '../../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-dashboard-home',
