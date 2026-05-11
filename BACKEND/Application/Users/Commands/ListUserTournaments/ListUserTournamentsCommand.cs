@@ -1,4 +1,4 @@
-﻿using Application.Tournament.Responses;
+﻿using Application.Tournaments.Responses;
 using MediatR;
 
 namespace Application.Users.Commands.ListUserTournaments

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Repository.Tournament;
-using Application.Tournament.Responses;
+using Application.Tournaments.Helpers;
+using Application.Tournaments.Responses;
 using MediatR;
 
 namespace Application.Users.Commands.ListUserTournaments
@@ -15,22 +16,12 @@ namespace Application.Users.Commands.ListUserTournaments
 
         public async Task<List<TournamentBaseResponse>> Handle(ListUserTournamentsCommand request, CancellationToken cancellationToken)
         {
-            var tournaments = await _tournamentReadRepository.GetAllByUserIdAsync(request.UserId, cancellationToken);
+            var tournaments = await _tournamentReadRepository
+                .GetAllByUserIdAsync(request.UserId, cancellationToken);
 
-            return tournaments.Select(tournament => new TournamentBaseResponse
-            {
-                Id = tournament.Id,
-                Name = tournament.Name,
-                Description = tournament.Description,
-                Type = tournament.Type.ToString(),
-                Visibility = tournament.Visibility.ToString(),
-                Status = tournament.Status.ToString(),
-                MaxParticipants = tournament.MaxParticipants,
-                StartDate = tournament.StartDate,
-                EndDate = tournament.EndDate,
-                Deadline = tournament.Deadline,
-                OrganizerUserName = tournament.OrganizerUser.UserName
-            }).ToList();
+            return tournaments
+                .Select(t => TournamentResponseMapper.ToBaseResponse(t, request.UserId))
+                .ToList();
         }
     }
 }
