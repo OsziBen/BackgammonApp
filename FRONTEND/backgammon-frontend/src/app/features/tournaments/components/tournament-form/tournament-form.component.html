@@ -45,8 +45,18 @@
     </label>
 
     <label>
-      Rules Template Id
-      <input [(ngModel)]="model.rulesTemplateId" name="rulesTemplateId" />
+      Rules Template
+      <select
+        [(ngModel)]="model.rulesTemplateId"
+        name="rulesTemplateId"
+        required
+      >
+        @for (t of rulesTemplates; track t.id) {
+          <option [value]="t.id">
+            {{ t.name }}
+          </option>
+        }
+      </select>
     </label>
   </div>
 
