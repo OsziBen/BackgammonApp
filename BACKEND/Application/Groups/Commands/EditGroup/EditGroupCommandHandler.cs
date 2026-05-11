@@ -1,4 +1,5 @@
-﻿using Application.Groups.Responses;
+﻿using Application.Groups.Helpers;
+using Application.Groups.Responses;
 using Application.Interfaces.Repository;
 using Application.Shared;
 using Application.Shared.Time;
@@ -6,6 +7,7 @@ using Common.Enums;
 using Common.Enums.Group;
 using Common.Exceptions;
 using Domain.Group;
+using Domain.GroupRole;
 using MediatR;
 
 namespace Application.Groups.Commands.EditGroup
@@ -53,20 +55,9 @@ namespace Application.Groups.Commands.EditGroup
 
             await _uow.CommitAsync(cancellationToken);
 
-            return new GroupBaseResponse
-            {
-                Id = group.Id,
-                CreatorName = group.Creator.UserName,
-                Name = group.Name,
-                Description = group.Description,
-                Visibility = group.Visibility.ToString(),
-                JoinPolicy = group.JoinPolicy.ToString(),
-                SizePreset = group.SizePreset.ToString(),
-                MaxMembers = group.MaxMembers,
-                MaxModerators = group.MaxModerators,
-                CanJoin = false,
-                CreatedAt = group.CreatedAt,
-            };
+            return GroupResponseMapper.ToBaseResponse(
+                group,
+                GroupRoleConstants.Owner);
         }
     }
 }

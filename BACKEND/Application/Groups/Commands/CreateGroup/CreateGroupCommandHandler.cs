@@ -1,10 +1,12 @@
-﻿using Application.Groups.Responses;
+﻿using Application.Groups.Helpers;
+using Application.Groups.Responses;
 using Application.Interfaces.Repository;
 using Application.Interfaces.Repository.Group;
 using Application.Interfaces.Repository.GroupRole;
 using Application.Interfaces.Repository.User;
 using Application.Shared;
 using Application.Shared.Time;
+using Common.Constants;
 using Common.Enums;
 using Common.Enums.Group;
 using Common.Exceptions;
@@ -122,7 +124,7 @@ namespace Application.Groups.Commands.CreateGroup
                 SizePreset = group.SizePreset.ToString(),
                 MaxMembers = group.MaxMembers,
                 MaxModerators = group.MaxModerators,
-                CanJoin = false,
+                GroupUserState = GroupRoleConstants.Owner,
                 CreatedAt = group.CreatedAt,
             };
         }
