@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../../../../shared/services/auth.service';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AppRoutes } from '../../../../../app.routes';
 import { LoginComponent } from '../../../../auth/login/components/login.component';
 import { RegistrationComponent } from '../../../../auth/registration/components/registration.component';
+import { AppRoutes } from '../../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-dashboard-layout',

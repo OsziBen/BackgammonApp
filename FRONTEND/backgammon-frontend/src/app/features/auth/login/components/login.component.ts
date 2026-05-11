@@ -9,9 +9,9 @@ import {
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../../shared/services/auth.service';
-import { AppRoutes } from '../../../../app.routes';
 import { LoginRequest } from '../models/login-request.model';
 import { AuthResponse } from '../../../../shared/models/auth-response.models';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 
 @Component({
   selector: 'app-login',
