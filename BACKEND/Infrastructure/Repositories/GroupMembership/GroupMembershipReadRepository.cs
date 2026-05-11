@@ -32,6 +32,13 @@ namespace Infrastructure.Repositories.GroupMembership
                 .Where(x => x.UserId == userId && x.IsActive)
                 .ToListAsync(cancellationToken);
 
+        public Task<List<Domain.GroupMembership.GroupMembership>> GetMembershipsWithRolesByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => Query()
+                .Include(gm => gm.GroupRoles)
+                    .ThenInclude(gmr => gmr.GroupRole)
+                .Where(gm => gm.UserId == userId && gm.IsActive)
+                .ToListAsync(cancellationToken);
+
         public Task<string?> GetUserRoleAsync(Guid userId, Guid groupId, CancellationToken cancellationToken)
             => Query()
                 .Where(gm => gm.UserId == userId && gm.GroupId == groupId)
