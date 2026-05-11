@@ -1,7 +1,22 @@
-<div class="group-card">
-  <h3 class="group-title">{{ group.name }}</h3>
+<div
+  class="group-card"
+  [ngClass]="{ pending: group.groupUserState === 'PENDING' }"
+>
+  <div class="group-header">
+    <h3 class="group-title">
+      {{ group.name }}
 
-  <p class="group-description">{{ group.description }}</p>
+      @if (group.groupUserState && group.groupUserState !== 'PENDING') {
+        <span class="badge" [ngClass]="group.groupUserState.toLowerCase()">
+          {{ group.groupUserState }}
+        </span>
+      }
+    </h3>
+  </div>
+
+  <p class="group-description">
+    {{ group.description }}
+  </p>
 
   <div class="group-meta">
     <p><strong>Creator:</strong> {{ group.creatorName }}</p>
@@ -10,12 +25,11 @@
   </div>
 
   <div class="group-actions">
-    @if (group.canJoin) {
-      <button class="btn primary" (click)="onJoin()">Join</button>
-    } @else {
-      <button class="btn secondary" (click)="onView()">View</button>
-    }
-    @if (!group.canJoin) {
+    @if (group.groupUserState === 'PENDING') {
+      <div class="group-info">
+        Your request is pending approval from the group moderators.
+      </div>
+    } @else if (group.groupUserState === 'NONE') {
       <button class="btn primary" (click)="onJoin()">Join</button>
     } @else {
       <button class="btn secondary" (click)="onView()">View</button>

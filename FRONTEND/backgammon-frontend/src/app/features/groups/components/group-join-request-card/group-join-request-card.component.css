@@ -1,0 +1,55 @@
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #335533;
+}
+
+.body p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.label {
+  color: #777;
+}
+
+.status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* status színek */
+.pending {
+  background: #fff4d6;
+  color: #a67c00;
+}
+
+.approved {
+  background: #e6f7ea;
+  color: #1b7f3a;
+}
+
+.rejected {
+  background: #ffe6e6;
+  color: #c62828;
+}
