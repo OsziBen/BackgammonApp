@@ -1,11 +1,20 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { BaseGroupResponse } from '../../../models/api/responses/base-group.response';
 
 @Component({
   selector: 'app-group-overview',
   standalone: true,
   templateUrl: './group-overview.component.html',
-  styleUrls: ['./group-overview.component.css'],
 })
 export class GroupOverviewComponent {
-  role: 'Member' | 'Moderator' | 'Owner' = 'Owner'; // dummy
+  group: BaseGroupResponse;
+
+  constructor(private route: ActivatedRoute) {
+    this.group = this.route.parent!.snapshot.data['group'];
+  }
+
+  isOwner(): boolean {
+    return this.group.groupUserState === 'OWNER';
+  }
 }

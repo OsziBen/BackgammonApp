@@ -1,17 +1,17 @@
 <h3 class="section-title">Join Requests</h3>
 
-<div class="card-grid">
-  @for (r of [1, 2, 3]; track r) {
-    <div class="card-item">
-      <p>
-        <strong>User {{ r }}</strong>
-      </p>
-      <p>Status: Pending</p>
-    </div>
-  }
-</div>
+@if (loading()) {
+  <p>Loading requests...</p>
+}
 
-<div *ngIf="role !== 'Member'" class="actions">
-  <button>Approve</button>
-  <button class="danger">Reject</button>
+<div class="card-grid">
+  @for (r of requests(); track trackById($index, r)) {
+    <app-group-join-request-card
+      [request]="r"
+      [canManage]="canManageRequests()"
+      (approve)="onApprove($event)"
+      (reject)="onReject($event)"
+    >
+    </app-group-join-request-card>
+  }
 </div>

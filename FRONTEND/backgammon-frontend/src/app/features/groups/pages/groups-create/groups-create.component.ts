@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { GroupFormComponent } from '../../components/group-form/group-form.component';
 import { Router } from '@angular/router';
-import { AppRoutes } from '../../../../app.routes';
+import { AppRoutes } from '../../../../shared/constants/app-routes.constants';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { CreateGroupRequest } from '../../models/api/requests/create-group.request';

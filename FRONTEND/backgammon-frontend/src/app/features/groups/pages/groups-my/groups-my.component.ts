@@ -5,6 +5,7 @@ import { GroupsApiService } from '../../services/groups-api.service';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { GroupCardComponent } from '../../components/group-card/group-card.component';
+import { UsersApiService } from '../../../user/services/users-api.service';
 
 @Component({
   selector: 'app-groups-my',
@@ -19,7 +20,7 @@ export class GroupsMyComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   constructor(
-    private readonly api: GroupsApiService,
+    private readonly usersApi: UsersApiService,
     private readonly toastr: ToastrService,
   ) {}
 
@@ -32,7 +33,7 @@ export class GroupsMyComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const result = await firstValueFrom(this.api.getMyGroups());
+      const result = await firstValueFrom(this.usersApi.getMyGroups());
       this.groups.set(result);
     } catch (err) {
       console.error(err);
