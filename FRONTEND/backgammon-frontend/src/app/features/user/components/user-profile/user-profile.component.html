@@ -1,0 +1,36 @@
+<div class="profile-card" *ngIf="user">
+  <div class="profile-row">
+    <span class="label">Username</span>
+    <span class="value">{{ user.userName }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Name</span>
+    <span class="value"> {{ user.firstName }} {{ user.lastName }} </span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Email</span>
+    <span class="value">{{ user.emailAddress }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Date of Birth</span>
+    <span class="value">{{ user.dateOfBirth }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Rating</span>
+    <span class="value">{{ user.rating }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Experience</span>
+    <span class="value">{{ user.experiencePoints }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">Member since</span>
+    <span class="value">{{ user.createdAt | date: 'yyyy. MMM d. HH:mm' }}</span>
+  </div>
+</div>
