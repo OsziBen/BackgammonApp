@@ -1,19 +1,19 @@
 ﻿using Application.Interfaces.Common;
-using Application.Tournament.Commands.AddTournamentParticipant;
-using Application.Tournament.Commands.ApproveTournamentJoinRequest;
-using Application.Tournament.Commands.CreateTournament;
-using Application.Tournament.Commands.DeleteTournament;
-using Application.Tournament.Commands.GetAllTournaments;
-using Application.Tournament.Commands.GetTournamentById;
-using Application.Tournament.Commands.JoinTournament;
-using Application.Tournament.Commands.ListTournamentJoinRequests;
-using Application.Tournament.Commands.ListTournamentParticipants;
-using Application.Tournament.Commands.RejectTournamentJoinRequest;
-using Application.Tournament.Commands.RemoveTournamentParticipant;
-using Application.Tournament.Commands.UpdateTournament;
-using Application.Tournament.Commands.WithdrawTournamentParticipation;
-using Application.Tournament.Requests;
-using Application.Tournament.Responses;
+using Application.Tournaments.Commands.AddTournamentParticipant;
+using Application.Tournaments.Commands.ApproveTournamentJoinRequest;
+using Application.Tournaments.Commands.CreateTournament;
+using Application.Tournaments.Commands.DeleteTournament;
+using Application.Tournaments.Commands.GetTournamentById;
+using Application.Tournaments.Commands.JoinTournament;
+using Application.Tournaments.Commands.ListTournamentJoinRequests;
+using Application.Tournaments.Commands.ListTournamentParticipants;
+using Application.Tournaments.Commands.RejectTournamentJoinRequest;
+using Application.Tournaments.Commands.RemoveTournamentParticipant;
+using Application.Tournaments.Commands.UpdateTournament;
+using Application.Tournaments.Commands.WithdrawTournamentParticipation;
+using Application.Tournaments.Commands.GetAllTournaments;
+using Application.Tournaments.Requests;
+using Application.Tournaments.Responses;
 using Asp.Versioning;
 using Common.Enums.Tournament;
 using MediatR;
@@ -129,7 +129,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new GetAllTournamentsCommand();
+            var command = new GetAllTournamentsCommand(userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 

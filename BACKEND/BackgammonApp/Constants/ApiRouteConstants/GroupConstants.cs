@@ -11,6 +11,7 @@
         public const string Leave = "{groupId:guid}/leave";
         public const string AllGroupMembers = "{groupId:guid}/members";
         public const string GroupMember = "{groupId:guid}/members/{userId:guid}";
+        public const string AddMember = "{groupId:guid}/members/{string:userName}";
         public const string AllGroupModerators = "{groupId:guid}/moderators";
         public const string GroupModerator = "{groupId:guid}/moderators/{userId:guid}";
     }

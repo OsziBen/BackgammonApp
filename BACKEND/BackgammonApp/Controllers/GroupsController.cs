@@ -170,7 +170,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost(GroupConstants.GroupMember)]
-        [Authorize(Policy = Policies.GroupModerator)]
+        [Authorize(Policy = Policies.GroupModerator)]   // TODO: javítani!
         public async Task<ActionResult> AddMember(
             [FromRoute] Guid groupId,
             [FromRoute] string userName,
