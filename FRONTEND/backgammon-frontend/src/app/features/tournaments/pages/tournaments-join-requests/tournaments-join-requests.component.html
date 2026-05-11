@@ -1,5 +1,20 @@
 <h2 class="section-title">Join Requests</h2>
 
-<div class="placeholder-card">
-  <p>No tournament join requests yet</p>
-</div>
+@if (loading()) {
+  <div class="info-text">Loading requests...</div>
+}
+
+@if (error()) {
+  <div class="error-box">
+    {{ error() }}
+  </div>
+}
+
+@if (!loading() && !error()) {
+  <div class="card-grid">
+    @for (req of requests(); track req.id) {
+      <app-user-tournament-join-request-card [request]="req">
+      </app-user-tournament-join-request-card>
+    }
+  </div>
+}

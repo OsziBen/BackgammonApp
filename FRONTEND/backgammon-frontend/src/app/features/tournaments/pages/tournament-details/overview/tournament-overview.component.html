@@ -1,60 +1,13 @@
-<h3 class="section-title">Overview</h3>
+<h2>Overview</h2>
 
-<div class="card overview-card">
-  <div class="grid">
-    <div class="item">
-      <span class="label">Name</span>
-      <span class="value">Winter Championship 2026</span>
-    </div>
+<p><strong>Name:</strong> {{ tournament.name }}</p>
+<p><strong>Description:</strong> {{ tournament.description }}</p>
+<p><strong>Organizer:</strong> {{ tournament.organizerUserName }}</p>
+<p><strong>Type:</strong> {{ tournament.type }}</p>
+<p><strong>Visibility:</strong> {{ tournament.visibility }}</p>
+<p><strong>Status:</strong> {{ tournament.status }}</p>
 
-    <div class="item">
-      <span class="label">Organizer</span>
-      <span class="value">AdminUser</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Status</span>
-      <span class="value">Active</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Type</span>
-      <span class="value">Knockout</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Visibility</span>
-      <span class="value">Public</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Max</span>
-      <span class="value">32</span>
-    </div>
-
-    <div class="item full">
-      <span class="label">Description</span>
-      <span class="value">Seasonal elimination tournament</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Start</span>
-      <span class="value">2026.06.01 18:00</span>
-    </div>
-
-    <div class="item">
-      <span class="label">End</span>
-      <span class="value">2026.06.10 20:00</span>
-    </div>
-
-    <div class="item">
-      <span class="label">Deadline</span>
-      <span class="value">2026.05.30 23:59</span>
-    </div>
-  </div>
-</div>
-
-<div class="actions">
+@if (isOrganizer()) {
   <button>Edit</button>
-  <button class="danger">Delete</button>
-</div>
+  <button>Delete</button>
+}
