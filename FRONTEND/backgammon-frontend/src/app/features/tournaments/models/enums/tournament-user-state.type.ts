@@ -1,1 +1,5 @@
-export type TournamentUserState = 'NONE' | 'ORGANIZER' | 'PARTICIPANT';
+export type TournamentUserState =
+  | 'NONE'
+  | 'ORGANIZER'
+  | 'PARTICIPANT'
+  | 'PENDING';
