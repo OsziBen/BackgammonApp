@@ -63,8 +63,8 @@ export class GroupsApiService {
   // ADD GROUP MEMBER
   addGroupMember(groupId: string, userName: string): Observable<void> {
     return this.http.post<void>(
-      `${this.groupsBaseUrl}/${groupId}/members/${userName}`,
-      {},
+      `${this.groupsBaseUrl}/${GROUP_API_ROUTES.MEMBERS(groupId)}`,
+      { userName },
     );
   }
 
