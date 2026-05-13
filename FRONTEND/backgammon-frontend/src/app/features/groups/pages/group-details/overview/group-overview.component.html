@@ -1,11 +1,67 @@
-<h2>Overview</h2>
+<h2 class="section-title">Overview</h2>
 
-<p><strong>Name:</strong> {{ group.name }}</p>
-<p><strong>Description:</strong> {{ group.description }}</p>
-<p><strong>Owner:</strong> {{ group.creatorName }}</p>
-<p><strong>Visibility:</strong> {{ group.visibility }}</p>
+<div class="overview-card">
+  <div class="grid">
+    <div class="item">
+      <span class="label">Name</span>
 
-@if (isOwner()) {
-  <button>Edit</button>
-  <button>Delete</button>
-}
+      <span class="value">{{ group.name }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Owner</span>
+
+      <span class="value">{{ group.creatorName }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Visibility</span>
+
+      <span class="value">{{ group.visibility }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Size Preset</span>
+
+      <span class="value">{{ group.sizePreset }}</span>
+    </div>
+
+    <div class="item full">
+      <span class="label">Description</span>
+
+      <span class="value">
+        {{ group.description || 'No description provided.' }}
+      </span>
+    </div>
+  </div>
+
+  @if (isOwner()) {
+    <div class="actions">
+      <button [routerLink]="['../edit']">Edit</button>
+
+      <button class="danger" (click)="openDeleteConfirm()">Delete</button>
+
+      @if (showDeleteConfirm) {
+        <div class="modal-backdrop">
+          <div class="modal">
+            <h3>Delete group?</h3>
+
+            <p>
+              Are you sure you want to delete
+              <strong>{{ group.name }}</strong
+              >? This action cannot be undone.
+            </p>
+
+            <div class="modal-actions">
+              <button (click)="closeDeleteConfirm()">Cancel</button>
+
+              <button class="danger" (click)="confirmDelete()">
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

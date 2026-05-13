@@ -8,37 +8,17 @@
 </app-tournament-participants-add>
 
 @if (loading()) {
-  <p>Loading participants...</p>
+  <p class="info-text">Loading participants...</p>
 }
 
-<div class="card-grid">
-  @for (p of participants(); track trackById($index, p)) {
-    <div class="card-item">
-      <!-- NAME -->
-      <p>
-        <strong>{{ p.displayName }}</strong>
-      </p>
-
-      <!-- STATUS -->
-      <p class="muted">Status: {{ p.status }}</p>
-
-      <!-- EMAIL -->
-      @if (p.email) {
-        <p class="muted">Email: {{ p.email }}</p>
-      }
-
-      <!-- CREATED AT -->
-      <p class="muted">Joined: {{ p.createdAt | date: 'medium' }}</p>
-
-      <!-- NOTES -->
-      @if (p.notes) {
-        <p class="muted">Notes: {{ p.notes }}</p>
-      }
-
-      <!-- ACTIONS -->
-      @if (canManageParticipants()) {
-        <button class="danger" (click)="onRemove(p.userId)">Remove</button>
-      }
-    </div>
-  }
-</div>
+@if (!loading()) {
+  <div class="card-grid">
+    @for (participant of participants(); track participant.userId) {
+      <app-tournament-participant-card
+        [participant]="participant"
+        [canManage]="canManageParticipants()"
+        (remove)="onRemove($event)"
+      />
+    }
+  </div>
+}

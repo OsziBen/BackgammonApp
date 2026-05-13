@@ -15,11 +15,16 @@ namespace Infrastructure.Repositories.Tournament
             => Query()
                 .AnyAsync(t => t.Name == tournamentName, cancellationToken);
 
-        public Task<List<Domain.Tournament.Tournament>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        public Task<List<Domain.Tournament.Tournament>> GetAllByUserIdAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
             => Query()
-                .Where(t => t.OrganizerUserId == userId)
+                .Where(t =>
+                    t.OrganizerUserId == userId
+                    || t.Participants.Any(p => p.UserId == userId))
                 .Include(t => t.OrganizerUser)
                 .Include(t => t.Participants)
+                .Include(t => t.RulesTemplate)
                 .ToListAsync(cancellationToken);
 
         public Task<List<Domain.Tournament.Tournament>> GetAllPublicAsync(CancellationToken cancellationToken)
@@ -27,12 +32,14 @@ namespace Infrastructure.Repositories.Tournament
                 .Where(t => t.Visibility == TournamentVisibility.Public)
                 .Include(t => t.OrganizerUser)
                 .Include(t => t.Participants)
+                .Include(t => t.RulesTemplate)
                 .ToListAsync(cancellationToken);
 
         public Task<Domain.Tournament.Tournament?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => Query()
                 .Include(t => t.OrganizerUser)
                 .Include(t => t.Participants)
+                .Include(t => t.RulesTemplate)
                 .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 }

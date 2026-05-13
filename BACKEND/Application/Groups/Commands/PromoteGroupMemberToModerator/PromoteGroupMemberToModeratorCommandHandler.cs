@@ -39,40 +39,52 @@ namespace Application.Groups.Commands.PromoteGroupMemberToModerator
                 .GetAsync(request.TargetUserId, request.GroupId, cancellationToken)
                 .GetOrThrowAsync(nameof(GroupMembership), request.TargetUserId);
 
-            var group = membership.Group;
-
-            var currentModerators = await _uow.GroupMembershipRolesWrite
-                .CountActiveByRoleAsync(group.Id, GroupRoleConstants.Moderator, cancellationToken);
-
-            if (currentModerators >= group.MaxModerators)
-            {
-                throw new BusinessRuleException(
-                    FunctionCode.ModeratorLimitReached,
-                    "Moderator limit reached.");
-            }
-
             var moderatorRole = await _roleRead
                 .GetBySystemNameAsync(GroupRoleConstants.Moderator, cancellationToken)
                 .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Moderator);
 
-            var alreadyModerator = await _uow.GroupMembershipRolesWrite
-                .ExistsActiveRoleAsync(membership.Id, moderatorRole.Id, cancellationToken);
+            var memeberRole = await _roleRead
+                .GetBySystemNameAsync(GroupRoleConstants.Member, cancellationToken)
+                .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Member);
 
-            if (alreadyModerator)
+            var activeRoles = await _uow.GroupMembershipRolesWrite
+                .GetActiveRolesAsync(membership.Id, cancellationToken);
+
+            var isAlreadyModerator = activeRoles.Any(x => x.GroupRoleId == moderatorRole.Id);
+
+            if (isAlreadyModerator)
             {
                 throw new BusinessRuleException(
                     FunctionCode.UserIsAlreadyModerator,
                     "Selected user is already a moderator.");
             }
 
-            await _uow.GroupMembershipRolesWrite.AddAsync(new GroupMembershipRole
+            var currentModerators = await _uow.GroupMembershipRolesWrite
+                .CountActiveByRoleAsync(membership.GroupId, GroupRoleConstants.Moderator, cancellationToken);
+
+            if (currentModerators >= membership.Group.MaxModerators)
             {
-                GroupMembershipId = membership.Id,
-                GroupRoleId = moderatorRole.Id,
-                IsActive = true,
-                AssignedAt = now,
-                GrantedBy = request.CurrentUserId
-            }, cancellationToken);
+                throw new BusinessRuleException(
+                    FunctionCode.ModeratorLimitReached,
+                    "Moderator limit reached.");
+            }
+
+            foreach (var role in activeRoles)
+            {
+                role.IsActive = false;
+                role.RevokedAt = now;
+            }
+
+            await _uow.GroupMembershipRolesWrite.AddAsync(
+                new GroupMembershipRole
+                {
+                    GroupMembershipId = membership.Id,
+                    GroupRoleId = moderatorRole.Id,
+                    IsActive = true,
+                    AssignedAt = now,
+                    GrantedBy = request.CurrentUserId
+                },
+                cancellationToken);
 
             await _uow.CommitAsync(cancellationToken);
 

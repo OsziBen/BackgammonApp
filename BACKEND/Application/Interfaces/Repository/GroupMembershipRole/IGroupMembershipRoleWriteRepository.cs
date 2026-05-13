@@ -2,7 +2,7 @@
 {
     public interface IGroupMembershipRoleWriteRepository
     {
-        Task<Domain.GroupMembershipRole.GroupMembershipRole?> GetByIdsAsync(Guid groupMembershipId, Guid groupRoleId);
+        Task<Domain.GroupMembershipRole.GroupMembershipRole?> GetByIdAsync(Guid groupMembershipId, CancellationToken cancellationToken);
         Task AddAsync(Domain.GroupMembershipRole.GroupMembershipRole groupMembershipRole, CancellationToken cancellationToken);
         void Remove(Domain.GroupMembershipRole.GroupMembershipRole entity);
         Task<List<Domain.GroupMembershipRole.GroupMembershipRole>> GetActiveRolesAsync(Guid groupMembershipId, CancellationToken cancellationToken);

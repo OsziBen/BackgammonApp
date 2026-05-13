@@ -1,0 +1,148 @@
+.card {
+  background: white;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+
+  padding: 18px;
+
+  min-height: 120px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.card:hover {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.08);
+}
+
+/* ======================
+   HEADER
+   ====================== */
+.header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+.header h4 {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  color: #335533;
+
+  overflow-wrap: anywhere;
+}
+
+/* ======================
+   ROLE BADGE
+   ====================== */
+.role-badge {
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  background: #eef5ee;
+  color: #335533;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.owner {
+  background: #fff0d6;
+  color: #a66300;
+}
+
+.moderator {
+  background: #e8f0ff;
+  color: #2952cc;
+}
+
+.member {
+  background: #eef5ee;
+  color: #335533;
+}
+
+/* ======================
+   BODY
+   ====================== */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.muted {
+  margin: 0;
+
+  color: #666;
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+/* ======================
+   ACTIONS
+   ====================== */
+.actions {
+  display: flex;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+  margin-top: auto;
+}
+
+button {
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: 0.15s ease;
+}
+
+button:not(.danger) {
+  background: #335533;
+  color: white;
+}
+
+button:not(.danger):hover {
+  background: #2a442a;
+}
+
+button.danger {
+  background: #d9534f;
+  color: white;
+}
+
+button.danger:hover {
+  background: #c9302c;
+}
+
+@media (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

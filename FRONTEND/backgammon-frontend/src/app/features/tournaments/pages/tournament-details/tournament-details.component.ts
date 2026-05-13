@@ -21,9 +21,12 @@ export class TournamentDetailsComponent {
   constructor(private route: ActivatedRoute) {}
 
   // RESOLVED DATA
-  tournament = computed(
-    () => this.route.snapshot.data['tournament'] as TournamentBaseResponse,
-  );
+  tournament = computed(() => {
+    return (
+      (history.state?.tournament as TournamentBaseResponse) ??
+      (this.route.snapshot.data['tournament'] as TournamentBaseResponse)
+    );
+  });
 
   role = computed<TournamentRole>(() => {
     const t = this.tournament();
@@ -43,5 +46,13 @@ export class TournamentDetailsComponent {
 
   isParticipantOrOrganizer = computed(
     () => this.role() === 'Organizer' || this.role() === 'Participant',
+  );
+
+  isPrivateTournament = computed(
+    () => this.tournament()?.visibility === 'Private',
+  );
+
+  showRequestsTab = computed(
+    () => this.isOrganizer() && !this.isPrivateTournament(),
   );
 }

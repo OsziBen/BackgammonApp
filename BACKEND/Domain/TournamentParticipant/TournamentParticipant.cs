@@ -1,9 +1,10 @@
 ﻿using Common.Enums.TournamentParticipant;
+using Common.Interfaces;
 using Common.Models;
 
 namespace Domain.TournamentParticipant
 {
-    public class TournamentParticipant : BaseEntity
+    public class TournamentParticipant : BaseEntity, ISoftDeletable
     {
         public Guid TournamentId { get; set; }
         public Guid UserId { get; set; }

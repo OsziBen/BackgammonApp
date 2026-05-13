@@ -118,8 +118,12 @@ export class TournamentsApiService {
     userName: string,
   ): Observable<void> {
     return this.http.post<void>(
-      `${this.tournamentsBaseUrl}/${tournamentId}/participants/${userName}`,
-      {},
+      `${this.tournamentsBaseUrl}/${TOURNAMENT_API_ROUTES.PARTICIPANTS(
+        tournamentId,
+      )}`,
+      {
+        userName,
+      },
     );
   }
 

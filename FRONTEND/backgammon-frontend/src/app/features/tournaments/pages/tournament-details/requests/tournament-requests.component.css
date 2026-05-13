@@ -1,26 +1,39 @@
+.section-title {
+  margin-bottom: 18px;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #222;
+}
+
+/* ======================
+   STATES
+   ====================== */
+.info-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.error-box {
+  padding: 12px;
+  border-radius: 8px;
+
+  background: #ffe6e6;
+  color: #b42323;
+
+  margin-bottom: 16px;
+}
+
+/* ======================
+   GRID
+   ====================== */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-}
 
-.card-item {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  background: #fff;
-}
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
 
-.actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-}
+  gap: 20px;
 
-button {
-  background: #335533;
-}
-
-button.danger {
-  background: #e53935;
+  align-items: start;
 }

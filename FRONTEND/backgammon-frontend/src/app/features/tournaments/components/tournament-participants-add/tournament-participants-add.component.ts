@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './tournament-participants-add.component.html',
+  styleUrls: ['./tournament-participants-add.component.css'],
 })
 export class TournamentParticipantsAddComponent {
   @Input() canAdd = false;

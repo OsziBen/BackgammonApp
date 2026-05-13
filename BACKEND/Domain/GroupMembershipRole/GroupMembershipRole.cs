@@ -1,6 +1,8 @@
-﻿namespace Domain.GroupMembershipRole
+﻿using Common.Models;
+
+namespace Domain.GroupMembershipRole
 {
-    public class GroupMembershipRole
+    public class GroupMembershipRole : BaseEntity
     {
         public Guid GroupMembershipId { get; set; }
         public Guid GroupRoleId { get; set; }

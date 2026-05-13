@@ -9,7 +9,7 @@
         public const string ApproveJoinRequest = "{tournamentId:guid}/requests/{requestId:guid}/approve";
         public const string RejectJoinRequest = "{tournamentId:guid}/requests/{requestId:guid}/reject";
         public const string Withdraw = "{tournamentId:guid}/withdraw";
-        public const string AllTournamentParticipants = "{tournamentId:guid}/participants";
-        public const string TournamentParticipant = "{tournamentId:guid}/participants/{userId:guid}";
+        public const string TournamentParticipants = "{tournamentId:guid}/participants";
+        public const string Participant = "{tournamentId:guid}/participants/{userId:guid}";
     }
 }

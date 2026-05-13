@@ -15,7 +15,8 @@ namespace Application.Users.Commands.ListGroupJoinRequestsByUserId
 
         public async Task<List<UserGroupJoinRequestResponse>> Handle(ListGroupJoinRequestsByUserIdCommand request, CancellationToken cancellationToken)
         {
-            var joinRequests = await _groupJoinRequestReadRepository.GetAllByUserIdAsync(request.UserId, cancellationToken);
+            var joinRequests = await _groupJoinRequestReadRepository
+                .GetAllByUserIdAsync(request.UserId, cancellationToken);
 
             return joinRequests.Select(joinRequest => new UserGroupJoinRequestResponse
             {

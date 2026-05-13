@@ -21,7 +21,8 @@ namespace Application.Users.Commands.ListUserGroups
 
         public async Task<List<GroupBaseResponse>> Handle(ListUserGroupsCommand request, CancellationToken cancellationToken)
         {
-            var groups = await _groupReadRepository.GetAllByUserIdAsync(request.UserId, cancellationToken);
+            var groups = await _groupReadRepository
+                .GetAllByUserIdAsync(request.UserId, cancellationToken);
 
             var memberships = await _groupMembershipReadRepository
                 .GetMembershipsWithRolesByUserIdAsync(

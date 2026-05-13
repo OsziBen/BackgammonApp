@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces.Repository.TournamentJoinRequest;
 using Common.Enums.Group;
-using Domain.User;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +23,13 @@ namespace Infrastructure.Repositories.TournamentJoinRequest
                 .Where(tjr => tjr.UserId == userId)
                 .Include(tjr => tjr.Tournament)
                 .ThenInclude(t => t.OrganizerUser)
+                .ToListAsync(cancellationToken);
+
+        public Task<List<Domain.TournamentJoinRequest.TournamentJoinRequest>> GetAllPendingByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+            => Query()
+                .Where(tjr => tjr.UserId == userId
+                           && tjr.Status == JoinRequestStatus.Pending)
+                .Include(tjr => tjr.Tournament)
                 .ToListAsync(cancellationToken);
 
         public Task<bool> HasPendingRequestAsync(Guid userId, Guid tournamentId, CancellationToken cancellationToken)

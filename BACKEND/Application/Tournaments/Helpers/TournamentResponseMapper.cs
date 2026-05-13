@@ -1,4 +1,5 @@
-﻿using Application.Tournaments.Responses;
+﻿using Application.RulesTemplate.Responses;
+using Application.Tournaments.Responses;
 using Common.Constants;
 
 namespace Application.Tournaments.Helpers
@@ -7,7 +8,8 @@ namespace Application.Tournaments.Helpers
     {
         public static TournamentBaseResponse ToBaseResponse(
             Domain.Tournament.Tournament tournament,
-            Guid? userId)
+            Guid? userId,
+            bool hasPendingRequest = false)
         {
             string? state = null;
 
@@ -21,6 +23,14 @@ namespace Application.Tournaments.Helpers
                 {
                     state = TournamentUserStates.Participant;
                 }
+                else if (hasPendingRequest)
+                {
+                    state = TournamentUserStates.Pending;
+                }
+                else
+                {
+                    state = TournamentUserStates.None;
+                }
             }
 
             return BuildResponse(tournament, state);
@@ -30,6 +40,22 @@ namespace Application.Tournaments.Helpers
             Domain.Tournament.Tournament tournament,
             string? state)
         {
+            var template = tournament.RulesTemplate;
+
+            var templateResponse = new RulesTemplateResponse
+            {
+                Id = template.Id,
+                Name = template.Name,
+                Description = template.Description,
+                AuthorName = template.Author?.UserName ?? "System",
+                TargetScore = template.TargetScore,
+                UseClock = template.UseClock,
+                MatchTimePerPlayerInSeconds = template.MatchTimePerPlayerInSeconds,
+                StartOfTurnDelayPerPlayerInSeconds = template.StartOfTurnDelayPerPlayerInSeconds,
+                CrawfordRuleEnabled = template.CrawfordRuleEnabled,
+                CreatedAt = template.CreatedAt,
+            };
+
             return new TournamentBaseResponse
             {
                 Id = tournament.Id,
@@ -42,6 +68,7 @@ namespace Application.Tournaments.Helpers
                 StartDate = tournament.StartDate,
                 EndDate = tournament.EndDate,
                 Deadline = tournament.Deadline,
+                RulesTemplate = templateResponse,
                 OrganizerUserName = tournament.OrganizerUser.UserName,
                 TournamentUserState = state
             };

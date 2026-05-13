@@ -38,7 +38,7 @@ namespace Application.Tournaments.Commands.ApproveTournamentJoinRequest
             var now = _dateTimeProvider.UtcNow;
 
             var joinRequest = await _uow.TournamentJoinRequestsWrite
-                .GetByIdAsync(request.TournamentId, cancellationToken)
+                .GetByIdAsync(request.RequestId, cancellationToken)
                 .GetOrThrowAsync(nameof(TournamentJoinRequest), request.TournamentId);
 
             if (joinRequest.Status != JoinRequestStatus.Pending)
@@ -55,7 +55,7 @@ namespace Application.Tournaments.Commands.ApproveTournamentJoinRequest
                     "Tournament IDs are not macthing.");
             }
 
-            if (await _tournamentParticipantReadRepository.ExistsAsync(request.UserId, request.TournamentId, cancellationToken))
+            if (await _tournamentParticipantReadRepository.ExistsAsync(joinRequest.UserId, request.TournamentId, cancellationToken))
             {
                 throw new BusinessRuleException(
                     FunctionCode.UserAlreadyActiveParticipant,
@@ -80,17 +80,17 @@ namespace Application.Tournaments.Commands.ApproveTournamentJoinRequest
                     "The deadline for joining this tournament has passed.");
             }
 
-            var participant = new TournamentParticipant
+            await _uow.TournamentParticipantsWrite.AddAsync(new TournamentParticipant
             {
                 TournamentId = request.TournamentId,
-                UserId = request.UserId,
+                UserId = joinRequest.UserId,
                 Status = TournamentParticipantStatus.Active,
                 DisplayName = joinRequest.User.UserName,
                 Email = joinRequest.User.EmailAddress,
                 Notes = null,
                 CreatedAt = now,
                 LastUpdatedAt = now,
-            };
+            }, cancellationToken);
 
             joinRequest.Status = JoinRequestStatus.Approved;
             joinRequest.ReviewedAt = now;

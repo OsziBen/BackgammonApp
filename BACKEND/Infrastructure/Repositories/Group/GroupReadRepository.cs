@@ -23,7 +23,8 @@ namespace Infrastructure.Repositories.Group
 
         public Task<List<Domain.Group.Group>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
             => Query()
-                .Where(g => g.CreatorId == userId)
+                .Where(g => g.CreatorId == userId
+                    || g.GroupMemberships.Any(gm => gm.UserId == userId))
                 .Include(g => g.Creator)
                 .ToListAsync(cancellationToken);
 

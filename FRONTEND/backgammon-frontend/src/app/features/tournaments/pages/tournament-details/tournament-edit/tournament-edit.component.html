@@ -1,0 +1,94 @@
+<div class="page-header">
+  <button
+    class="back-button"
+    [routerLink]="['/tournaments', tournament.id, 'overview']"
+  >
+    ← Back
+  </button>
+
+  <h2 class="section-title">Edit Tournament</h2>
+</div>
+
+<form class="edit-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <label>Name</label>
+
+    <input type="text" formControlName="name" />
+  </div>
+
+  <div class="form-group">
+    <label>Description</label>
+
+    <textarea rows="5" formControlName="description"></textarea>
+  </div>
+
+  <div class="grid">
+    <div class="form-group">
+      <label>Type</label>
+
+      <select formControlName="type">
+        @for (t of typeOptions; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Visibility</label>
+
+      <select formControlName="visibility">
+        @for (v of visibilityOptions; track v) {
+          <option [value]="v">{{ v }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+
+      <select formControlName="status">
+        @for (s of statusOptions; track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Max Participants</label>
+
+      <input type="number" min="2" formControlName="maxParticipants" />
+    </div>
+
+    <div class="form-group">
+      <label>Start Date</label>
+
+      <input type="datetime-local" formControlName="startDate" />
+    </div>
+
+    <div class="form-group">
+      <label>End Date</label>
+
+      <input type="datetime-local" formControlName="endDate" />
+    </div>
+
+    <div class="form-group">
+      <label>Deadline</label>
+
+      <input type="datetime-local" formControlName="deadline" />
+    </div>
+
+    <div class="form-group">
+      <label>Rules Template</label>
+
+      <select formControlName="rulesTemplateId">
+        @for (t of rulesTemplates; track t.id) {
+          <option [value]="t.id">{{ t.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="loading()">Save Changes</button>
+  </div>
+</form>

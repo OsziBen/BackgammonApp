@@ -1,17 +1,24 @@
 <h3 class="section-title">Join Requests</h3>
 
 @if (loading()) {
-  <p>Loading requests...</p>
+  <p class="info-text">Loading requests...</p>
 }
 
-<div class="card-grid">
-  @for (r of requests(); track trackById($index, r)) {
-    <app-tournament-join-request-card
-      [request]="r"
-      [canManage]="canManageRequests()"
-      (approve)="onApprove($event)"
-      (reject)="onReject($event)"
-    >
-    </app-tournament-join-request-card>
-  }
-</div>
+@if (error()) {
+  <div class="error-box">
+    {{ error() }}
+  </div>
+}
+
+@if (!loading() && !error()) {
+  <div class="card-grid">
+    @for (request of requests(); track request.id) {
+      <app-tournament-join-request-card
+        [request]="request"
+        [canManage]="canManageRequests()"
+        (approve)="onApprove($event)"
+        (reject)="onReject($event)"
+      />
+    }
+  </div>
+}

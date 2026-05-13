@@ -598,10 +598,6 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId", "GroupId")
-                        .IsUnique()
-                        .HasFilter("\"Status\" = 0");
-
                     b.ToTable("GroupJoinRequests");
                 });
 
@@ -641,16 +637,20 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.GroupMembershipRole.GroupMembershipRole", b =>
                 {
-                    b.Property<Guid>("GroupMembershipId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("GroupRoleId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("AssignedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("GrantedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupMembershipId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupRoleId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
@@ -661,11 +661,13 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("GroupMembershipId", "GroupRoleId");
+                    b.HasKey("Id");
 
                     b.HasIndex("GrantedBy");
 
                     b.HasIndex("GroupRoleId");
+
+                    b.HasIndex("GroupMembershipId", "GroupRoleId");
 
                     b.ToTable("GroupMembershipRoles");
                 });
@@ -1189,10 +1191,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("TournamentId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "TournamentId")
-                        .IsUnique()
-                        .HasFilter("\"Status\" = 0");
 
                     b.ToTable("TournamentJoinRequests");
                 });

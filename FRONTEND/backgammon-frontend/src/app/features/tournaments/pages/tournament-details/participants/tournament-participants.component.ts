@@ -4,28 +4,34 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TournamentsApiService } from '../../../services/tournaments-api.service';
 import { TournamentBaseResponse } from '../../../models/api/responses/tournament-base.response';
-import { TournamentParticipantsAddComponent } from '../../../components/tournament-participants-add/tournament-participants-add.component';
 import { TournamentParticipantBaseResponse } from '../../../models/api/responses/tournament-participant-base.response';
+import { TournamentParticipantsAddComponent } from '../../../components/tournament-participants-add/tournament-participants-add.component';
+import { TournamentParticipantCardComponent } from '../../../components/tournament-participant-card/tournament-participant-card.component';
 
 type TournamentRole = 'Organizer' | 'Participant' | 'None';
 
 @Component({
   selector: 'app-tournament-participants',
   standalone: true,
-  imports: [CommonModule, TournamentParticipantsAddComponent],
+  imports: [
+    CommonModule,
+    TournamentParticipantsAddComponent,
+    TournamentParticipantCardComponent,
+  ],
   templateUrl: './tournament-participants.component.html',
   styleUrls: ['./tournament-participants.component.css'],
 })
 export class TournamentParticipantsComponent implements OnInit {
-  // STATE
   readonly participants = signal<TournamentParticipantBaseResponse[]>([]);
   readonly tournament = signal<TournamentBaseResponse | null>(null);
+
   readonly role = signal<TournamentRole>('None');
+
   readonly loading = signal(false);
 
   constructor(
-    private route: ActivatedRoute,
-    private api: TournamentsApiService,
+    private readonly route: ActivatedRoute,
+    private readonly api: TournamentsApiService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -36,6 +42,7 @@ export class TournamentParticipantsComponent implements OnInit {
     if (!tournament) return;
 
     this.tournament.set(tournament);
+
     this.role.set(this.mapRole(tournament.tournamentUserState));
 
     await this.loadParticipants(tournament.id);
@@ -45,11 +52,11 @@ export class TournamentParticipantsComponent implements OnInit {
     this.loading.set(true);
 
     try {
-      const res = await firstValueFrom(
+      const result = await firstValueFrom(
         this.api.getTournamentParticipants(tournamentId),
       );
 
-      this.participants.set(res.participants);
+      this.participants.set(result.participants);
     } finally {
       this.loading.set(false);
     }
@@ -59,8 +66,10 @@ export class TournamentParticipantsComponent implements OnInit {
     switch (state) {
       case 'ORGANIZER':
         return 'Organizer';
+
       case 'PARTICIPANT':
         return 'Participant';
+
       default:
         return 'None';
     }
@@ -70,18 +79,23 @@ export class TournamentParticipantsComponent implements OnInit {
   // PERMISSIONS
   // =========================
 
-  isOrganizer = () => this.role() === 'Organizer';
+  isOrganizer(): boolean {
+    return this.role() === 'Organizer';
+  }
 
-  canManageParticipants = () => this.role() === 'Organizer';
+  canManageParticipants(): boolean {
+    return this.role() === 'Organizer';
+  }
 
-  canAddParticipants = () =>
-    this.isOrganizer() && this.tournament()?.visibility === 'Private';
+  canAddParticipants(): boolean {
+    return this.isOrganizer() && this.tournament()?.visibility === 'Private';
+  }
 
   // =========================
   // ACTIONS
   // =========================
 
-  async onAddParticipant(username: string) {
+  async onAddParticipant(username: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
 
     if (!tournamentId) return;
@@ -93,7 +107,7 @@ export class TournamentParticipantsComponent implements OnInit {
     await this.loadParticipants(tournamentId);
   }
 
-  async onRemove(userId: string) {
+  async onRemove(userId: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
 
     if (!tournamentId) return;
@@ -103,9 +117,5 @@ export class TournamentParticipantsComponent implements OnInit {
     );
 
     await this.loadParticipants(tournamentId);
-  }
-
-  trackById(index: number, item: TournamentParticipantBaseResponse): string {
-    return item.userId;
   }
 }

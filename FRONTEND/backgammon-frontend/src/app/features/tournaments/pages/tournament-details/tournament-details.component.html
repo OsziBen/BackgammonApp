@@ -5,7 +5,7 @@
     <a routerLink="overview" routerLinkActive="active">Overview</a>
     <a routerLink="participants" routerLinkActive="active">Participants</a>
 
-    @if (isOrganizer()) {
+    @if (showRequestsTab()) {
       <a [routerLink]="['requests']" routerLinkActive="active">
         Join Requests
       </a>

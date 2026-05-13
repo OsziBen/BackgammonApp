@@ -78,7 +78,7 @@ namespace Application.Tournaments.Commands.AddTournamentParticipant
                     "The deadline for joining this tournament has passed.");
             }
 
-            var participant = new TournamentParticipant
+            await _uow.TournamentParticipantsWrite.AddAsync(new TournamentParticipant
             {
                 TournamentId = request.TournamentId,
                 UserId = user.Id,
@@ -88,7 +88,7 @@ namespace Application.Tournaments.Commands.AddTournamentParticipant
                 Notes = null,
                 CreatedAt = now,
                 LastUpdatedAt = now,
-            };
+            }, cancellationToken);
 
             await _uow.CommitAsync(cancellationToken);
 

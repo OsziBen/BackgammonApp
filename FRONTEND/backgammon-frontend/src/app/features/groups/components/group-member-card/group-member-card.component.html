@@ -1,0 +1,34 @@
+<div class="card">
+  <div class="header">
+    <h4>{{ member.userName }}</h4>
+
+    <span class="role-badge" [ngClass]="member.groupRoleName?.toLowerCase()">
+      {{ member.groupRoleName ?? 'Member' }}
+    </span>
+  </div>
+
+  <div class="body">
+    <p class="muted">
+      Rating:
+      <strong>{{ member.rating }}</strong>
+    </p>
+  </div>
+
+  @if (showActions()) {
+    <div class="actions">
+      @if (isOwner) {
+        @if (getRole() === 'MEMBER') {
+          <button (click)="onPromote()">Promote</button>
+        }
+
+        @if (getRole() === 'MODERATOR') {
+          <button (click)="onDemote()">Demote</button>
+        }
+      }
+
+      @if (canShowRemove()) {
+        <button class="danger" (click)="onRemove()">Remove</button>
+      }
+    </div>
+  }
+</div>

@@ -15,5 +15,9 @@ namespace Infrastructure.Repositories.RulesTemplate
                 .Where(rt => rt.IsPublic)
                 .Include(rt => rt.Author)
                 .ToListAsync(cancellationToken);
+
+        public Task<Domain.RulesTemplate.RulesTemplate?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+            => Query()
+                .FirstOrDefaultAsync(rt => rt.Id == id, cancellationToken);
     }
 }

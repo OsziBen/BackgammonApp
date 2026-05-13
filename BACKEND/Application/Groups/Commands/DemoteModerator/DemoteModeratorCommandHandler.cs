@@ -6,6 +6,7 @@ using Application.Shared.Time;
 using Common.Enums;
 using Common.Exceptions;
 using Domain.GroupMembership;
+using Domain.GroupMembershipRole;
 using Domain.GroupRole;
 using MediatR;
 
@@ -42,31 +43,36 @@ namespace Application.Groups.Commands.DemoteModerator
                 .GetBySystemNameAsync(GroupRoleConstants.Moderator, cancellationToken)
                 .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Moderator);
 
-            var roles = await _uow.GroupMembershipRolesWrite
+            var memberRole = await _roleRead
+                .GetBySystemNameAsync(GroupRoleConstants.Member, cancellationToken)
+                .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Member);
+
+            var activeRoles = await _uow.GroupMembershipRolesWrite
                 .GetActiveRolesAsync(membership.Id, cancellationToken);
 
-            var moderator = roles.FirstOrDefault(r => r.GroupRoleId == moderatorRole.Id);
+            var activeModeratorRole = activeRoles
+                .FirstOrDefault(x => x.GroupRoleId == moderatorRole.Id);
 
-            if (moderator == null)
+            if (activeModeratorRole == null)
             {
                 throw new BusinessRuleException(
                     FunctionCode.UserIsNotModerator,
                     "Selected user is not a moderator.");
             }
-                
 
-            var isOwner = await _uow.GroupMembershipRolesWrite
-                .IsOwnerAsync(membership.Id, cancellationToken);
+            activeModeratorRole.IsActive = false;
+            activeModeratorRole.RevokedAt = now;
 
-            if (isOwner)
-            {
-                throw new BusinessRuleException(
-                    FunctionCode.CannotDemoteGroupOwner,
-                    "Cannot demote group owner.");
-            }
-
-            moderator.IsActive = false;
-            moderator.RevokedAt = now;
+            await _uow.GroupMembershipRolesWrite.AddAsync(
+                new GroupMembershipRole
+                {
+                    GroupMembershipId = membership.Id,
+                    GroupRoleId = memberRole.Id,
+                    IsActive = true,
+                    AssignedAt = now,
+                    GrantedBy = request.CurrentUserId
+                },
+                cancellationToken);
 
             await _uow.CommitAsync(cancellationToken);
 

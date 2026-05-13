@@ -169,11 +169,11 @@ namespace WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpPost(GroupConstants.GroupMember)]
-        [Authorize(Policy = Policies.GroupModerator)]   // TODO: javítani!
+        [HttpPost(GroupConstants.AllGroupMembers)]
+        [Authorize(Policy = Policies.GroupModerator)]
         public async Task<ActionResult> AddMember(
             [FromRoute] Guid groupId,
-            [FromRoute] string userName,
+            [FromBody] AddGroupMemberRequest request,
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;
@@ -183,7 +183,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new AddGroupMemberCommand(groupId, userName, userId);
+            var command = new AddGroupMemberCommand(groupId, request.UserName, userId);
 
             var response = await _mediator.Send(command, cancellationToken);
 
@@ -345,7 +345,7 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new DemoteModeratorCommand(groupId, userId);
+            var command = new DemoteModeratorCommand(groupId, userId, currentUserId);
 
             var response = await _mediator.Send(command, cancellationToken);
 

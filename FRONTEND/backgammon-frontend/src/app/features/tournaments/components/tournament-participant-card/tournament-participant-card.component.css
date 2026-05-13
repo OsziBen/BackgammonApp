@@ -1,0 +1,112 @@
+.card {
+  background: #fff;
+
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* ======================
+   HEADER
+   ====================== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+h3 {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  color: #335533;
+
+  overflow-wrap: anywhere;
+}
+
+/* ======================
+   STATUS
+   ====================== */
+.status {
+  width: fit-content;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  padding: 4px 8px;
+  border-radius: 999px;
+
+  background: #eef5ee;
+  color: #335533;
+
+  text-transform: uppercase;
+}
+
+/* ======================
+   BODY
+   ====================== */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.body p {
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #555;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+}
+
+/* ======================
+   ACTIONS
+   ====================== */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+
+  padding: 8px 12px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: 0.15s ease;
+}
+
+button.danger {
+  background: #d9534f;
+  color: white;
+}
+
+button.danger:hover {
+  background: #c9302c;
+}

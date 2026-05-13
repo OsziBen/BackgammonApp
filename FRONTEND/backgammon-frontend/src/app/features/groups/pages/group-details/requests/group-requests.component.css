@@ -1,25 +1,39 @@
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #335533;
+  margin-bottom: 12px;
+}
+
+.info-text {
+  color: #555;
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.error-box {
+  background: #ffecec;
+  color: #e53935;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
+
+  align-items: stretch;
 }
 
 .card-item {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  background: white;
+  display: flex;
+  min-width: 0;
+  height: 100%;
 }
 
-.muted {
-  color: #777;
-  font-size: 12px;
-}
-
-.actions button {
-  background: #335533;
-}
-
-.actions button.danger {
-  background: #e53935;
+.card-item > * {
+  flex: 1;
+  display: flex;
 }
