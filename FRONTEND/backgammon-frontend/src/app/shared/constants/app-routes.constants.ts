@@ -17,6 +17,7 @@ export const AppRoutes = {
   groupsCreate: 'create',
   groupsDetails: ':groupId',
   groupsOverview: 'overview',
+  groupsEdit: 'edit',
   groupsMembers: 'members',
   groupsRequests: 'requests',
 
@@ -27,6 +28,7 @@ export const AppRoutes = {
   tournamentsCreate: 'create',
   tournamentsDetails: ':tournamentId',
   tournamentsOverview: 'overview',
+  tournamentsEdit: 'edit',
   tournamentsParticipants: 'participants',
   tournamentsRequests: 'requests',
 } as const;

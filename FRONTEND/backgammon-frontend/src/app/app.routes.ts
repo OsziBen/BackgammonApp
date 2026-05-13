@@ -117,6 +117,13 @@ export const routes: Routes = [
                     (m) => m.GroupRequestsComponent,
                   ),
               },
+              {
+                path: AppRoutes.groupsEdit,
+                loadComponent: () =>
+                  import('./features/groups/pages/group-details/group-edit/group-edit.component').then(
+                    (m) => m.GroupEditComponent,
+                  ),
+              },
             ],
           },
         ],
@@ -196,6 +203,13 @@ export const routes: Routes = [
                 loadComponent: () =>
                   import('./features/tournaments/pages/tournament-details/requests/tournament-requests.component').then(
                     (m) => m.TournamentRequestsComponent,
+                  ),
+              },
+              {
+                path: AppRoutes.tournamentsEdit,
+                loadComponent: () =>
+                  import('./features/tournaments/pages/tournament-details/tournament-edit/tournament-edit.component').then(
+                    (m) => m.TournamentEditComponent,
                   ),
               },
             ],
