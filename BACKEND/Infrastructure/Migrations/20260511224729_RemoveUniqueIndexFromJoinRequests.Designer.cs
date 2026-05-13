@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511224729_RemoveUniqueIndexFromJoinRequests")]
+    partial class RemoveUniqueIndexFromJoinRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -637,20 +640,16 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.GroupMembershipRole.GroupMembershipRole", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("GroupMembershipId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupRoleId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("AssignedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("GrantedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("GroupMembershipId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("GroupRoleId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
@@ -661,13 +660,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("GroupMembershipId", "GroupRoleId");
 
                     b.HasIndex("GrantedBy");
 
                     b.HasIndex("GroupRoleId");
-
-                    b.HasIndex("GroupMembershipId", "GroupRoleId");
 
                     b.ToTable("GroupMembershipRoles");
                 });

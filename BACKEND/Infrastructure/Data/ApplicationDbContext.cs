@@ -297,10 +297,6 @@ namespace Infrastructure.Data
                 groupJoinRequest.HasIndex(x => x.GroupId);
 
                 groupJoinRequest.HasIndex(x => x.UserId);
-
-                groupJoinRequest.HasIndex(gjr => new { gjr.UserId, gjr.GroupId })
-                                .IsUnique()
-                                .HasFilter("\"Status\" = 0");
             });
 
             modelBuilder.Entity<GroupRole>(groupRole =>
@@ -391,7 +387,10 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<GroupMembershipRole>(groupMembershipRole =>
             {
-                groupMembershipRole.HasKey(gmr => new { gmr.GroupMembershipId, gmr.GroupRoleId });
+                groupMembershipRole.HasKey(gmr => gmr.Id);
+
+                groupMembershipRole.HasIndex(gmr =>
+                    new { gmr.GroupMembershipId, gmr.GroupRoleId });
 
                 groupMembershipRole.HasOne(gmr => gmr.GroupMembership)
                                    .WithMany(gm => gm.GroupRoles)
@@ -399,7 +398,7 @@ namespace Infrastructure.Data
                                    .OnDelete(DeleteBehavior.Cascade);
 
                 groupMembershipRole.HasOne(gmr => gmr.GroupRole)
-                                   .WithMany(gm => gm.GroupMembershipRoles)
+                                   .WithMany(gr => gr.GroupMembershipRoles)
                                    .HasForeignKey(gmr => gmr.GroupRoleId)
                                    .OnDelete(DeleteBehavior.Cascade);
 
@@ -849,10 +848,6 @@ namespace Infrastructure.Data
                 tournamentJoinRequest.HasIndex(x => x.TournamentId);
 
                 tournamentJoinRequest.HasIndex(x => x.UserId);
-
-                tournamentJoinRequest.HasIndex(tjr => new { tjr.UserId, tjr.TournamentId })
-                                .IsUnique()
-                                .HasFilter("\"Status\" = 0");
             });
 
             modelBuilder.Entity<TournamentPairing>(tournamentPairing =>
