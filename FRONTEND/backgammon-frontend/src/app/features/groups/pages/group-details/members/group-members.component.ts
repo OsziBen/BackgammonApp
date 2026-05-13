@@ -8,13 +8,14 @@ import { GroupsApiService } from '../../../services/groups-api.service';
 import { BaseGroupResponse } from '../../../models/api/responses/base-group.response';
 import { UserBaseResponse } from '../../../../user/models/api/responses/user-base.response';
 import { GroupMembersAddComponent } from '../../../components/group-members-add/group-members-add.component';
+import { GroupMemberCardComponent } from '../../../components/group-member-card/group-member-card.component';
 
 type GroupRole = 'Owner' | 'Moderator' | 'Member' | 'None';
 
 @Component({
   selector: 'app-group-members',
   standalone: true,
-  imports: [CommonModule, GroupMembersAddComponent],
+  imports: [CommonModule, GroupMembersAddComponent, GroupMemberCardComponent],
   templateUrl: './group-members.component.html',
   styleUrls: ['./group-members.component.css'],
 })

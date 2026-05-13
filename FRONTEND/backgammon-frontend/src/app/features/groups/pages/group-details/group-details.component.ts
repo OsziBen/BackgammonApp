@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { BaseGroupResponse } from '../../models/api/responses/base-group.response';
 
-type GroupRole = 'Owner' | 'Moderator' | 'Member' | 'None';
+type GroupRole = 'OWNER' | 'MODERATOR' | 'MEMBER' | 'NONE';
 
 @Component({
   selector: 'app-group-details',
@@ -27,21 +27,27 @@ export class GroupDetailsComponent {
 
   role = computed<GroupRole>(() => {
     const g = this.group();
-    if (!g) return 'None';
+    if (!g) return 'NONE';
 
     switch (g.groupUserState) {
       case 'OWNER':
-        return 'Owner';
+        return 'OWNER';
       case 'MODERATOR':
-        return 'Moderator';
+        return 'MODERATOR';
       case 'MEMBER':
-        return 'Member';
+        return 'MEMBER';
       default:
-        return 'None';
+        return 'NONE';
     }
   });
 
   isModeratorOrOwner = computed(
-    () => this.role() === 'Owner' || this.role() === 'Moderator',
+    () => this.role() === 'OWNER' || this.role() === 'MODERATOR',
+  );
+
+  isPrivateGroup = computed(() => this.group()?.visibility === 'Private');
+
+  showRequestsTab = computed(
+    () => this.isModeratorOrOwner() && !this.isPrivateGroup(),
   );
 }

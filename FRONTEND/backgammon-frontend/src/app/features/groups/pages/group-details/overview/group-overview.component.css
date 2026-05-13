@@ -1,35 +1,162 @@
 .section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #335533;
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #222;
+
+  margin-bottom: 18px;
 }
 
-.card {
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  background: #fafafa;
+.overview-card {
+  background: white;
+
+  border-radius: 14px;
+  border: 1px solid #e8e8e8;
+
+  padding: 22px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+.item {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+.item.full {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #777;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+}
+
+.value {
+  font-size: 15px;
+
+  color: #222;
+
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+/* ======================
+   ACTIONS
+   ====================== */
 .actions {
-  margin-top: 12px;
   display: flex;
-  gap: 10px;
+  gap: 12px;
+
+  margin-top: 28px;
+
+  flex-wrap: wrap;
 }
 
 button {
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 16px;
+
   border: none;
+  border-radius: 8px;
+
   cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.15s ease;
+}
+
+button:not(.danger) {
   background: #335533;
   color: white;
 }
 
+button:not(.danger):hover {
+  background: #2a442a;
+}
+
 button.danger {
-  background: #c0392b;
+  background: #d9534f;
+  color: white;
+}
+
+button.danger:hover {
+  background: #c9302c;
+}
+
+/* ======================
+   MODAL
+   ====================== */
+.modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+}
+
+.modal {
+  background: white;
+
+  border-radius: 14px;
+
+  padding: 24px;
+
+  width: min(90vw, 420px);
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3 {
+  margin-top: 0;
+
+  margin-bottom: 12px;
+
+  font-size: 20px;
+}
+
+.modal p {
+  margin-bottom: 20px;
+
+  color: #555;
+
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }

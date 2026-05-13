@@ -5,7 +5,7 @@
     <a routerLink="overview" routerLinkActive="active">Overview</a>
     <a routerLink="members" routerLinkActive="active">Members</a>
 
-    @if (isModeratorOrOwner()) {
+    @if (showRequestsTab()) {
       <a routerLink="requests" routerLinkActive="active">Requests</a>
     }
   </nav>

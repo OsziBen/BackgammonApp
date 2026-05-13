@@ -33,13 +33,10 @@ export class GroupsAllComponent implements OnInit {
 
     try {
       const result = await firstValueFrom(this.api.getAllGroups());
-
       this.groups.set(result);
     } catch (err) {
       console.error(err);
-
       this.error.set('Could not load groups');
-
       this.toastr.error('Could not load groups', 'Error');
     } finally {
       this.loading.set(false);
@@ -52,15 +49,9 @@ export class GroupsAllComponent implements OnInit {
 
       this.toastr.success('Join request sent', 'Success');
 
-      this.groups.update((groups) =>
-        groups.map((g) => (g.id === groupId ? { ...g, canJoin: false } : g)),
-      );
+      await this.loadGroups();
     } catch {
       this.toastr.error('Could not join group', 'Error');
     }
-  }
-
-  trackById(index: number, item: BaseGroupResponse): string {
-    return item.id;
   }
 }

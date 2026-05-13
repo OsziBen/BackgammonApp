@@ -1,39 +1,23 @@
 <h3 class="section-title">Members</h3>
 
-<!-- ADD MEMBER -->
 <app-group-members-add [canAdd]="canAddMembers()" (add)="onAddMember($event)">
 </app-group-members-add>
 
 @if (loading()) {
-  <p>Loading members...</p>
+  <p class="info-text">Loading members...</p>
 }
 
-<div class="card-grid">
-  @for (m of members(); track trackById($index, m)) {
-    <div class="card-item">
-      <p>
-        <strong>{{ m.userName }}</strong>
-      </p>
-
-      <p class="muted">Role: {{ m.groupRoleName ?? 'Member' }}</p>
-
-      <p class="muted">Rating: {{ m.rating }}</p>
-
-      <!-- OWNER ONLY -->
-      @if (isOwner()) {
-        @if (m.groupRoleName === 'MEMBER') {
-          <button (click)="onPromote(m.id)">Promote</button>
-        }
-
-        @if (m.groupRoleName === 'MODERATOR') {
-          <button (click)="onDemote(m.id)">Demote</button>
-        }
-      }
-
-      <!-- MODERATOR + OWNER -->
-      @if (canManageMembers()) {
-        <button class="danger" (click)="onRemove(m.id)">Remove</button>
-      }
-    </div>
-  }
-</div>
+@if (!loading()) {
+  <div class="card-grid">
+    @for (m of members(); track trackById($index, m)) {
+      <app-group-member-card
+        [member]="m"
+        [isOwner]="isOwner()"
+        [canManage]="canManageMembers()"
+        (promote)="onPromote($event)"
+        (demote)="onDemote($event)"
+        (remove)="onRemove($event)"
+      />
+    }
+  </div>
+}

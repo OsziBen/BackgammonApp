@@ -25,6 +25,8 @@ export class GroupRequestsComponent implements OnInit {
 
   readonly loading = signal(false);
 
+  readonly error = signal<string | null>(null);
+
   constructor(
     private route: ActivatedRoute,
     private api: GroupsApiService,
