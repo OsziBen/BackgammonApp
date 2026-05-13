@@ -46,6 +46,7 @@ namespace Application.Tournaments.Commands.RemoveTournamentParticipant
             }
 
             participant.Status = Common.Enums.TournamentParticipant.TournamentParticipantStatus.Removed;
+            participant.IsDeleted = true;
             participant.DeletedAt = now;
             participant.LastUpdatedAt = now;
 

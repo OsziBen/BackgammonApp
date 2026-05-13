@@ -1,10 +1,13 @@
 ﻿using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.RulesTemplate;
+using Application.RulesTemplate.Responses;
 using Application.Shared;
 using Application.Shared.Time;
 using Application.Tournaments.Responses;
 using Common.Constants;
 using Common.Enums;
 using Common.Exceptions;
+using Domain.RulesTemplate;
 using Domain.Tournament;
 using MediatR;
 
@@ -14,13 +17,16 @@ namespace Application.Tournaments.Commands.UpdateTournament
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IRulesTemplateReadRepository _rulesTemplateReadRepository;
 
         public UpdateTournamentCommandHandler(
             IUnitOfWork uow,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider,
+            IRulesTemplateReadRepository rulesTemplateReadRepository)
         {
             _uow = uow;
             _dateTimeProvider = dateTimeProvider;
+            _rulesTemplateReadRepository = rulesTemplateReadRepository;
         }
 
         public async Task<TournamentBaseResponse> Handle(UpdateTournamentCommand request, CancellationToken cancellationToken)
@@ -37,19 +43,37 @@ namespace Application.Tournaments.Commands.UpdateTournament
             }
 
             tournament.Name = request.Name.Trim();
-            tournament.Description = request.Description.Trim();
+            tournament.Description = request.Description?.Trim();
             tournament.Type = request.Type;
             tournament.Visibility = request.Visibility;
             tournament.Status = request.Status;
             tournament.MaxParticipants = request.MaxParticipants;
-            tournament.StartDate = request.StartDate;
-            tournament.EndDate = request.EndDate;
-            tournament.Deadline = request.Deadline;
+            tournament.StartDate = request.StartDate.ToUniversalTime();
+            tournament.EndDate = request.EndDate.ToUniversalTime();
+            tournament.Deadline = request.Deadline.ToUniversalTime();
             tournament.RulesTemplateId = request.RulesTemplateId;
 
             tournament.LastUpdatedAt = _dateTimeProvider.UtcNow;
 
             await _uow.CommitAsync(cancellationToken);
+
+            var template = await _rulesTemplateReadRepository
+                .GetByIdAsync(request.RulesTemplateId, cancellationToken)
+                .GetOrThrowAsync(nameof(RulesTemplate), request.RulesTemplateId);
+
+            var templateResponse = new RulesTemplateResponse
+            {
+                Id = template.Id,
+                Name = template.Name,
+                Description = template.Description,
+                AuthorName = template.Author?.UserName ?? "System",
+                TargetScore = template.TargetScore,
+                UseClock = template.UseClock,
+                MatchTimePerPlayerInSeconds = template.MatchTimePerPlayerInSeconds,
+                StartOfTurnDelayPerPlayerInSeconds = template.StartOfTurnDelayPerPlayerInSeconds,
+                CrawfordRuleEnabled = template.CrawfordRuleEnabled,
+                CreatedAt = template.CreatedAt,
+            };
 
             return new TournamentBaseResponse
             {
@@ -63,6 +87,7 @@ namespace Application.Tournaments.Commands.UpdateTournament
                 StartDate = tournament.StartDate,
                 EndDate = tournament.EndDate,
                 Deadline = tournament.Deadline,
+                RulesTemplate = templateResponse,
                 OrganizerUserName = tournament.OrganizerUser.UserName,
                 TournamentUserState = TournamentUserStates.Organizer
             };
