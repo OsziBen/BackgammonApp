@@ -20,7 +20,7 @@ namespace Application.Users.Commands.ListUserTournaments
                 .GetAllByUserIdAsync(request.UserId, cancellationToken);
 
             return tournaments
-                .Select(t => TournamentResponseMapper.ToBaseResponse(t, request.UserId))
+                .Select(t => TournamentResponseMapper.ToBaseResponse(t, request.UserId, hasPendingRequest: false))
                 .ToList();
         }
     }

@@ -15,7 +15,8 @@ namespace Application.Users.Commands.ListTournamentJoinRequestsByUserId
 
         public async Task<List<UserTournamentJoinRequestResponse>> Handle(ListTournamentJoinRequestsByUserIdCommand request, CancellationToken cancellationToken)
         {
-            var joinRequests = await _tournamentJoinRequestReadRepository.GetAllByUserIdAsync(request.UserId, cancellationToken);
+            var joinRequests = await _tournamentJoinRequestReadRepository
+                .GetAllByUserIdAsync(request.UserId, cancellationToken);
 
             return joinRequests.Select(joinRequest => new UserTournamentJoinRequestResponse
             {
