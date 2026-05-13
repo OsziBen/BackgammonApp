@@ -233,7 +233,7 @@ namespace WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet(TournamentConstants.AllTournamentParticipants)]
+        [HttpGet(TournamentConstants.TournamentParticipants)]
         public async Task<ActionResult<TournamentParticipantsResponse>> ListTournamentParticipantsAsync(
             [FromRoute] Guid tournamentId,
             CancellationToken cancellationToken)
@@ -253,10 +253,10 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost(TournamentConstants.TournamentParticipant)]
+        [HttpPost(TournamentConstants.TournamentParticipants)]
         public async Task<ActionResult> AddTournamentParticipant(
             [FromRoute] Guid tournamentId,
-            [FromRoute] string userName,
+            [FromBody] AddTournamentParticipantRequest request,
             CancellationToken cancellationToken)
         {
             var userId = _currentUser.UserId;
@@ -266,14 +266,18 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             }
 
-            var command = new AddTournamentParticipantCommand(tournamentId, userName, userId);
+            var command = new AddTournamentParticipantCommand(
+                tournamentId,
+                request.UserName,
+                userId
+            );
 
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(response);
         }
 
-        [HttpDelete(TournamentConstants.TournamentParticipant)]
+        [HttpDelete(TournamentConstants.Participant)]
         public async Task<ActionResult> RemoveTournamentParticipantAsync(
             [FromRoute] Guid tournamentId,
             [FromRoute] Guid userId,
