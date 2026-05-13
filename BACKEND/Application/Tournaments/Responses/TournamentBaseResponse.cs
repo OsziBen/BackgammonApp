@@ -1,4 +1,6 @@
-﻿namespace Application.Tournaments.Responses
+﻿using Application.RulesTemplate.Responses;
+
+namespace Application.Tournaments.Responses
 {
     public class TournamentBaseResponse
     {
@@ -13,7 +15,7 @@
         public DateTimeOffset EndDate { get; set; }
         public DateTimeOffset Deadline { get; set; }
         public required string OrganizerUserName { get; set; }
-
+        public required RulesTemplateResponse RulesTemplate { get; set; }
         public string? TournamentUserState { get; set; }
     }
 }
