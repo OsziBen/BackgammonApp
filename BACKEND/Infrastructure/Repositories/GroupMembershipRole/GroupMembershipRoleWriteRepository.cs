@@ -38,11 +38,11 @@ namespace Infrastructure.Repositories.GroupMembershipRole
                     gmr.IsActive)
                 .ToListAsync(cancellationToken);
 
-        public Task<Domain.GroupMembershipRole.GroupMembershipRole?> GetByIdsAsync(Guid groupMembershipId, Guid groupRoleId)
+        public Task<Domain.GroupMembershipRole.GroupMembershipRole?> GetByIdAsync(Guid groupMembershipId, CancellationToken cancellationToken)
             => _context.GroupMembershipRoles
                 .FirstOrDefaultAsync(gmr =>
-                    gmr.GroupMembershipId == groupMembershipId &&
-                    gmr.GroupRoleId == groupRoleId);
+                    gmr.GroupMembershipId == groupMembershipId,
+                cancellationToken);
 
         public Task<bool> IsOwnerAsync(Guid membershipId, CancellationToken cancellationToken)
             => _context.GroupMembershipRoles

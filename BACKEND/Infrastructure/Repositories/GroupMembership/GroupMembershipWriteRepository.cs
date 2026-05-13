@@ -19,6 +19,12 @@ namespace Infrastructure.Repositories.GroupMembership
         public Task<Domain.GroupMembership.GroupMembership?> GetAnyAsync(Guid userId, Guid groupId, CancellationToken cancellationToken)
             => _context.GroupMemberships
                 .Where(x => x.UserId == userId && x.GroupId == groupId)
+                .OrderByDescending(x => x.JoinedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+        public Task<Domain.GroupMembership.GroupMembership?> GetAnyActiveAsync(Guid userId, Guid groupId, CancellationToken cancellationToken)
+            => _context.GroupMemberships
+                .Where(x => x.UserId == userId && x.GroupId == groupId)
                 .OrderByDescending(x => x.IsActive)
                 .ThenByDescending(x => x.JoinedAt)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -34,5 +40,11 @@ namespace Infrastructure.Repositories.GroupMembership
 
         public void Remove(Domain.GroupMembership.GroupMembership groupMembership)
             => _context.GroupMemberships.Remove(groupMembership);
+
+        public Task<List<Domain.GroupMembership.GroupMembership>> GetByGroupIdAsync(Guid groupId, CancellationToken cancellationToken)
+            => _context.GroupMemberships
+                .Include(x => x.GroupRoles)
+                .Where(x => x.GroupId == groupId)
+                .ToListAsync(cancellationToken);
     }
 }
