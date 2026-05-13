@@ -1,5 +1,6 @@
 ﻿using Application.Groups.Helpers;
 using Application.Interfaces.Repository;
+using Application.Interfaces.Repository.Group;
 using Application.Interfaces.Repository.GroupMembership;
 using Application.Interfaces.Repository.GroupRole;
 using Application.Shared;
@@ -7,6 +8,7 @@ using Application.Shared.Time;
 using Common.Enums;
 using Common.Enums.Group;
 using Common.Exceptions;
+using Domain.Group;
 using Domain.GroupJoinRequest;
 using Domain.GroupMembershipRole;
 using Domain.GroupRole;
@@ -14,26 +16,32 @@ using MediatR;
 
 namespace Application.Groups.Commands.ApproveGroupJoinRequest
 {
-    public class ApproveGroupJoinRequestCommandHandler : IRequestHandler<ApproveGroupJoinRequestCommand, Unit>
+    public class ApproveGroupJoinRequestCommandHandler
+        : IRequestHandler<ApproveGroupJoinRequestCommand, Unit>
     {
         private readonly IUnitOfWork _uow;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
         private readonly IGroupRoleReadRepository _groupRoleReadRepository;
+        private readonly IGroupReadRepository _groupReadRepository;
 
         public ApproveGroupJoinRequestCommandHandler(
             IUnitOfWork uow,
             IDateTimeProvider dateTimeProvider,
             IGroupMembershipReadRepository groupMembershipReadRepository,
-            IGroupRoleReadRepository groupRoleReadRepository)
+            IGroupRoleReadRepository groupRoleReadRepository,
+            IGroupReadRepository groupReadRepository)
         {
             _uow = uow;
             _dateTimeProvider = dateTimeProvider;
             _groupMembershipReadRepository = groupMembershipReadRepository;
             _groupRoleReadRepository = groupRoleReadRepository;
+            _groupReadRepository = groupReadRepository;
         }
 
-        public async Task<Unit> Handle(ApproveGroupJoinRequestCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(
+            ApproveGroupJoinRequestCommand request,
+            CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
 
@@ -52,14 +60,28 @@ namespace Application.Groups.Commands.ApproveGroupJoinRequest
             {
                 throw new BusinessRuleException(
                     FunctionCode.GroupMismatch,
-                    "Group IDs are not macthing.");
+                    "Group IDs are not matching.");
             }
 
-            if (await _groupMembershipReadRepository.ExistsAsync(joinRequest.UserId, request.GroupId, cancellationToken))
+            if (await _groupMembershipReadRepository.ExistsAsync(
+                    joinRequest.UserId,
+                    request.GroupId,
+                    cancellationToken))
             {
                 throw new BusinessRuleException(
                     FunctionCode.UserAlreadyActiveMember,
                     "User is already an active member of the group.");
+            }
+
+            var group = await _groupReadRepository
+                .GetByIdAsync(joinRequest.GroupId, cancellationToken)
+                .GetOrThrowAsync(nameof(Group), joinRequest.GroupId);
+
+            if (group.GroupMemberships.Count(gm => gm.IsActive) >= group.MaxMembers)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.GroupReachedMaxMembersLimit,
+                    "Group has reached its limit of members.");
             }
 
             var membership = await MembershipHelper.GetOrCreateMembershipAsync(
@@ -69,18 +91,32 @@ namespace Application.Groups.Commands.ApproveGroupJoinRequest
                 now,
                 cancellationToken);
 
-            var role = await _groupRoleReadRepository
+            membership.IsActive = true;
+            membership.DisabledAt = null;
+
+            var activeRoles = await _uow.GroupMembershipRolesWrite
+                .GetActiveRolesAsync(membership.Id, cancellationToken);
+
+            foreach (var role in activeRoles)
+            {
+                role.IsActive = false;
+                role.RevokedAt = now;
+            }
+
+            var memberRole = await _groupRoleReadRepository
                 .GetBySystemNameAsync(GroupRoleConstants.Member, cancellationToken)
                 .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Member);
 
-            await _uow.GroupMembershipRolesWrite.AddAsync(new GroupMembershipRole
-            {
-                GroupMembershipId = membership.Id,
-                GroupRoleId = role.Id,
-                IsActive = true,
-                AssignedAt = now,
-                GrantedBy = request.UserId
-            }, cancellationToken);
+            await _uow.GroupMembershipRolesWrite.AddAsync(
+                new GroupMembershipRole
+                {
+                    GroupMembershipId = membership.Id,
+                    GroupRoleId = memberRole.Id,
+                    IsActive = true,
+                    AssignedAt = now,
+                    GrantedBy = request.UserId
+                },
+                cancellationToken);
 
             joinRequest.Status = JoinRequestStatus.Approved;
             joinRequest.ReviewedAt = now;

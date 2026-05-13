@@ -42,7 +42,9 @@ namespace Application.Groups.Commands.AddGroupMember
             _userReadRepository = userReadRepository;
         }
 
-        public async Task<Unit> Handle(AddGroupMemberCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(
+            AddGroupMemberCommand request,
+            CancellationToken cancellationToken)
         {
             var now = _dateTimeProvider.UtcNow;
 
@@ -57,22 +59,25 @@ namespace Application.Groups.Commands.AddGroupMember
                     "Direct add is only allowed for private groups.");
             }
 
-            var user = await _userReadRepository
-                .GetByUserNameAsync(request.UserName, cancellationToken)
-                .GetOrThrowAsync(nameof(User), request.UserName);
-
-            if (await _groupMembershipReadRepository.ExistsAsync(user.Id, group.Id, cancellationToken))
-            {
-                throw new BusinessRuleException(
-                    FunctionCode.UserAlreadyActiveMember,
-                    "User already a member.");
-            }
-
-            if (group.GroupMemberships.Count >= group.MaxMembers)
+            if (group.GroupMemberships.Count(gm => gm.IsActive) >= group.MaxMembers)
             {
                 throw new BusinessRuleException(
                     FunctionCode.GroupReachedMaxMembersLimit,
                     "Group has reached its limit of members.");
+            }
+
+            var user = await _userReadRepository
+                .GetByUserNameAsync(request.UserName, cancellationToken)
+                .GetOrThrowAsync(nameof(User), request.UserName);
+
+            var existingMembership = await _uow.GroupMembershipsWrite
+                .GetAnyAsync(user.Id, group.Id, cancellationToken);
+
+            if (existingMembership?.IsActive == true)
+            {
+                throw new BusinessRuleException(
+                    FunctionCode.UserAlreadyActiveMember,
+                    "User already a member.");
             }
 
             var membership = await MembershipHelper.GetOrCreateMembershipAsync(
@@ -82,18 +87,32 @@ namespace Application.Groups.Commands.AddGroupMember
                 now,
                 cancellationToken);
 
-            var role = await _groupRoleReadRepository
-                .GetBySystemNameAsync(GroupRoleConstants.Member, cancellationToken)
-                .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Member.ToString());
+            membership.IsActive = true;
+            membership.DisabledAt = null;
 
-            await _uow.GroupMembershipRolesWrite.AddAsync(new GroupMembershipRole
+            var memberRole = await _groupRoleReadRepository
+                .GetBySystemNameAsync(GroupRoleConstants.Member, cancellationToken)
+                .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Member);
+
+            var activeRoles = await _uow.GroupMembershipRolesWrite
+                .GetActiveRolesAsync(membership.Id, cancellationToken);
+
+            foreach (var role in activeRoles)
             {
-                GroupMembershipId = membership.Id,
-                GroupRoleId = role.Id,
-                IsActive = true,
-                AssignedAt = now,
-                GrantedBy = request.UserId
-            }, cancellationToken);
+                role.IsActive = false;
+                role.RevokedAt = now;
+            }
+
+            await _uow.GroupMembershipRolesWrite.AddAsync(
+                new GroupMembershipRole
+                {
+                    GroupMembershipId = membership.Id,
+                    GroupRoleId = memberRole.Id,
+                    IsActive = true,
+                    AssignedAt = now,
+                    GrantedBy = request.UserId
+                },
+                cancellationToken);
 
             await _uow.CommitAsync(cancellationToken);
 

@@ -31,6 +31,23 @@ namespace Application.Groups.Commands.DeleteGroup
             group.DeletedAt = now;
             group.LastUpdatedAt = now;
 
+            var memberships = await _uow.GroupMembershipsWrite
+                .GetByGroupIdAsync(request.GroupId, cancellationToken);
+
+            foreach (var membership in memberships)
+            {
+                membership.IsActive = false;
+                membership.DisabledAt = now;
+
+                var roles = membership.GroupRoles;
+
+                foreach (var role in roles)
+                {
+                    role.IsActive = false;
+                    role.RevokedAt = now;
+                }
+            }
+
             await _uow.CommitAsync(cancellationToken);
 
             return Unit.Value;

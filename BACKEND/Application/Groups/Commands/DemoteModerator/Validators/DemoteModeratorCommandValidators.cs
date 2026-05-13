@@ -13,6 +13,10 @@ namespace Application.Groups.Commands.DemoteModerator.Validators
             RuleFor(x => x.TargetUserId)
                .NotEmpty()
                .WithMessage("Target User ID is required.");
+
+            RuleFor(x => x.CurrentUserId)
+               .NotEmpty()
+               .WithMessage("Current User ID is required.");
         }
     }
 }
