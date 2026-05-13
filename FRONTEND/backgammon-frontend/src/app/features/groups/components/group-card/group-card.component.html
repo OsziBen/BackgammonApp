@@ -25,11 +25,11 @@
   </div>
 
   <div class="group-actions">
-    @if (group.groupUserState === 'PENDING') {
+    @if (isPending()) {
       <div class="group-info">
         Your request is pending approval from the group moderators.
       </div>
-    } @else if (group.groupUserState === 'NONE') {
+    } @else if (canJoin()) {
       <button class="btn primary" (click)="onJoin()">Join</button>
     } @else {
       <button class="btn secondary" (click)="onView()">View</button>

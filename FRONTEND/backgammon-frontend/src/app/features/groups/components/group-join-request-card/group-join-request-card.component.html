@@ -11,13 +11,13 @@
 
   <div class="body">
     <p>
-      <span class="label"> Requested at: </span>
+      <span class="label">Requested at:</span>
 
       {{ request.createdAt | date: 'yyyy.MM.dd HH:mm' }}
     </p>
   </div>
 
-  @if (canManage) {
+  @if (canManage && isPending()) {
     <div class="actions">
       <button (click)="onApprove()">Approve</button>
 
