@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { TournamentsApiService } from '../../../services/tournaments-api.service';
 import { TournamentBaseResponse } from '../../../models/api/responses/tournament-base.response';
@@ -19,12 +20,16 @@ type TournamentRole = 'Organizer' | 'Participant' | 'None';
 export class TournamentRequestsComponent implements OnInit {
   readonly requests = signal<TournamentJoinRequestResponse[]>([]);
   readonly tournament = signal<TournamentBaseResponse | null>(null);
+
   readonly role = signal<TournamentRole>('None');
+
   readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
 
   constructor(
-    private route: ActivatedRoute,
-    private api: TournamentsApiService,
+    private readonly route: ActivatedRoute,
+    private readonly api: TournamentsApiService,
+    private readonly toastr: ToastrService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -32,9 +37,13 @@ export class TournamentRequestsComponent implements OnInit {
       'tournament'
     ] as TournamentBaseResponse;
 
-    if (!tournament) return;
+    if (!tournament) {
+      this.error.set('Tournament not found');
+      return;
+    }
 
     this.tournament.set(tournament);
+
     this.role.set(this.mapRole(tournament.tournamentUserState));
 
     await this.loadRequests(tournament.id);
@@ -42,13 +51,20 @@ export class TournamentRequestsComponent implements OnInit {
 
   private async loadRequests(tournamentId: string): Promise<void> {
     this.loading.set(true);
+    this.error.set(null);
 
     try {
-      const res = await firstValueFrom(
+      const result = await firstValueFrom(
         this.api.getTournamentJoinRequests(tournamentId),
       );
 
-      this.requests.set(res);
+      this.requests.set(result);
+    } catch (err) {
+      console.error(err);
+
+      this.error.set('Could not load join requests');
+
+      this.toastr.error('Could not load join requests', 'Error');
     } finally {
       this.loading.set(false);
     }
@@ -58,44 +74,54 @@ export class TournamentRequestsComponent implements OnInit {
     switch (state) {
       case 'ORGANIZER':
         return 'Organizer';
+
       case 'PARTICIPANT':
         return 'Participant';
+
       default:
         return 'None';
     }
   }
 
-  // =========================
-  // PERMISSIONS
-  // =========================
+  canManageRequests(): boolean {
+    return this.role() === 'Organizer';
+  }
 
-  canManageRequests = () => this.role() === 'Organizer';
-
-  // =========================
-  // ACTIONS
-  // =========================
-
-  async onApprove(requestId: string) {
+  async onApprove(requestId: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
 
     if (!tournamentId) return;
 
-    await firstValueFrom(this.api.approveJoinRequest(tournamentId, requestId));
+    try {
+      await firstValueFrom(
+        this.api.approveJoinRequest(tournamentId, requestId),
+      );
 
-    await this.loadRequests(tournamentId);
+      this.toastr.success('Join request approved', 'Success');
+
+      await this.loadRequests(tournamentId);
+    } catch (err) {
+      console.error(err);
+
+      this.toastr.error('Could not approve join request', 'Error');
+    }
   }
 
-  async onReject(requestId: string) {
+  async onReject(requestId: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
 
     if (!tournamentId) return;
 
-    await firstValueFrom(this.api.rejectJoinRequest(tournamentId, requestId));
+    try {
+      await firstValueFrom(this.api.rejectJoinRequest(tournamentId, requestId));
 
-    await this.loadRequests(tournamentId);
-  }
+      this.toastr.success('Join request rejected', 'Success');
 
-  trackById(index: number, item: TournamentJoinRequestResponse): string {
-    return item.id;
+      await this.loadRequests(tournamentId);
+    } catch (err) {
+      console.error(err);
+
+      this.toastr.error('Could not reject join request', 'Error');
+    }
   }
 }

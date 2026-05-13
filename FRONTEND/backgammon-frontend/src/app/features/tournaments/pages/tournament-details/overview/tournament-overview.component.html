@@ -1,13 +1,65 @@
-<h2>Overview</h2>
+<h2 class="section-title">Overview</h2>
 
-<p><strong>Name:</strong> {{ tournament.name }}</p>
-<p><strong>Description:</strong> {{ tournament.description }}</p>
-<p><strong>Organizer:</strong> {{ tournament.organizerUserName }}</p>
-<p><strong>Type:</strong> {{ tournament.type }}</p>
-<p><strong>Visibility:</strong> {{ tournament.visibility }}</p>
-<p><strong>Status:</strong> {{ tournament.status }}</p>
+<div class="overview-card">
+  <div class="grid">
+    <div class="item">
+      <span class="label">Name</span>
+      <span class="value">{{ tournament.name }}</span>
+    </div>
 
-@if (isOrganizer()) {
-  <button>Edit</button>
-  <button>Delete</button>
-}
+    <div class="item">
+      <span class="label">Organizer</span>
+      <span class="value">{{ tournament.organizerUserName }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Type</span>
+      <span class="value">{{ tournament.type }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Visibility</span>
+      <span class="value">{{ tournament.visibility }}</span>
+    </div>
+
+    <div class="item">
+      <span class="label">Status</span>
+      <span class="value">{{ tournament.status }}</span>
+    </div>
+
+    <div class="item full">
+      <span class="label">Description</span>
+      <span class="value">{{ tournament.description }}</span>
+    </div>
+  </div>
+
+  @if (isOrganizer()) {
+    <div class="actions">
+      <button [routerLink]="['../edit']">Edit</button>
+
+      <button class="danger" (click)="openDeleteConfirm()">Delete</button>
+
+      @if (showDeleteConfirm) {
+        <div class="modal-backdrop">
+          <div class="modal">
+            <h3>Delete tournament?</h3>
+
+            <p>
+              Are you sure you want to delete
+              <strong>{{ tournament.name }}</strong
+              >? This action cannot be undone.
+            </p>
+
+            <div class="modal-actions">
+              <button (click)="closeDeleteConfirm()">Cancel</button>
+
+              <button class="danger" (click)="confirmDelete()">
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

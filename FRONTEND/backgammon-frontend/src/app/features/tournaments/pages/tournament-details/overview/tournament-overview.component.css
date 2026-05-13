@@ -1,44 +1,49 @@
 .section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #335533;
+  margin-bottom: 18px;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #222;
 }
 
 /* ======================
    CARD
    ====================== */
 .overview-card {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #e6e6e6;
-  background: #fafafa;
+  padding: 16px;
 
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+
+  background: #fafafa;
 }
 
 /* ======================
-   GRID LAYOUT
+   GRID
    ====================== */
 .grid {
   display: grid;
+
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
+
+  gap: 12px 20px;
 }
 
 .item {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  align-items: flex-start;
 
-  font-size: 13px;
-  color: #444;
+  gap: 10px;
+
+  font-size: 14px;
 }
 
 .item.full {
   grid-column: 1 / -1;
+
+  flex-direction: column;
 }
 
 /* ======================
@@ -47,37 +52,145 @@
 .label {
   font-weight: 600;
   color: #333;
-  min-width: 80px;
+
+  min-width: 90px;
 }
 
 .value {
   color: #555;
+
   text-align: right;
 
   overflow-wrap: anywhere;
+}
+
+.item.full .value {
+  text-align: left;
+}
+
+/* ======================
+   STATES
+   ====================== */
+.info-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.error-box {
+  margin-bottom: 16px;
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  background: #ffe6e6;
+  color: #b42323;
 }
 
 /* ======================
    ACTIONS
    ====================== */
 .actions {
-  margin-top: 10px;
+  margin-top: 20px;
+
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* ======================
+   BUTTONS
+   ====================== */
 button {
-  padding: 7px 10px;
+  padding: 10px 16px;
+
+  border: 1px solid transparent;
   border-radius: 8px;
-  border: none;
-  cursor: pointer;
 
   background: #335533;
   color: white;
 
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease,
+    opacity 0.15s ease;
 }
 
+button:hover {
+  background: #2c492c;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ======================
+   DANGER BUTTON
+   ====================== */
 button.danger {
-  background: #e53935;
+  background: #d64545;
+}
+
+button.danger:hover {
+  background: #bf3838;
+}
+
+/* ======================
+   RESPONSIVE
+   ====================== */
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .value {
+    text-align: left;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+
+  width: 360px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
 }

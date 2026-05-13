@@ -49,16 +49,11 @@ export class TournamentsAllComponent implements OnInit {
 
   async onJoin(tournamentId: string): Promise<void> {
     try {
-      //await firstValueFrom(this.api.joinTournament(tournamentId));
+      await firstValueFrom(this.api.joinTournament(tournamentId));
 
       this.toastr.success('Joined tournament', 'Success');
 
-      // ha nincs canJoin meződ, akkor status-t frissítünk
-      this.tournaments.update((tournaments) =>
-        tournaments.map((t) =>
-          t.id === tournamentId ? { ...t, status: 'RegistrationClosed' } : t,
-        ),
-      );
+      await this.loadTournaments();
     } catch {
       this.toastr.error('Could not join tournament', 'Error');
     }
