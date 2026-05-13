@@ -30,4 +30,8 @@ export class TournamentJoinRequestCardComponent {
   onReject(): void {
     this.reject.emit(this.request.id);
   }
+
+  isPending(): boolean {
+    return this.request.status === 'Pending';
+  }
 }

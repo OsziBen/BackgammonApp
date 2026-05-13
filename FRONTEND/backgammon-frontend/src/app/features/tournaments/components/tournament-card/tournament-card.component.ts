@@ -26,8 +26,29 @@ export class TournamentCardComponent {
     this.router.navigate([AppRoutes.tournaments, this.tournament.id]);
   }
 
-  // opcionális: státusz alapú logika
   canJoin(): boolean {
-    return this.tournament.status === 'Open';
+    return (
+      this.tournament.status === 'RegistrationOpen' &&
+      this.tournament.tournamentUserState === 'NONE'
+    );
+  }
+
+  canView(): boolean {
+    return (
+      this.tournament.tournamentUserState === 'PARTICIPANT' ||
+      this.tournament.tournamentUserState === 'ORGANIZER'
+    );
+  }
+
+  isOrganizer(): boolean {
+    return this.tournament.tournamentUserState === 'ORGANIZER';
+  }
+
+  isParticipant(): boolean {
+    return this.tournament.tournamentUserState === 'PARTICIPANT';
+  }
+
+  isPending(): boolean {
+    return this.tournament.tournamentUserState === 'PENDING';
   }
 }

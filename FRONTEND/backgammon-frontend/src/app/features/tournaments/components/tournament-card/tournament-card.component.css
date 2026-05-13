@@ -34,6 +34,28 @@
 }
 
 /* ======================
+   HEADER BADGES
+   ====================== */
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.owner-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+
+  background: #335533;
+  color: white;
+
+  white-space: nowrap;
+}
+
+/* ======================
    STATUS BADGE
    ====================== */
 .status {
@@ -128,4 +150,17 @@ button.primary {
 
 button.primary:hover {
   background: #2a442a;
+}
+
+.info-box {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+
+  padding: 8px 10px;
+  border-radius: 8px;
+
+  background: #fff8e1;
+  color: #7a5c00;
+  border: 1px solid #f2d58a;
 }

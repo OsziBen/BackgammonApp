@@ -1,0 +1,38 @@
+<div class="card">
+  <div class="header">
+    <div class="user-info">
+      <h3>{{ participant.displayName }}</h3>
+
+      <span class="status">
+        {{ participant.status }}
+      </span>
+    </div>
+  </div>
+
+  <div class="body">
+    @if (participant.email) {
+      <p>
+        <span class="label">Email:</span>
+        {{ participant.email }}
+      </p>
+    }
+
+    <p>
+      <span class="label">Joined:</span>
+      {{ participant.createdAt | date: 'yyyy.MM.dd HH:mm' }}
+    </p>
+
+    @if (participant.notes) {
+      <p>
+        <span class="label">Notes:</span>
+        {{ participant.notes }}
+      </p>
+    }
+  </div>
+
+  @if (canManage) {
+    <div class="actions">
+      <button class="danger" (click)="onRemove()">Remove</button>
+    </div>
+  }
+</div>

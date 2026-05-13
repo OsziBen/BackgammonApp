@@ -1,0 +1,71 @@
+.add-user {
+  display: flex;
+  gap: 10px;
+
+  align-items: center;
+
+  padding: 14px;
+
+  background: #fff;
+
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+
+  margin-bottom: 18px;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+/* ======================
+   INPUT
+   ====================== */
+.add-user input {
+  flex: 1;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: 0.15s ease;
+}
+
+.add-user input:focus {
+  border-color: #335533;
+  box-shadow: 0 0 0 3px rgba(51, 85, 51, 0.15);
+}
+
+/* ======================
+   BUTTON
+   ====================== */
+.add-user button {
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #335533;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.15s ease;
+
+  white-space: nowrap;
+}
+
+.add-user button:hover {
+  background: #2a442a;
+}
+
+.add-user button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

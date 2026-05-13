@@ -1,7 +1,14 @@
 <div class="card">
   <div class="card-header">
     <h3 class="title">{{ tournament.name }}</h3>
-    <span class="status">{{ tournament.status }}</span>
+
+    <div class="header-badges">
+      @if (isOrganizer()) {
+        <span class="owner-badge">Your tournament</span>
+      }
+
+      <span class="status">{{ tournament.status }}</span>
+    </div>
   </div>
 
   <p class="description">{{ tournament.description }}</p>
@@ -52,14 +59,13 @@
   </div>
 
   <div class="actions">
-    @if (canJoin()) {
+    @if (isPending()) {
+      <div class="info-box">
+        Your request is pending approval from the tournament organizer.
+      </div>
+    } @else if (canJoin()) {
       <button class="primary" (click)="onJoin()">Join</button>
-    } @else {
-      <button (click)="onView()">View</button>
-    }
-    @if (!canJoin()) {
-      <button class="primary" (click)="onJoin()">Join</button>
-    } @else {
+    } @else if (canView()) {
       <button (click)="onView()">View</button>
     }
   </div>
