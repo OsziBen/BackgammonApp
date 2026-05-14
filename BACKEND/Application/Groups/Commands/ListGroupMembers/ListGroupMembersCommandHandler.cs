@@ -1,8 +1,10 @@
 ﻿using Application.Groups.Responses;
 using Application.Interfaces.Repository.Group;
 using Application.Interfaces.Repository.GroupMembership;
+using Application.Interfaces.Repository.GroupRole;
 using Application.Shared;
 using Application.Users.Responses;
+using Domain.GroupRole;
 using MediatR;
 using System.Text.RegularExpressions;
 
@@ -12,13 +14,16 @@ namespace Application.Groups.Commands.ListGroupMembers
     {
         private readonly IGroupReadRepository _groupReadRepository;
         private readonly IGroupMembershipReadRepository _groupMembershipReadRepository;
+        private readonly IGroupRoleReadRepository _groupRoleReadRepository;
 
         public ListGroupMembersCommandHandler(
             IGroupReadRepository groupReadRepository,
-            IGroupMembershipReadRepository groupMembershipReadRepository)
+            IGroupMembershipReadRepository groupMembershipReadRepository,
+            IGroupRoleReadRepository groupRoleReadRepository)
         {
             _groupReadRepository = groupReadRepository;
             _groupMembershipReadRepository = groupMembershipReadRepository;
+            _groupRoleReadRepository = groupRoleReadRepository;
         }
 
         public async Task<GroupMembersResponse> Handle(ListGroupMembersCommand request, CancellationToken cancellationToken)
@@ -52,11 +57,17 @@ namespace Application.Groups.Commands.ListGroupMembers
                 });
             }
 
+            var moderatorRole = await _groupRoleReadRepository
+                .GetBySystemNameAsync(GroupRoleConstants.Moderator, cancellationToken)
+                .GetOrThrowAsync(nameof(GroupRole), GroupRoleConstants.Moderator);
+
             return new GroupMembersResponse
             {
                 Members = members,
                 MaxModeratorNumber = group.MaxModerators,
-                CurrentModeratorNumber = members.Select(m => m.GroupRoleName == "Moderator").Count()
+                CurrentModeratorNumber = members.Where(m => m.GroupRoleName == moderatorRole.Name).Count(),
+                MaxMemeberNumber = group.MaxMembers,
+                CurrentMemberNumber = memberships.Count,
             };
         }
     }

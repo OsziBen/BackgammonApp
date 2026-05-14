@@ -19,6 +19,7 @@ namespace Infrastructure.Repositories.GameSession
         public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.GameSessions
                 .Include(gs => gs.Players)
+                    .ThenInclude(p => p.User)
                 .FirstOrDefaultAsync(gs => gs.Id == id, cancellationToken);
 
         public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken, bool includePlayers = false)
@@ -27,7 +28,8 @@ namespace Infrastructure.Repositories.GameSession
 
             if (includePlayers)
             {
-                query = query.Include(gs => gs.Players);
+                query = query.Include(gs => gs.Players)
+                            .ThenInclude(p => p.User);
             }
 
             return query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);

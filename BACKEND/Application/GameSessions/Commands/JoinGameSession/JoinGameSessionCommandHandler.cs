@@ -69,9 +69,13 @@ namespace Application.GameSessions.Commands.JoinGameSession
 
             var eventType = joinResult.IsRejoin ? SessionEventType.PlayerReconnected : SessionEventType.PlayerJoined;
 
-            await _gameSessionBroadcaster.BroadcastAsync(session, eventType, isRejoin: joinResult.IsRejoin);
+            var freshSession = await _gameSessionReadRepository
+                .GetByIdWithPlayersAndUsersAsync(session.Id, cancellationToken)
+                .GetOrThrowAsync(nameof(GameSession), session.Id);
 
-            await _mediator.Send(new TryStartGameSessionCommand(session.Id), cancellationToken);
+            await _gameSessionBroadcaster.BroadcastAsync(freshSession, eventType, isRejoin: joinResult.IsRejoin);
+
+            await _mediator.Send(new TryStartGameSessionCommand(freshSession.Id), cancellationToken);
 
             return joinResult;
         }

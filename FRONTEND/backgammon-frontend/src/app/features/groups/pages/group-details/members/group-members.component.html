@@ -1,5 +1,13 @@
 <h3 class="section-title">Members</h3>
 
+@if (!loading() && membersResponse()) {
+  <p class="info-text">
+    Moderators: {{ currentModerators() }} / {{ maxModerators() }}
+  </p>
+
+  <p class="info-text">Members: {{ currentMembers() }} / {{ maxMembers() }}</p>
+}
+
 <app-group-members-add [canAdd]="canAddMembers()" (add)="onAddMember($event)">
 </app-group-members-add>
 

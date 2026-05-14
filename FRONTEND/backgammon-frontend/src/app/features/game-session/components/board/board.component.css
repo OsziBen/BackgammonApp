@@ -76,13 +76,16 @@ app-bar {
   align-items: flex-end; /* lefelé mutató háromszögek alján */
 }
 
-/* Off point container */
+/* ======================
+   Off Point
+   ====================== */
+
 .off-point {
   flex: 0 0 50px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #554422; /* barna, dobozszerű */
+  background-color: #554422;
   padding: 4px;
   box-sizing: border-box;
   cursor: pointer;
@@ -92,28 +95,94 @@ app-bar {
   filter: drop-shadow(0 0 6px lightgreen);
 }
 
-/* Off sections (felső/fekete és alsó/fehér) */
+/* Felső és alsó szekció */
 .off-point .off-section {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  border-bottom: 1px solid #2c2c2c; /* opcionális elválasztó vonal */
-  justify-content: flex-start;
   height: 50%;
+  box-sizing: border-box;
 }
 
-/* Felső fekete off */
+/* Fekete fent */
 .off-point .off-section.top {
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 6px;
 }
 
-/* Alsó fehér off */
+/* Fehér lent */
 .off-point .off-section.bottom {
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 6px;
 }
 
-/* Halványabb korongok */
-.off-checker {
-  opacity: 0.5;
-  pointer-events: none; /* ne lehessen onnan elmozdítani */
+/* Counter badge */
+.off-counter {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  font-size: 14px;
+
+  pointer-events: none;
+
+  border: 2px solid #222;
+  box-sizing: border-box;
+}
+
+/* Fekete counter */
+.off-counter.black {
+  background-color: #222;
+  color: white;
+}
+
+/* Fehér counter */
+.off-counter.white {
+  background-color: #eee;
+  color: black;
+}
+
+/* ======================
+   Disabled Overlay
+   ====================== */
+
+.board {
+  position: relative;
+}
+
+.board-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 100;
+
+  backdrop-filter: blur(2px);
+}
+
+.overlay-content {
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+
+  padding: 16px 24px;
+
+  border-radius: 12px;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  border: 2px solid rgba(255, 255, 255, 0.2);
+
+  letter-spacing: 1px;
 }

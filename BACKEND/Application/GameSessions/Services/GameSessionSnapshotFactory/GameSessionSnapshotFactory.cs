@@ -31,6 +31,7 @@ namespace Application.GameSessions.Services.GameSessionSnapshotFactory
                 {
                     PlayerId = p.Id,
                     UserId = p.UserId,
+                    UserName = p.User.UserName,
                     IsHost = p.IsHost,
                     Color = p.Color,
                     IsConnected = p.IsConnected,

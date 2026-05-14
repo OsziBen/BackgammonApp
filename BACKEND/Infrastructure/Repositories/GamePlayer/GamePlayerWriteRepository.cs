@@ -19,10 +19,12 @@ namespace Infrastructure.Repositories.GamePlayer
         public Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             => _context.GamePlayers
                 .Include(gp => gp.GameSession)
+                .Include(gp => gp.User)
                 .FirstOrDefaultAsync(gp => gp.Id == id, cancellationToken);
 
         public Task<Domain.GamePlayer.GamePlayer?> GetBySessionAndUserAsync(Guid sessionId, Guid userId)
             => _context.GamePlayers
+                .Include(gp => gp.User)
                 .FirstOrDefaultAsync(gp =>
                     gp.GameSessionId == sessionId &&
                     gp.UserId == userId);

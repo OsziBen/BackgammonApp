@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+
 import { TournamentsApiService } from '../../../services/tournaments-api.service';
+
 import { TournamentBaseResponse } from '../../../models/api/responses/tournament-base.response';
 import { TournamentParticipantBaseResponse } from '../../../models/api/responses/tournament-participant-base.response';
+import { TournamentParticipantsResponse } from '../../../models/api/responses/tournament-participants.response';
+
 import { TournamentParticipantsAddComponent } from '../../../components/tournament-participants-add/tournament-participants-add.component';
 import { TournamentParticipantCardComponent } from '../../../components/tournament-participant-card/tournament-participant-card.component';
 
@@ -22,7 +26,14 @@ type TournamentRole = 'Organizer' | 'Participant' | 'None';
   styleUrls: ['./tournament-participants.component.css'],
 })
 export class TournamentParticipantsComponent implements OnInit {
-  readonly participants = signal<TournamentParticipantBaseResponse[]>([]);
+  readonly participantsResponse = signal<TournamentParticipantsResponse | null>(
+    null,
+  );
+
+  readonly participants = computed<TournamentParticipantBaseResponse[]>(
+    () => this.participantsResponse()?.participants ?? [],
+  );
+
   readonly tournament = signal<TournamentBaseResponse | null>(null);
 
   readonly role = signal<TournamentRole>('None');
@@ -42,7 +53,6 @@ export class TournamentParticipantsComponent implements OnInit {
     if (!tournament) return;
 
     this.tournament.set(tournament);
-
     this.role.set(this.mapRole(tournament.tournamentUserState));
 
     await this.loadParticipants(tournament.id);
@@ -56,11 +66,19 @@ export class TournamentParticipantsComponent implements OnInit {
         this.api.getTournamentParticipants(tournamentId),
       );
 
-      this.participants.set(result.participants);
+      this.participantsResponse.set(result);
     } finally {
       this.loading.set(false);
     }
   }
+
+  readonly currentParticipants = computed(
+    () => this.participantsResponse()?.currentParticipantsNumber ?? 0,
+  );
+
+  readonly maxParticipants = computed(
+    () => this.participantsResponse()?.maxParticipantsNumber ?? 0,
+  );
 
   private mapRole(state: string | null): TournamentRole {
     switch (state) {
@@ -78,7 +96,6 @@ export class TournamentParticipantsComponent implements OnInit {
   // =========================
   // PERMISSIONS
   // =========================
-
   isOrganizer(): boolean {
     return this.role() === 'Organizer';
   }
@@ -94,10 +111,8 @@ export class TournamentParticipantsComponent implements OnInit {
   // =========================
   // ACTIONS
   // =========================
-
   async onAddParticipant(username: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
-
     if (!tournamentId) return;
 
     await firstValueFrom(
@@ -109,7 +124,6 @@ export class TournamentParticipantsComponent implements OnInit {
 
   async onRemove(userId: string): Promise<void> {
     const tournamentId = this.tournament()?.id;
-
     if (!tournamentId) return;
 
     await firstValueFrom(

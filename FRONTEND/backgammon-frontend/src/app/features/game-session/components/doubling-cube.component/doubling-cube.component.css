@@ -1,35 +1,51 @@
 :host {
   display: flex;
-  align-items: stretch; /* kitölti a parent magasságát */
-  height: 100%; /* a board-wrapper flexének megfelelő magasság */
+  align-items: stretch;
+  height: 100%;
 }
 
 .doubling-cube {
   display: flex;
   flex-direction: column;
+
   width: 50px;
-  height: 100%; /* a board negyed magasságához igazítva a parentben */
-  border: 1px solid #ccc;
+  height: 100%;
+
+  border: 2px solid #444;
   border-radius: 6px;
-  background: #f8f8f8;
+
+  background: #f2e6c9;
+
   text-align: center;
+
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+
   user-select: none;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+  overflow: hidden;
 }
 
 .segment {
   flex: 1;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
   transition:
     background 0.2s,
     color 0.2s;
 }
 
 .segment.middle {
-  background: #e0e0e0;
+  background: #cfcfcf;
+  color: #111;
 }
 
 .segment.top.highlight {
@@ -43,5 +59,5 @@
 }
 
 .doubling-cube.disabled {
-  opacity: 0.3;
+  filter: grayscale(0.3);
 }

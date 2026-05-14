@@ -314,4 +314,43 @@ export class GameBoardComponent {
       return;
     }
   }
+
+  getCurrentPlayerLabel(): string {
+    const snapshot = this.store.snapshot();
+    if (!snapshot || !snapshot.currentPlayerId) return 'Unknown';
+
+    const player = snapshot.players.find(
+      (p) => p.playerId === snapshot.currentPlayerId,
+    );
+
+    if (!player) return 'Unknown';
+
+    return this.formatPlayerLabel(player.userName, player.color);
+  }
+
+  getPlayerLabel(playerId: string | null | undefined): string {
+    const snapshot = this.store.snapshot();
+    if (!snapshot || !playerId) return 'Unknown';
+
+    const player = snapshot.players.find((p) => p.playerId === playerId);
+
+    if (!player) return 'Unknown';
+
+    return this.formatPlayerLabel(player.userName, player.color);
+  }
+
+  private formatPlayerLabel(userName: string, color: PlayerColor): string {
+    return `${userName} (${this.getColorLabel(color)})`;
+  }
+
+  getColorLabel(color: PlayerColor): string {
+    switch (color) {
+      case PlayerColor.White:
+        return 'White';
+      case PlayerColor.Black:
+        return 'Black';
+      default:
+        return 'Unknown';
+    }
+  }
 }

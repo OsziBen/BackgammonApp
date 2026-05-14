@@ -20,6 +20,7 @@ namespace Infrastructure.Repositories.GameSession
         public Task<Domain.GameSession.GameSession?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken)
             => Query()
                 .Include(gs => gs.Players)
+                    .ThenInclude(gp => gp.User)
                 .FirstOrDefaultAsync(gs =>
                     !gs.IsDeleted &&
                     !gs.IsFinished &&
@@ -28,7 +29,14 @@ namespace Infrastructure.Repositories.GameSession
         public Task<Domain.GameSession.GameSession?> GetByIdAsync(Guid id)
             => Query()
                 .Include(gs => gs.Players)
+                    .ThenInclude(gp => gp.User)
                 .FirstOrDefaultAsync(gs => gs.Id == id);
+
+        public Task<Domain.GameSession.GameSession?> GetByIdWithPlayersAndUsersAsync(Guid sessionId, CancellationToken cancellationToken)
+            => Query()
+                .Include(s => s.Players)
+                    .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
 
         public Task<Domain.GameSession.GameSession?> GetBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken, bool includePlayers = false)
         {
@@ -36,7 +44,8 @@ namespace Infrastructure.Repositories.GameSession
 
             if (includePlayers)
             {
-                query = query.Include(gs => gs.Players);
+                query = query.Include(gs => gs.Players)
+                        .ThenInclude(gp => gp.User);
             }
 
             return query.FirstOrDefaultAsync(gs => gs.SessionCode == sessionCode, cancellationToken);
