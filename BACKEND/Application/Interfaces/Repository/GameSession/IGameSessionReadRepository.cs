@@ -7,5 +7,6 @@
         Task<bool> HasActiveSession(Guid playerId, CancellationToken cancellationToken);
         Task<Domain.GameSession.GameSession?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken);
         Task<bool> ExistsBySessionCodeAsync(string sessionCode, CancellationToken cancellationToken);
+        Task<Domain.GameSession.GameSession?> GetByIdWithPlayersAndUsersAsync(Guid sessionId, CancellationToken cancellationToken);
     }
 }

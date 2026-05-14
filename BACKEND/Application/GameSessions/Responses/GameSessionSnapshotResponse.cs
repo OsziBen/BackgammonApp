@@ -39,6 +39,7 @@ namespace Application.GameSessions.Responses
     {
         public Guid PlayerId { get; set; }
         public Guid UserId { get; set; }
+        public required string UserName { get; set; }
         public bool IsHost { get; set; }
         public PlayerColor Color { get; set; }
         public bool IsConnected { get; set; }

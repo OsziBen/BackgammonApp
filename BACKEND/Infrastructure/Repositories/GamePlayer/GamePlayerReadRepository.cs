@@ -17,6 +17,7 @@ namespace Infrastructure.Repositories.GamePlayer
             Guid sessionId,
             Guid userId)
             => Query()
+                .Include(gp => gp.User)
                 .FirstOrDefaultAsync(gp =>
                     gp.GameSessionId == sessionId &&
                     gp.UserId == userId);
@@ -26,6 +27,7 @@ namespace Infrastructure.Repositories.GamePlayer
             Guid excludePlayerId,
             CancellationToken cancellationToken)
             => Query()
+                .Include(gp => gp.User)
                 .FirstOrDefaultAsync(gp =>
                     gp.GameSessionId == sessionId &&
                     gp.UserId != excludePlayerId,
@@ -34,6 +36,7 @@ namespace Infrastructure.Repositories.GamePlayer
         public async Task<IReadOnlyList<Domain.GamePlayer.GamePlayer>> GetPlayersBySessionAsync(
             Guid sessionId)
             => await Query()
+                .Include(gp => gp.User)
                 .Where(gp => gp.GameSessionId == sessionId)
                 .ToListAsync();
 
@@ -43,6 +46,7 @@ namespace Infrastructure.Repositories.GamePlayer
             CancellationToken cancellationToken)
         {
             return await Query()
+                .Include(gp => gp.User)
                 .Where(gp =>
                     !gp.IsConnected &&
                     gp.LastConnectedAt != null &&
@@ -53,6 +57,7 @@ namespace Infrastructure.Repositories.GamePlayer
 
         public  Task<Domain.GamePlayer.GamePlayer?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
             =>  Query()
+                .Include(gp => gp.User)
                 .FirstOrDefaultAsync(gp => gp.Id == id, cancellationToken);
     }
 }
