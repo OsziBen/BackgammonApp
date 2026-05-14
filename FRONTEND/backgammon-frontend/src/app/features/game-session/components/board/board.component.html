@@ -82,24 +82,21 @@
   >
     <!-- Fekete off -->
     <div class="off-section top">
-      <ng-container *ngFor="let checker of getOffCheckers(PlayerColor.Black)">
-        <div class="checker black off-checker">
-          <span *ngIf="checker.count" class="count-text">{{
-            checker.count
-          }}</span>
-        </div>
-      </ng-container>
+      <div *ngIf="board.off[PlayerColor.White] > 0" class="off-counter white">
+        {{ board.off[PlayerColor.White] }}
+      </div>
     </div>
 
     <!-- Fehér off -->
     <div class="off-section bottom">
-      <ng-container *ngFor="let checker of getOffCheckers(PlayerColor.White)">
-        <div class="checker white off-checker">
-          <span *ngIf="checker.count" class="count-text">{{
-            checker.count
-          }}</span>
-        </div>
-      </ng-container>
+      <div *ngIf="board.off[PlayerColor.Black] > 0" class="off-counter black">
+        {{ board.off[PlayerColor.Black] }}
+      </div>
     </div>
+  </div>
+
+  <!-- Disabled overlay -->
+  <div *ngIf="!enabled" class="board-overlay">
+    <div class="overlay-content">Opponent's turn</div>
   </div>
 </div>

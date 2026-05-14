@@ -37,7 +37,7 @@ export class GroupsCreateComponent {
       this.toastr.success('Group created successfully', 'Success');
 
       // opcionális: redirect új group oldalra később
-      await this.router.navigate([AppRoutes.groups, AppRoutes.groupsMy]);
+      await this.router.navigate([AppRoutes.groups, response.id]);
     } catch (err) {
       console.error(err);
 

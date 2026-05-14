@@ -58,12 +58,14 @@
   z-index: 1;
 }
 
-:host-context(.quarter.top) .checker-wrapper {
+.point.top .checker-wrapper {
   top: 0;
+  bottom: auto;
 }
 
-:host-context(.quarter.bottom) .checker-wrapper {
+.point:not(.top) .checker-wrapper {
   bottom: 0;
+  top: auto;
 }
 
 /* ========================

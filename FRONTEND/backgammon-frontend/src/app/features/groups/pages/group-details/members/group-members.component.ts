@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -9,6 +9,7 @@ import { BaseGroupResponse } from '../../../models/api/responses/base-group.resp
 import { UserBaseResponse } from '../../../../user/models/api/responses/user-base.response';
 import { GroupMembersAddComponent } from '../../../components/group-members-add/group-members-add.component';
 import { GroupMemberCardComponent } from '../../../components/group-member-card/group-member-card.component';
+import { GroupMembersResponse } from '../../../models/api/responses/group-members.response';
 
 type GroupRole = 'Owner' | 'Moderator' | 'Member' | 'None';
 
@@ -21,7 +22,10 @@ type GroupRole = 'Owner' | 'Moderator' | 'Member' | 'None';
 })
 export class GroupMembersComponent implements OnInit {
   // STATE
-  readonly members = signal<UserBaseResponse[]>([]);
+
+  readonly membersResponse = signal<GroupMembersResponse | null>(null);
+
+  readonly members = computed(() => this.membersResponse()?.members ?? []);
 
   readonly group = signal<BaseGroupResponse | null>(null);
 
@@ -42,7 +46,6 @@ export class GroupMembersComponent implements OnInit {
     if (!group) return;
 
     this.group.set(group);
-
     this.role.set(this.mapRole(group.groupUserState));
 
     await this.loadMembers(group.id);
@@ -54,7 +57,7 @@ export class GroupMembersComponent implements OnInit {
     try {
       const res = await firstValueFrom(this.api.getGroupMembers(groupId));
 
-      this.members.set(res.members);
+      this.membersResponse.set(res);
     } finally {
       this.loading.set(false);
     }
@@ -64,17 +67,30 @@ export class GroupMembersComponent implements OnInit {
     switch (state) {
       case 'OWNER':
         return 'Owner';
-
       case 'MODERATOR':
         return 'Moderator';
-
       case 'MEMBER':
         return 'Member';
-
       default:
         return 'None';
     }
   }
+
+  readonly currentModerators = computed(
+    () => this.membersResponse()?.currentModeratorNumber ?? 0,
+  );
+
+  readonly maxModerators = computed(
+    () => this.membersResponse()?.maxModeratorNumber ?? 0,
+  );
+
+  readonly currentMembers = computed(
+    () => this.membersResponse()?.currentMemberNumber ?? 0,
+  );
+
+  readonly maxMembers = computed(
+    () => this.membersResponse()?.maxMemeberNumber ?? 0,
+  );
 
   // =========================
   // PERMISSIONS
@@ -94,41 +110,33 @@ export class GroupMembersComponent implements OnInit {
 
   async onAddMember(username: string) {
     const groupId = this.group()?.id;
-
     if (!groupId) return;
 
     await firstValueFrom(this.api.addGroupMember(groupId, username));
-
     await this.loadMembers(groupId);
   }
 
   async onPromote(userId: string) {
     const groupId = this.group()?.id;
-
     if (!groupId) return;
 
     await firstValueFrom(this.api.promoteToModerator(groupId, userId));
-
     await this.loadMembers(groupId);
   }
 
   async onDemote(userId: string) {
     const groupId = this.group()?.id;
-
     if (!groupId) return;
 
     await firstValueFrom(this.api.demoteModerator(groupId, userId));
-
     await this.loadMembers(groupId);
   }
 
   async onRemove(userId: string) {
     const groupId = this.group()?.id;
-
     if (!groupId) return;
 
     await firstValueFrom(this.api.removeGroupMember(groupId, userId));
-
     await this.loadMembers(groupId);
   }
 

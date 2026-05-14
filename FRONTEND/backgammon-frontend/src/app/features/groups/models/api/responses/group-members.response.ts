@@ -3,7 +3,11 @@ import { UserBaseResponse } from '../../../../user/models/api/responses/user-bas
 export interface GroupMembersResponse {
   members: UserBaseResponse[];
 
-  maxModeratorNumber?: number | null;
+  maxModeratorNumber: number;
 
   currentModeratorNumber: number;
+
+  maxMemeberNumber: number;
+
+  currentMemberNumber: number;
 }

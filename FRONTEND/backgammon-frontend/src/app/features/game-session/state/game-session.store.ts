@@ -2,6 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import { ConnectionState } from '../models/enums/connection-state.enum';
 import { GameSessionSnapshotResponse } from '../models/api/game-session-snapshot-response.model';
 import { GamePhase } from '../models/enums/game-phase.enum';
+import { PlayerColor } from '../models/enums/player-color.enum';
 
 interface InternalState {
   snapshot: GameSessionSnapshotResponse | null;
@@ -91,6 +92,16 @@ export class GameSessionStore {
     const player = this.localPlayer();
 
     return player?.isHost ?? false;
+  });
+
+  readonly currentPlayer = computed(() => {
+    const snapshot = this._state().snapshot;
+    if (!snapshot || !snapshot.currentPlayerId) return null;
+
+    return (
+      snapshot.players.find((p) => p.playerId === snapshot.currentPlayerId) ??
+      null
+    );
   });
 
   // STATE UPDATES

@@ -1,5 +1,11 @@
 <h3 class="section-title">Participants</h3>
 
+@if (!loading() && participants().length) {
+  <p class="info-text">
+    Participants: {{ currentParticipants() }} / {{ maxParticipants() }}
+  </p>
+}
+
 <!-- ADD PARTICIPANT -->
 <app-tournament-participants-add
   [canAdd]="canAddParticipants()"

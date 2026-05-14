@@ -4,7 +4,9 @@
     <div class="player-info">
       <span>
         Current player:
-        <strong>{{ board.currentPlayer }}</strong>
+        <strong>
+          {{ getCurrentPlayerLabel() }}
+        </strong>
       </span>
 
       <span *ngIf="ui.isMyTurn()" class="badge"> Your turn </span>
